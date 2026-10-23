@@ -1,0 +1,60 @@
+{
+  "name": "saas-api",
+  "version": "0.1.0",
+  "description": "Production-grade multi-tenant SaaS API with PostgreSQL RLS and strict security",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src/ tests/",
+    "lint:fix": "eslint src/ tests/ --fix",
+    "format": "prettier --write \"src/**/*.{ts,json}\" \"tests/**/*.{ts,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,json}\" \"tests/**/*.{ts,json}\"",
+    "migrate:create": "node-pg-migrate -m migrations create",
+    "migrate:up": "node-pg-migrate -m migrations up",
+    "migrate:down": "node-pg-migrate -m migrations down"
+  },
+  "dependencies": {
+    "argon2": "^0.41.1",
+    "compression": "^1.7.5",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "hpp": "^0.2.3",
+    "ioredis": "^5.4.2",
+    "jsonwebtoken": "^9.0.2",
+    "node-pg-migrate": "^7.9.0",
+    "pg": "^8.13.1",
+    "pino": "^9.6.0",
+    "pino-http": "^10.4.0",
+    "uuidv7": "^1.0.2",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "@types/compression": "^1.7.5",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/hpp": "^0.2.6",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^22.10.7",
+    "@types/pg": "^8.11.10",
+    "@types/supertest": "^6.0.2",
+    "eslint": "^9.18.0",
+    "pino-pretty": "^13.0.0",
+    "prettier": "^3.4.2",
+    "supertest": "^7.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.20.0",
+    "vitest": "^3.0.4"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
