@@ -3,8 +3,8 @@
 > **Purpose:** Central living reference and handoff document. Any developer or AI assistant working in this workspace must read this document first before giving any guidance or suggestions.  
 > **Learner:** PJ Sudhakar  
 > **Workspace Root:** `c:\Users\DMC\Desktop\be`  
-> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 1: Step 10 Complete (Migrations Live)  
-> **Last Updated:** 2026-10-23  
+> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 1: Step 12 Complete (Auth Module Live & Verified)  
+> **Last Updated:** 2026-10-24  
 
 ---
 
@@ -93,18 +93,18 @@ c:\Users\DMC\Desktop\be\
 - [x] **Step 8:** Raw PostgreSQL Database Pool connection (`src/config/database.ts` with Neon SSL, query timing, withTransaction).
 - [x] **Step 9:** Redis client setup (`src/config/redis.ts` with ioredis, retryStrategy, readiness check).
 - [x] **Step 10:** Raw SQL Migrations setup (`node-pg-migrate`) & Migration 001 applied to Neon (`users`, `sessions` with family rotation, `auth_tokens`).
-- [ ] **Step 11:** Crypto Library (`src/lib/crypto.ts`: Argon2id hashing, RS256 JWT sign/verify, SHA-256 token hashing).
-- [ ] **Step 12:** Auth Module (Signup, Login, Token Refresh with Family Reuse Detection, Logout).
-- [ ] **Step 13:** Health check endpoints (`/health` liveness, `/ready` readiness) & Graceful Shutdown.
+- [x] **Step 11:** Crypto Library (`src/lib/crypto.ts`: Argon2id hashing, RS256 JWT sign/verify, SHA-256 token hashing).
+- [x] **Step 12:** Auth Module (Signup, Login, Token Refresh with Family Reuse Detection, Logout).
+- [ ] **Step 13:** Health check endpoints (`/health` liveness, `/ready` readiness) & Graceful Shutdown (Production Hardening).
 - [ ] **Step 14:** Adversarial Auth Testing with Vitest & Supertest.
 
 ---
 
-## 5. Completed Implementation Inventory (Steps 1–10)
+## 5. Completed Implementation Inventory (Steps 1–12)
 
 | File | Purpose / Architectural Standard |
 |---|---|
-| `package.json` | Pinned production & dev dependencies (no ORMs, raw `pg`, `ioredis`, `argon2`, `pino`) |
+| `package.json` | Pinned production & dev dependencies (no ORMs, raw `pg`, `ioredis`, `argon2`, `pino`, `cookie-parser`) |
 | `tsconfig.json` | Strictest compiler checks (`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`) |
 | `tsconfig.build.json` | Production build config excluding `tests/` |
 | `eslint.config.mjs` | ESLint 9 Flat Config enforcing async safety & flagging `console.log` |
@@ -119,17 +119,25 @@ c:\Users\DMC\Desktop\be\
 | `src/middleware/errorHandler.ts` | Centralized RFC 9457 error handler with Zod formatting and 500 stack masking |
 | `src/config/database.ts` | `pg.Pool` connection pool with Neon SSL, `withTransaction`, and query duration logging |
 | `src/config/redis.ts` | `ioredis` client with exponential backoff and `checkRedisHealth` |
-| `src/app.ts` | Express application mounting middleware, `/api/v1/health`, `/api/v1/ready`, and 404 handler |
+| `src/app.ts` | Express application mounting middleware, `/api/v1/auth`, `/api/v1/health`, `/api/v1/ready`, and 404 handler |
 | `src/index.ts` | Server entrypoint listening on port 4000 with SIGTERM graceful shutdown handler |
 | `migrations/001_create-users-and-sessions.up.sql` | Users table (lower email index), Sessions (family-based refresh tokens), Auth tokens |
 | `migrations/001_create-users-and-sessions.down.sql` | Clean migration rollback statements |
+| `src/lib/crypto.ts` | Argon2id password hashing, RS256 asymmetric JWT sign/verify, SHA-256 token hashing, timingSafeCompare |
+| `src/middleware/validate.ts` | Reusable Zod request validator forwarding schema violations to RFC 9457 errorHandler |
+| `src/modules/auth/auth.schemas.ts` | Zod validation schemas and TypeScript DTO contracts (SignupInput, LoginInput, UserResponse, AuthResponse) |
+| `src/modules/auth/user.repository.ts` | Raw SQL user repository with lowercase email index scans (`idx_users_email_lower`) |
+| `src/modules/auth/session.repository.ts` | Raw SQL session repository supporting atomic session rotation and token family revocation |
+| `src/modules/auth/auth.service.ts` | Authentication business logic: Argon2id verification, session rotation, family reuse detection |
+| `src/modules/auth/auth.controller.ts` | HTTP controller managing HttpOnly cookies, request metadata extraction, and response DTOs |
+| `src/modules/auth/auth.routes.ts` | Express router exposing `/signup`, `/login`, `/refresh`, and `/logout` |
 
 ---
 
 ## 6. Next Immediate Action for AI
-* **Current Step:** Guide PJ through **Step 11: Crypto Library (`src/lib/crypto.ts`)**.
+* **Current Step:** Guide PJ through **Step 13: Production Hardening for Health Checks & Graceful Shutdown** and **Step 14: Adversarial Test Suite with Vitest & Supertest**.
 * **Action:**
-  1. Implement `src/lib/crypto.ts` (Argon2id password hashing, RS256 asymmetric JWT sign/verify, SHA-256 token hashing).
-  2. Generate 2048-bit RSA key pair for `.env` (`JWT_ACCESS_PRIVATE_KEY` and `JWT_ACCESS_PUBLIC_KEY`).
-  3. Wait for PJ to verify before starting Step 12 (Auth Module: repositories, services, controllers, routes).
+  1. Review `/health` and `/ready` in `src/app.ts` and enhance graceful shutdown in `src/index.ts` (draining `pg.Pool`, quitting `redis`, closing HTTP server cleanly).
+  2. Implement comprehensive automated test suite in `tests/integration/auth.test.ts` using Vitest and Supertest.
+  3. Complete Milestone 1 and prepare kickoff for Milestone 2 (Multi-Tenancy & Row-Level Security).
 
