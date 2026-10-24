@@ -7,12 +7,17 @@ import { NotFoundError } from "./lib/apiError";
 import { asyncHandler } from "./lib/asyncHandler";
 import { checkDatabaseHealth } from "./config/database";
 import { checkRedisHealth } from "./config/redis";
+import cookieParser from "cookie-parser";
+import { authRouter } from "./modules/auth/auth.routes";
 
 const app = express();
 
 app.use(correlationMiddleware);
 app.use(requestLogger);
 app.use(express.json());
+app.use(cookieParser());
+
+app.use("/api/v1/auth", authRouter);
 
 app.get("/api/v1/health", (_req: Request, res: Response) => {
   logger.info("Health check endpoint was pinged");
