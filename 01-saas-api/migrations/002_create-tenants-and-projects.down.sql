@@ -1,0 +1,5 @@
+
+DROP POLICY IF EXISTS tenant_isolation_policy ON projects;
+DROP TABLE IF EXISTS projects CASCADE;
+DROP TABLE IF EXISTS tenant_members CASCADE;
+DROP TABLE IF EXISTS tenants CASCADE;

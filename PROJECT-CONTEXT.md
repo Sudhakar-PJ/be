@@ -3,8 +3,8 @@
 > **Purpose:** Central living reference and handoff document. Any developer or AI assistant working in this workspace must read this document first before giving any guidance or suggestions.  
 > **Learner:** PJ Sudhakar  
 > **Workspace Root:** `c:\Users\DMC\Desktop\be`  
-> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 1: Step 12 Complete (Auth Module Live & Verified)  
-> **Last Updated:** 2026-10-24  
+> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 2: Multi-Tenancy & Row-Level Security in progress (Migration 002 applied)  
+> **Last Updated:** 2026-10-27  
 
 ---
 
@@ -80,9 +80,9 @@ c:\Users\DMC\Desktop\be\
 ## 4. Current Status & Progress Tracker
 
 ### Current Active Project: **Project #1 (Multi-Tenant SaaS API)**
-**Current Milestone:** **Milestone 1 — Foundation, Environment, Tooling & Auth**
+**Current Milestone:** **Milestone 2 — Multi-Tenancy & Row-Level Security (RLS)**
 
-#### Milestone 1 Checklist:
+#### Milestone 1 Checklist: (100% Complete)
 - [x] **Step 1:** Folder initialization (`01-saas-api`) & `package.json` setup with pinned dependencies.
 - [x] **Step 2:** Strict TypeScript configuration (`tsconfig.json`, `tsconfig.build.json`).
 - [x] **Step 3:** Code quality & formatting configuration (`eslint.config.mjs`, `.prettierrc`, `.editorconfig`).
@@ -95,12 +95,20 @@ c:\Users\DMC\Desktop\be\
 - [x] **Step 10:** Raw SQL Migrations setup (`node-pg-migrate`) & Migration 001 applied to Neon (`users`, `sessions` with family rotation, `auth_tokens`).
 - [x] **Step 11:** Crypto Library (`src/lib/crypto.ts`: Argon2id hashing, RS256 JWT sign/verify, SHA-256 token hashing).
 - [x] **Step 12:** Auth Module (Signup, Login, Token Refresh with Family Reuse Detection, Logout).
-- [ ] **Step 13:** Health check endpoints (`/health` liveness, `/ready` readiness) & Graceful Shutdown (Production Hardening).
-- [ ] **Step 14:** Adversarial Auth Testing with Vitest & Supertest.
+- [x] **Step 13:** Health check endpoints (`/health` liveness, `/ready` readiness) & Graceful Shutdown (Production Hardening).
+- [x] **Step 14:** Adversarial Auth Testing with Vitest & Supertest.
+
+#### Milestone 2 Checklist: (In Progress)
+- [x] **Step 1:** Deep-dive into PostgreSQL Row-Level Security (`ALTER TABLE ... ENABLE ROW LEVEL SECURITY;` + `FORCE ROW LEVEL SECURITY`, `SET LOCAL`).
+- [x] **Step 2:** Write Raw SQL Migration 002: Organizations (`tenants`), Memberships (`tenant_members` with composite PK & RBAC), and Projects (`projects` with RLS).
+- [x] **Step 3:** Scoped Tenant Transaction Runner (`withTenantTransaction` in `src/config/database.ts`).
+- [ ] **Step 4:** Authentication & Tenancy Middleware (`authenticate`, `requireTenant`, `requireRole`).
+- [ ] **Step 5:** Projects Module Implementation (schemas, repository, service, controller, routes).
+- [ ] **Step 6:** Adversarial Integration Tests for Multi-Tenancy & Cross-Tenant Leakage Prevention.
 
 ---
 
-## 5. Completed Implementation Inventory (Steps 1–12)
+## 5. Completed Implementation Inventory
 
 | File | Purpose / Architectural Standard |
 |---|---|
@@ -117,10 +125,10 @@ c:\Users\DMC\Desktop\be\
 | `src/lib/apiError.ts` | RFC 9457 `ProblemDetails` schema, `sendProblemDetails` helper, and typed error classes |
 | `src/lib/asyncHandler.ts` | Async route wrapper catching rejected Promises and eliminating try/catch |
 | `src/middleware/errorHandler.ts` | Centralized RFC 9457 error handler with Zod formatting and 500 stack masking |
-| `src/config/database.ts` | `pg.Pool` connection pool with Neon SSL, `withTransaction`, and query duration logging |
+| `src/config/database.ts` | `pg.Pool` connection pool with Neon SSL, `withTransaction`, `withTenantTransaction` (parameterized `set_config` RLS variable), and query logging |
 | `src/config/redis.ts` | `ioredis` client with exponential backoff and `checkRedisHealth` |
 | `src/app.ts` | Express application mounting middleware, `/api/v1/auth`, `/api/v1/health`, `/api/v1/ready`, and 404 handler |
-| `src/index.ts` | Server entrypoint listening on port 4000 with SIGTERM graceful shutdown handler |
+| `src/index.ts` | Server entrypoint with production-grade SIGTERM/SIGINT graceful shutdown (watchdog timer, pool drain, redis quit) |
 | `migrations/001_create-users-and-sessions.up.sql` | Users table (lower email index), Sessions (family-based refresh tokens), Auth tokens |
 | `migrations/001_create-users-and-sessions.down.sql` | Clean migration rollback statements |
 | `src/lib/crypto.ts` | Argon2id password hashing, RS256 asymmetric JWT sign/verify, SHA-256 token hashing, timingSafeCompare |
@@ -131,13 +139,16 @@ c:\Users\DMC\Desktop\be\
 | `src/modules/auth/auth.service.ts` | Authentication business logic: Argon2id verification, session rotation, family reuse detection |
 | `src/modules/auth/auth.controller.ts` | HTTP controller managing HttpOnly cookies, request metadata extraction, and response DTOs |
 | `src/modules/auth/auth.routes.ts` | Express router exposing `/signup`, `/login`, `/refresh`, and `/logout` |
+| `tests/integration/auth.test.ts` | 12 automated integration tests covering health, auth lifecycle, and adversarial replay attacks |
+| `migrations/002_create-tenants-and-projects.up.sql` | Tenants, Tenant Members (composite PK, RBAC), Projects with RLS policies & `FORCE ROW LEVEL SECURITY` |
+| `migrations/002_create-tenants-and-projects.down.sql` | Clean teardown statements for Milestone 2 schema |
 
 ---
 
 ## 6. Next Immediate Action for AI
-* **Current Step:** Guide PJ through **Step 13: Production Hardening for Health Checks & Graceful Shutdown** and **Step 14: Adversarial Test Suite with Vitest & Supertest**.
+* **Current Step:** **Step 4: Authentication & Tenancy Middleware (`authenticate`, `requireTenant`, `requireRole`)**.
 * **Action:**
-  1. Review `/health` and `/ready` in `src/app.ts` and enhance graceful shutdown in `src/index.ts` (draining `pg.Pool`, quitting `redis`, closing HTTP server cleanly).
-  2. Implement comprehensive automated test suite in `tests/integration/auth.test.ts` using Vitest and Supertest.
-  3. Complete Milestone 1 and prepare kickoff for Milestone 2 (Multi-Tenancy & Row-Level Security).
+  1. Build `authenticate` guard: extracts Bearer JWT from `Authorization` header, verifies RS256 signature, validates `jti` against Redis denylist, and sets `userId` in `AsyncLocalStorage`.
+  2. Build `requireTenant` middleware: extracts `X-Tenant-ID` header, queries `tenant_members` to verify membership & fetch role, and updates `AsyncLocalStorage` context with `tenantId`.
+  3. Build `requireRole` RBAC authorization middleware enforcing hierarchy (`OWNER` > `ADMIN` > `MEMBER` > `VIEWER`).
 

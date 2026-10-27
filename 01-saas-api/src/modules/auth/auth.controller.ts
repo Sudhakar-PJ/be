@@ -100,7 +100,8 @@ export class AuthController {
       await authService.logout(token);
     }
 
-    res.clearCookie(REFRESH_COOKIE_NAME, COOKIE_OPTIONS);
+    const { maxAge: _, ...clearCookieOptions } = COOKIE_OPTIONS;
+    res.clearCookie(REFRESH_COOKIE_NAME, clearCookieOptions);
 
     res.status(200).json({
       status: "success",
