@@ -147,10 +147,7 @@ export class AuthService {
    * Rotates a refresh token and issues a new access token.
    * Detects reuse/replay attacks and executes family-wide revocation.
    */
-  async refresh(
-    rawRefreshToken: string,
-    meta: RequestMetadata = {}
-  ): Promise<TokenRefreshResult> {
+  async refresh(rawRefreshToken: string, meta: RequestMetadata = {}): Promise<TokenRefreshResult> {
     // 1. Compute SHA-256 hash of the presented token
     const tokenHash = hashToken(rawRefreshToken);
 
@@ -164,7 +161,7 @@ export class AuthService {
     if (session.is_revoked) {
       logger.warn(
         { userId: session.user_id, familyId: session.family_id },
-        "🚨 Refresh token reuse detected! Revoking entire session family."
+        "🚨 Refresh token reuse detected! Revoking entire session family.",
       );
 
       // Execute the Nuclear Option: revoke all sessions in this family
@@ -172,7 +169,7 @@ export class AuthService {
 
       throw new UnauthorizedError(
         "Refresh token reuse detected. All sessions in this family have been revoked.",
-        "TOKEN_REUSE_DETECTED"
+        "TOKEN_REUSE_DETECTED",
       );
     }
 

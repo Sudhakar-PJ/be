@@ -8,13 +8,13 @@ import { UnauthorizedError } from "./apiError";
 const ARGON2_OPTIONS: argon2.Options & { type: 2 } = {
   type: argon2.argon2id,
   memoryCost: 65536, // 64 MiB
-  timeCost: 3,       // 3 iterations
-  parallelism: 4,    // 4 parallel threads
-  hashLength: 32,    // 32-byte raw output
+  timeCost: 3, // 3 iterations
+  parallelism: 4, // 4 parallel threads
+  hashLength: 32, // 32-byte raw output
 };
 
 export interface AccessTokenPayload {
-  sub: string;       // User UUID
+  sub: string; // User UUID
   email: string;
   role?: string;
 }
@@ -75,7 +75,6 @@ export function signAccessToken(payload: AccessTokenPayload): string {
   return jwt.sign(payload, privateKey, signOptions);
 }
 
-
 /**
  * Verifies and decodes an RS256 Asymmetric JWT using the public key.
  * Throws UnauthorizedError on expiration, signature tampering, or malformed token.
@@ -86,7 +85,7 @@ export function signAccessToken(payload: AccessTokenPayload): string {
  */
 export function verifyAccessToken(
   token: string,
-  options?: Omit<VerifyOptions, "algorithms">
+  options?: Omit<VerifyOptions, "algorithms">,
 ): DecodedAccessToken {
   const publicKey = normalizeKey(env.JWT_ACCESS_PUBLIC_KEY);
 
@@ -137,7 +136,6 @@ export function generateOpaqueToken(): { rawToken: string; tokenHash: string } {
   const tokenHash = hashToken(rawToken);
   return { rawToken, tokenHash };
 }
-
 
 /**
  * Performs a constant-time comparison of two strings to prevent timing attacks.

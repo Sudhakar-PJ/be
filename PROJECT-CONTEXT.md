@@ -3,8 +3,8 @@
 > **Purpose:** Central living reference and handoff document. Any developer or AI assistant working in this workspace must read this document first before giving any guidance or suggestions.  
 > **Learner:** PJ Sudhakar  
 > **Workspace Root:** `c:\Users\DMC\Desktop\be`  
-> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 2: Multi-Tenancy & Row-Level Security in progress (Migration 002 applied)  
-> **Last Updated:** 2026-10-27  
+> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 2 Complete (Multi-Tenancy & RLS with 16/16 Adversarial Tests Passing)! Ready for Milestone 3.  
+> **Last Updated:** 2026-10-28  
 
 ---
 
@@ -98,13 +98,13 @@ c:\Users\DMC\Desktop\be\
 - [x] **Step 13:** Health check endpoints (`/health` liveness, `/ready` readiness) & Graceful Shutdown (Production Hardening).
 - [x] **Step 14:** Adversarial Auth Testing with Vitest & Supertest.
 
-#### Milestone 2 Checklist: (In Progress)
+#### Milestone 2 Checklist: (100% Complete)
 - [x] **Step 1:** Deep-dive into PostgreSQL Row-Level Security (`ALTER TABLE ... ENABLE ROW LEVEL SECURITY;` + `FORCE ROW LEVEL SECURITY`, `SET LOCAL`).
 - [x] **Step 2:** Write Raw SQL Migration 002: Organizations (`tenants`), Memberships (`tenant_members` with composite PK & RBAC), and Projects (`projects` with RLS).
 - [x] **Step 3:** Scoped Tenant Transaction Runner (`withTenantTransaction` in `src/config/database.ts`).
-- [ ] **Step 4:** Authentication & Tenancy Middleware (`authenticate`, `requireTenant`, `requireRole`).
-- [ ] **Step 5:** Projects Module Implementation (schemas, repository, service, controller, routes).
-- [ ] **Step 6:** Adversarial Integration Tests for Multi-Tenancy & Cross-Tenant Leakage Prevention.
+- [x] **Step 4:** Authentication & Tenancy Middleware (`authenticate`, `requireTenant`, `requireRole`).
+- [x] **Step 5:** Projects Module Implementation (schemas, repository, service, controller, routes).
+- [x] **Step 6:** Adversarial Integration Tests for Multi-Tenancy & Cross-Tenant Leakage Prevention.
 
 ---
 
@@ -142,13 +142,27 @@ c:\Users\DMC\Desktop\be\
 | `tests/integration/auth.test.ts` | 12 automated integration tests covering health, auth lifecycle, and adversarial replay attacks |
 | `migrations/002_create-tenants-and-projects.up.sql` | Tenants, Tenant Members (composite PK, RBAC), Projects with RLS policies & `FORCE ROW LEVEL SECURITY` |
 | `migrations/002_create-tenants-and-projects.down.sql` | Clean teardown statements for Milestone 2 schema |
+| `src/types/express.d.ts` | Express global Request type augmentation (`req.user`, `req.tenant`) |
+| `src/middleware/authenticate.ts` | RS256 Bearer JWT guard extracting `sub` to `req.user` & `AsyncLocalStorage` |
+| `src/middleware/tenant.ts` | Tenancy guard verifying `tenant_members` in Postgres & hierarchical RBAC `requireRole` |
+| `src/modules/projects/project.schema.ts` | Zod validation schemas for project creation, updates, and param checking |
+| `src/modules/projects/project.repository.ts` | Raw SQL project repository using `withTenantTransaction` to enforce Postgres RLS |
+| `src/modules/projects/project.service.ts` | Domain logic enforcing key uniqueness, UUID v7 generation, and RFC 9457 error handling |
+| `src/modules/projects/project.controller.ts` | HTTP controller binding tenant/user context and returning standardized response envelopes |
+| `src/modules/projects/project.routes.ts` | Express router with layered guards (`authenticate` -> `requireTenant` -> `requireRole`) |
+| `tests/integration/tenant-projects.test.ts` | 16 automated adversarial tests verifying tenant isolation, cross-tenant leak prevention, and RBAC hierarchy |
 
 ---
 
 ## 6. Next Immediate Action for AI
-* **Current Step:** **Step 4: Authentication & Tenancy Middleware (`authenticate`, `requireTenant`, `requireRole`)**.
+* **Current Step:** **Milestone 3 — Task Engine, Keyset Pagination, Optimistic Concurrency & Idempotency**.
 * **Action:**
-  1. Build `authenticate` guard: extracts Bearer JWT from `Authorization` header, verifies RS256 signature, validates `jti` against Redis denylist, and sets `userId` in `AsyncLocalStorage`.
-  2. Build `requireTenant` middleware: extracts `X-Tenant-ID` header, queries `tenant_members` to verify membership & fetch role, and updates `AsyncLocalStorage` context with `tenantId`.
-  3. Build `requireRole` RBAC authorization middleware enforcing hierarchy (`OWNER` > `ADMIN` > `MEMBER` > `VIEWER`).
+  1. Design raw SQL migration for `tasks`, `labels`, `task_labels`, and `task_comments` (tenant-scoped with RLS and `version` column for optimistic locking).
+  2. Implement Redis atomic idempotency middleware (`Idempotency-Key` header with SET NX EX) to prevent duplicate POST submissions.
+  3. Implement cursor-based keyset pagination on tasks (O(1) execution plans avoiding `OFFSET` performance cliff).
+  4. Implement PostgreSQL Full-Text Search with `tsvector`, GIN index, and Trigram fuzzy matching.
+
+
+
+
 
