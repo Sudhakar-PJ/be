@@ -14,7 +14,7 @@ export function authenticate(req: Request, _res: Response, next: NextFunction): 
   }
 
   const token = authHeader.slice(7).trim();
-  if (!token) throw new UnauthorizedError("Bearer token is empty", "INVALID TOKEN");
+  if (!token) throw new UnauthorizedError("Bearer token is empty", "INVALID_TOKEN");
 
   const decoded = verifyAccessToken(token);
 
