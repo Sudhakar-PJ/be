@@ -3,8 +3,8 @@
 > **Purpose:** Central living reference and handoff document. Any developer or AI assistant working in this workspace must read this document first before giving any guidance or suggestions.  
 > **Learner:** PJ Sudhakar  
 > **Workspace Root:** `c:\Users\DMC\Desktop\be`  
-> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 2 Complete (Multi-Tenancy & RLS with 16/16 Adversarial Tests Passing)! Ready for Milestone 3.  
-> **Last Updated:** 2026-10-28  
+> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 3 Complete (Task Engine, Keyset Pagination, OCC & Idempotency: 12/12 Tests Passing)! Ready for Milestone 4.  
+> **Last Updated:** 2026-10-30  
 
 ---
 
@@ -106,6 +106,13 @@ c:\Users\DMC\Desktop\be\
 - [x] **Step 5:** Projects Module Implementation (schemas, repository, service, controller, routes).
 - [x] **Step 6:** Adversarial Integration Tests for Multi-Tenancy & Cross-Tenant Leakage Prevention.
 
+#### Milestone 3 Checklist: (100% Complete)
+- [x] **Step 1:** Migration 003: Tasks table, TSVECTOR full-text search, composite B-tree & GIN indexes, RLS policy.
+- [x] **Step 2:** Redis Atomic Idempotency Middleware (`src/middleware/idempotency.ts`).
+- [x] **Step 3:** Keyset / Cursor-Based Pagination Utility (`src/lib/pagination.ts`).
+- [x] **Step 4:** Tasks Feature Module (Zod schemas, repository with keyset pagination & OCC, service, controller, routes).
+- [x] **Step 5:** Adversarial Concurrency & Idempotency Integration Tests.
+
 ---
 
 ## 5. Completed Implementation Inventory
@@ -151,16 +158,26 @@ c:\Users\DMC\Desktop\be\
 | `src/modules/projects/project.controller.ts` | HTTP controller binding tenant/user context and returning standardized response envelopes |
 | `src/modules/projects/project.routes.ts` | Express router with layered guards (`authenticate` -> `requireTenant` -> `requireRole`) |
 | `tests/integration/tenant-projects.test.ts` | 16 automated adversarial tests verifying tenant isolation, cross-tenant leak prevention, and RBAC hierarchy |
+| `migrations/003_create-tasks-and-indexes.up.sql` | Tasks table, generated TSVECTOR for full-text search, composite indexes, and RLS |
+| `migrations/003_create-tasks-and-indexes.down.sql` | Clean rollback statements for tasks table and policy |
+| `src/middleware/idempotency.ts` | Atomic Redis idempotency guard (`SET NX EX`) replaying cached responses |
+| `src/lib/pagination.ts` | Opaque Base64 URL-safe cursor encoder/decoder and `LIMIT + 1` keyset pagination helper |
+| `src/modules/tasks/task.schema.ts` | Zod validation contracts (task creation, OCC version update, keyset filtering) |
+| `src/modules/tasks/task.repository.ts` | Raw SQL task repository with keyset pagination, next number resolution, and OCC updates |
+| `src/modules/tasks/task.service.ts` | Domain logic validating project references, cursor decoding, and OCC conflict handling |
+| `src/modules/tasks/task.controller.ts` | HTTP controller binding tenant/user context and returning paginated/item envelopes |
+| `src/modules/tasks/task.routes.ts` | Express router wiring `authenticate`, `requireTenant`, `requireRole`, and Redis `idempotency` |
+| `tests/integration/tasks.test.ts` | 12 automated adversarial tests covering sequential numbering, keyset cursor pagination, OCC 409 conflict, and Redis idempotency |
 
 ---
 
 ## 6. Next Immediate Action for AI
-* **Current Step:** **Milestone 3 — Task Engine, Keyset Pagination, Optimistic Concurrency & Idempotency**.
+* **Current Step:** **Milestone 4 — Asynchronous Processing & Background Jobs (BullMQ, Worker Process, DLQ & Transactional Emails)**.
 * **Action:**
-  1. Design raw SQL migration for `tasks`, `labels`, `task_labels`, and `task_comments` (tenant-scoped with RLS and `version` column for optimistic locking).
-  2. Implement Redis atomic idempotency middleware (`Idempotency-Key` header with SET NX EX) to prevent duplicate POST submissions.
-  3. Implement cursor-based keyset pagination on tasks (O(1) execution plans avoiding `OFFSET` performance cliff).
-  4. Implement PostgreSQL Full-Text Search with `tsvector`, GIN index, and Trigram fuzzy matching.
+  1. Set up BullMQ queue architecture and dedicated worker process (`src/jobs/`).
+  2. Implement reliable background job dispatching (e.g. task assignment notifications, audit logging).
+  3. Implement retry policies with exponential backoff and jitter.
+  4. Build Dead Letter Queue (DLQ) inspection, alerting, and manual retry mechanics.
 
 
 

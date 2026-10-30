@@ -10,6 +10,7 @@ import { checkRedisHealth } from "./config/redis";
 import cookieParser from "cookie-parser";
 import { authRouter } from "./modules/auth/auth.routes";
 import { projectRouter } from "./modules/projects/project.routes";
+import { taskRouter } from "./modules/tasks/task.routes";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(cookieParser());
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/projects", projectRouter);
+app.use("/api/v1/tasks", taskRouter);
 
 app.get("/api/v1/health", (_req: Request, res: Response) => {
   logger.info("Health check endpoint was pinged");
