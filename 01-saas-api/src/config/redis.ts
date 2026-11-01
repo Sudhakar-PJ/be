@@ -2,9 +2,9 @@ import Redis, { RedisOptions } from "ioredis";
 import { env } from "./env";
 import { logger } from "./logger";
 
-const redisOptions: RedisOptions = {
+export const redisConnectionOptions: RedisOptions = {
   maxRetriesPerRequest: null,
-  enableReadyCheck: true,
+  enableReadyCheck: false, // Recommended false for BullMQ to avoid connection race conditions
   retryStrategy(times: number) {
     const delay = Math.min(times * 100, 3000);
     logger.warn({ attempt: times, delayMs: delay }, "Reconnecting to Redis...");
@@ -12,7 +12,11 @@ const redisOptions: RedisOptions = {
   },
 };
 
-export const redis = new Redis(env.REDIS_URL, redisOptions);
+// Application-level Redis client (used for caching, rate limits, idempotency keys)
+export const redis = new Redis(env.REDIS_URL, {
+  ...redisConnectionOptions,
+  enableReadyCheck: true,
+});
 
 redis.on("connect", () => {
   logger.debug("Redis socket connection initiated");

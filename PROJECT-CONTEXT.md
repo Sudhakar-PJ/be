@@ -2,9 +2,8 @@
 
 > **Purpose:** Central living reference and handoff document. Any developer or AI assistant working in this workspace must read this document first before giving any guidance or suggestions.  
 > **Learner:** PJ Sudhakar  
-> **Workspace Root:** `c:\Users\DMC\Desktop\be`  
-> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 3 Complete (Task Engine, Keyset Pagination, OCC & Idempotency: 12/12 Tests Passing)! Ready for Milestone 4.  
-> **Last Updated:** 2026-10-30  
+> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 4 In Progress (Step 1 Complete: BullMQ installed & Redis connection options configured). Next: Step 2 (Job contracts & Queue manager).  
+> **Last Updated:** 2026-11-01  
 
 ---
 
@@ -80,7 +79,7 @@ c:\Users\DMC\Desktop\be\
 ## 4. Current Status & Progress Tracker
 
 ### Current Active Project: **Project #1 (Multi-Tenant SaaS API)**
-**Current Milestone:** **Milestone 2 — Multi-Tenancy & Row-Level Security (RLS)**
+**Current Milestone:** **Milestone 4 — Asynchronous Processing & Background Jobs**
 
 #### Milestone 1 Checklist: (100% Complete)
 - [x] **Step 1:** Folder initialization (`01-saas-api`) & `package.json` setup with pinned dependencies.
@@ -113,13 +112,21 @@ c:\Users\DMC\Desktop\be\
 - [x] **Step 4:** Tasks Feature Module (Zod schemas, repository with keyset pagination & OCC, service, controller, routes).
 - [x] **Step 5:** Adversarial Concurrency & Idempotency Integration Tests.
 
+#### Milestone 4 Checklist: (In Progress)
+- [x] **Step 1:** Install BullMQ, establish Redis connection options & queue connection factory.
+- [ ] **Step 2:** Define typed job contracts, queues, and Zod payload validation (`src/jobs/`).
+- [ ] **Step 3:** Implement Transactional Email Service abstraction (mock console/logger).
+- [ ] **Step 4:** Implement dedicated background Worker process (`src/workers/index.ts`) with concurrency & graceful shutdown.
+- [ ] **Step 5:** Wire asynchronous job dispatching into Tasks module (task assignment notifications).
+- [ ] **Step 6:** Dead Letter Queue (DLQ) inspection, retry mechanism, and adversarial tests.
+
 ---
 
 ## 5. Completed Implementation Inventory
 
 | File | Purpose / Architectural Standard |
 |---|---|
-| `package.json` | Pinned production & dev dependencies (no ORMs, raw `pg`, `ioredis`, `argon2`, `pino`, `cookie-parser`) |
+| `package.json` | Pinned production & dev dependencies (no ORMs, raw `pg`, `ioredis`, `argon2`, `pino`, `cookie-parser`, `bullmq`) |
 | `tsconfig.json` | Strictest compiler checks (`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`) |
 | `tsconfig.build.json` | Production build config excluding `tests/` |
 | `eslint.config.mjs` | ESLint 9 Flat Config enforcing async safety & flagging `console.log` |
@@ -133,7 +140,7 @@ c:\Users\DMC\Desktop\be\
 | `src/lib/asyncHandler.ts` | Async route wrapper catching rejected Promises and eliminating try/catch |
 | `src/middleware/errorHandler.ts` | Centralized RFC 9457 error handler with Zod formatting and 500 stack masking |
 | `src/config/database.ts` | `pg.Pool` connection pool with Neon SSL, `withTransaction`, `withTenantTransaction` (parameterized `set_config` RLS variable), and query logging |
-| `src/config/redis.ts` | `ioredis` client with exponential backoff and `checkRedisHealth` |
+| `src/config/redis.ts` | `ioredis` client with exponential backoff, exported `redisConnectionOptions` for BullMQ, and `checkRedisHealth` |
 | `src/app.ts` | Express application mounting middleware, `/api/v1/auth`, `/api/v1/health`, `/api/v1/ready`, and 404 handler |
 | `src/index.ts` | Server entrypoint with production-grade SIGTERM/SIGINT graceful shutdown (watchdog timer, pool drain, redis quit) |
 | `migrations/001_create-users-and-sessions.up.sql` | Users table (lower email index), Sessions (family-based refresh tokens), Auth tokens |
@@ -172,12 +179,12 @@ c:\Users\DMC\Desktop\be\
 ---
 
 ## 6. Next Immediate Action for AI
-* **Current Step:** **Milestone 4 — Asynchronous Processing & Background Jobs (BullMQ, Worker Process, DLQ & Transactional Emails)**.
+* **Current Step:** **Milestone 4 — Step 2: Define typed job contracts, queues, and Zod payload validation (`src/jobs/`).**
 * **Action:**
-  1. Set up BullMQ queue architecture and dedicated worker process (`src/jobs/`).
-  2. Implement reliable background job dispatching (e.g. task assignment notifications, audit logging).
-  3. Implement retry policies with exponential backoff and jitter.
-  4. Build Dead Letter Queue (DLQ) inspection, alerting, and manual retry mechanics.
+  1. Define typed queue names and BullMQ job contracts (e.g., `EMAIL_QUEUE`, `TASK_NOTIFICATION_QUEUE`).
+  2. Implement Zod payload schemas for background jobs.
+  3. Set up the queue manager and connection factory for job dispatching.
+  4. Implement the Transactional Email Service abstraction (mock console/logger).
 
 
 
