@@ -2,26 +2,28 @@
 
 > **Purpose:** Central living reference and handoff document. Any developer or AI assistant working in this workspace must read this document first before giving any guidance or suggestions.  
 > **Learner:** PJ Sudhakar  
-> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 4 In Progress (Step 1 Complete: BullMQ installed & Redis connection options configured). Next: Step 2 (Job contracts & Queue manager).  
-> **Last Updated:** 2026-11-01  
+> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 4 in progress (Steps 1 & 2 Complete: BullMQ, typed Zod contracts & queue factory configured, 40/40 tests passing). Ready for Step 3.  
+> **Last Updated:** 2026-11-02
 
 ---
 
 ## 1. Critical Operating Rules for AI Assistants
 
 ### Rule 1: PJ Codes Everything Himself
-* **The AI must NEVER directly write, modify, or generate project implementation files** (such as files in `01-saas-api/src/`, `01-saas-api/migrations/`, `01-saas-api/tests/`, etc.).
-* **The AI's role is strictly as a senior mentor, tutor, and staff architect:**
+
+- **The AI must NEVER directly write, modify, or generate project implementation files** (such as files in `01-saas-api/src/`, `01-saas-api/migrations/`, `01-saas-api/tests/`, etc.).
+- **The AI's role is strictly as a senior mentor, tutor, and staff architect:**
   1. Teach the underlying theory, data structures, and PostgreSQL/Redis mechanics deeply.
-  2. Explain the architectural *why* and evaluate trade-offs before showing any code.
+  2. Explain the architectural _why_ and evaluate trade-offs before showing any code.
   3. Provide exact terminal commands (e.g. `npm install ...`, `mkdir ...`) and complete, production-grade code snippets directly inside the chat interface.
   4. Wait for PJ to create, type, review, and test each file before advancing.
-* **The ONLY files the AI is authorized to create/update directly** are documentation tracking files in root or `docs/` (specifically `PROJECT-CONTEXT.md` to keep progress and next starting points synchronized).
+- **The ONLY files the AI is authorized to create/update directly** are documentation tracking files in root or `docs/` (specifically `PROJECT-CONTEXT.md` to keep progress and next starting points synchronized).
 
 ### Rule 2: No ORMs & No Hand-Wavy Shortcuts
-* **Zero ORMs:** We use raw SQL drivers (`pg` for PostgreSQL, `ioredis` for Redis, ClickHouse client, etc.). The goal is genuine mastery of relational algebra, execution plans (`EXPLAIN ANALYZE`), lock modes, and connection pool dynamics.
-* **Production-Grade from Day One:** Strict TypeScript (all strict compiler flags enabled), strict runtime validation (`zod`), RFC 9457 Problem Details for all error responses, and structured logging (`pino`) with `AsyncLocalStorage` correlation IDs. No `console.log` in backend code.
-* **No Code Without Design:** Each module begins with an understanding of the domain requirements, database schemas, and failure modes before any implementation begins.
+
+- **Zero ORMs:** We use raw SQL drivers (`pg` for PostgreSQL, `ioredis` for Redis, ClickHouse client, etc.). The goal is genuine mastery of relational algebra, execution plans (`EXPLAIN ANALYZE`), lock modes, and connection pool dynamics.
+- **Production-Grade from Day One:** Strict TypeScript (all strict compiler flags enabled), strict runtime validation (`zod`), RFC 9457 Problem Details for all error responses, and structured logging (`pino`) with `AsyncLocalStorage` correlation IDs. No `console.log` in backend code.
+- **No Code Without Design:** Each module begins with an understanding of the domain requirements, database schemas, and failure modes before any implementation begins.
 
 ---
 
@@ -58,30 +60,32 @@ c:\Users\DMC\Desktop\be\
 
 ## 3. Project #1 (SaaS API) Core Architecture Standards
 
-* **Runtime:** Node.js (v20+ / v22 LTS) with CommonJS modules.
-* **Language:** TypeScript in strict mode (`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`).
-* **HTTP Framework:** Express 4.
-* **Data Stores:**
-  * **PostgreSQL (Neon):** Durable relational state, Row-Level Security (RLS) multi-tenancy, raw `pg` client (`pg.Pool`), SQL migrations via `node-pg-migrate`.
-  * **Redis (Upstash / Local):** Ephemeral security state (rate limit token buckets, token denylists, idempotency keys, BullMQ job queues).
-* **Security & Auth:**
-  * Password Hashing: Argon2id (`argon2`).
-  * Access Tokens: RS256 Asymmetric JWTs (`jsonwebtoken`).
-  * Refresh Tokens: Cryptographically secure 256-bit opaque tokens (SHA-256 hashed in Postgres) with family-based reuse detection.
-* **Layering Pattern (Feature-Based):**
-  * `Route` (thin, declares middleware and controller)
-  * `Controller` (HTTP transport, request validation, response formatting)
-  * `Service` (Business logic, transactions, domain invariants — no HTTP, no SQL)
-  * `Repository` (Raw SQL, row mapping, RLS-aware queries — no business rules)
+- **Runtime:** Node.js (v20+ / v22 LTS) with CommonJS modules.
+- **Language:** TypeScript in strict mode (`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`).
+- **HTTP Framework:** Express 4.
+- **Data Stores:**
+  - **PostgreSQL (Neon):** Durable relational state, Row-Level Security (RLS) multi-tenancy, raw `pg` client (`pg.Pool`), SQL migrations via `node-pg-migrate`.
+  - **Redis (Upstash / Local):** Ephemeral security state (rate limit token buckets, token denylists, idempotency keys, BullMQ job queues).
+- **Security & Auth:**
+  - Password Hashing: Argon2id (`argon2`).
+  - Access Tokens: RS256 Asymmetric JWTs (`jsonwebtoken`).
+  - Refresh Tokens: Cryptographically secure 256-bit opaque tokens (SHA-256 hashed in Postgres) with family-based reuse detection.
+- **Layering Pattern (Feature-Based):**
+  - `Route` (thin, declares middleware and controller)
+  - `Controller` (HTTP transport, request validation, response formatting)
+  - `Service` (Business logic, transactions, domain invariants — no HTTP, no SQL)
+  - `Repository` (Raw SQL, row mapping, RLS-aware queries — no business rules)
 
 ---
 
 ## 4. Current Status & Progress Tracker
 
 ### Current Active Project: **Project #1 (Multi-Tenant SaaS API)**
+
 **Current Milestone:** **Milestone 4 — Asynchronous Processing & Background Jobs**
 
 #### Milestone 1 Checklist: (100% Complete)
+
 - [x] **Step 1:** Folder initialization (`01-saas-api`) & `package.json` setup with pinned dependencies.
 - [x] **Step 2:** Strict TypeScript configuration (`tsconfig.json`, `tsconfig.build.json`).
 - [x] **Step 3:** Code quality & formatting configuration (`eslint.config.mjs`, `.prettierrc`, `.editorconfig`).
@@ -98,6 +102,7 @@ c:\Users\DMC\Desktop\be\
 - [x] **Step 14:** Adversarial Auth Testing with Vitest & Supertest.
 
 #### Milestone 2 Checklist: (100% Complete)
+
 - [x] **Step 1:** Deep-dive into PostgreSQL Row-Level Security (`ALTER TABLE ... ENABLE ROW LEVEL SECURITY;` + `FORCE ROW LEVEL SECURITY`, `SET LOCAL`).
 - [x] **Step 2:** Write Raw SQL Migration 002: Organizations (`tenants`), Memberships (`tenant_members` with composite PK & RBAC), and Projects (`projects` with RLS).
 - [x] **Step 3:** Scoped Tenant Transaction Runner (`withTenantTransaction` in `src/config/database.ts`).
@@ -106,6 +111,7 @@ c:\Users\DMC\Desktop\be\
 - [x] **Step 6:** Adversarial Integration Tests for Multi-Tenancy & Cross-Tenant Leakage Prevention.
 
 #### Milestone 3 Checklist: (100% Complete)
+
 - [x] **Step 1:** Migration 003: Tasks table, TSVECTOR full-text search, composite B-tree & GIN indexes, RLS policy.
 - [x] **Step 2:** Redis Atomic Idempotency Middleware (`src/middleware/idempotency.ts`).
 - [x] **Step 3:** Keyset / Cursor-Based Pagination Utility (`src/lib/pagination.ts`).
@@ -113,6 +119,7 @@ c:\Users\DMC\Desktop\be\
 - [x] **Step 5:** Adversarial Concurrency & Idempotency Integration Tests.
 
 #### Milestone 4 Checklist: (In Progress)
+
 - [x] **Step 1:** Install BullMQ, establish Redis connection options & queue connection factory.
 - [ ] **Step 2:** Define typed job contracts, queues, and Zod payload validation (`src/jobs/`).
 - [ ] **Step 3:** Implement Transactional Email Service abstraction (mock console/logger).
@@ -124,69 +131,65 @@ c:\Users\DMC\Desktop\be\
 
 ## 5. Completed Implementation Inventory
 
-| File | Purpose / Architectural Standard |
-|---|---|
-| `package.json` | Pinned production & dev dependencies (no ORMs, raw `pg`, `ioredis`, `argon2`, `pino`, `cookie-parser`, `bullmq`) |
-| `tsconfig.json` | Strictest compiler checks (`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`) |
-| `tsconfig.build.json` | Production build config excluding `tests/` |
-| `eslint.config.mjs` | ESLint 9 Flat Config enforcing async safety & flagging `console.log` |
-| `.prettierrc` / `.editorconfig` | Unified indentation (2 spaces) and line endings (LF) |
-| `src/config/env.ts` | Zod runtime environment schema validation (fail-fast on boot) |
-| `src/config/logger.ts` | High-performance Pino logger with PII redaction and AsyncLocalStorage mixin |
-| `src/lib/context.ts` | `AsyncLocalStorage` request context store (`correlationId`, `userId`, `tenantId`) |
-| `src/middleware/correlation.ts` | Ingests or generates UUID v7 correlation IDs and enters ALS boundary |
-| `src/middleware/request-logger.ts` | `pino-http` middleware logging request/response with duration in ms |
-| `src/lib/apiError.ts` | RFC 9457 `ProblemDetails` schema, `sendProblemDetails` helper, and typed error classes |
-| `src/lib/asyncHandler.ts` | Async route wrapper catching rejected Promises and eliminating try/catch |
-| `src/middleware/errorHandler.ts` | Centralized RFC 9457 error handler with Zod formatting and 500 stack masking |
-| `src/config/database.ts` | `pg.Pool` connection pool with Neon SSL, `withTransaction`, `withTenantTransaction` (parameterized `set_config` RLS variable), and query logging |
-| `src/config/redis.ts` | `ioredis` client with exponential backoff, exported `redisConnectionOptions` for BullMQ, and `checkRedisHealth` |
-| `src/app.ts` | Express application mounting middleware, `/api/v1/auth`, `/api/v1/health`, `/api/v1/ready`, and 404 handler |
-| `src/index.ts` | Server entrypoint with production-grade SIGTERM/SIGINT graceful shutdown (watchdog timer, pool drain, redis quit) |
-| `migrations/001_create-users-and-sessions.up.sql` | Users table (lower email index), Sessions (family-based refresh tokens), Auth tokens |
-| `migrations/001_create-users-and-sessions.down.sql` | Clean migration rollback statements |
-| `src/lib/crypto.ts` | Argon2id password hashing, RS256 asymmetric JWT sign/verify, SHA-256 token hashing, timingSafeCompare |
-| `src/middleware/validate.ts` | Reusable Zod request validator forwarding schema violations to RFC 9457 errorHandler |
-| `src/modules/auth/auth.schemas.ts` | Zod validation schemas and TypeScript DTO contracts (SignupInput, LoginInput, UserResponse, AuthResponse) |
-| `src/modules/auth/user.repository.ts` | Raw SQL user repository with lowercase email index scans (`idx_users_email_lower`) |
-| `src/modules/auth/session.repository.ts` | Raw SQL session repository supporting atomic session rotation and token family revocation |
-| `src/modules/auth/auth.service.ts` | Authentication business logic: Argon2id verification, session rotation, family reuse detection |
-| `src/modules/auth/auth.controller.ts` | HTTP controller managing HttpOnly cookies, request metadata extraction, and response DTOs |
-| `src/modules/auth/auth.routes.ts` | Express router exposing `/signup`, `/login`, `/refresh`, and `/logout` |
-| `tests/integration/auth.test.ts` | 12 automated integration tests covering health, auth lifecycle, and adversarial replay attacks |
-| `migrations/002_create-tenants-and-projects.up.sql` | Tenants, Tenant Members (composite PK, RBAC), Projects with RLS policies & `FORCE ROW LEVEL SECURITY` |
-| `migrations/002_create-tenants-and-projects.down.sql` | Clean teardown statements for Milestone 2 schema |
-| `src/types/express.d.ts` | Express global Request type augmentation (`req.user`, `req.tenant`) |
-| `src/middleware/authenticate.ts` | RS256 Bearer JWT guard extracting `sub` to `req.user` & `AsyncLocalStorage` |
-| `src/middleware/tenant.ts` | Tenancy guard verifying `tenant_members` in Postgres & hierarchical RBAC `requireRole` |
-| `src/modules/projects/project.schema.ts` | Zod validation schemas for project creation, updates, and param checking |
-| `src/modules/projects/project.repository.ts` | Raw SQL project repository using `withTenantTransaction` to enforce Postgres RLS |
-| `src/modules/projects/project.service.ts` | Domain logic enforcing key uniqueness, UUID v7 generation, and RFC 9457 error handling |
-| `src/modules/projects/project.controller.ts` | HTTP controller binding tenant/user context and returning standardized response envelopes |
-| `src/modules/projects/project.routes.ts` | Express router with layered guards (`authenticate` -> `requireTenant` -> `requireRole`) |
-| `tests/integration/tenant-projects.test.ts` | 16 automated adversarial tests verifying tenant isolation, cross-tenant leak prevention, and RBAC hierarchy |
-| `migrations/003_create-tasks-and-indexes.up.sql` | Tasks table, generated TSVECTOR for full-text search, composite indexes, and RLS |
-| `migrations/003_create-tasks-and-indexes.down.sql` | Clean rollback statements for tasks table and policy |
-| `src/middleware/idempotency.ts` | Atomic Redis idempotency guard (`SET NX EX`) replaying cached responses |
-| `src/lib/pagination.ts` | Opaque Base64 URL-safe cursor encoder/decoder and `LIMIT + 1` keyset pagination helper |
-| `src/modules/tasks/task.schema.ts` | Zod validation contracts (task creation, OCC version update, keyset filtering) |
-| `src/modules/tasks/task.repository.ts` | Raw SQL task repository with keyset pagination, next number resolution, and OCC updates |
-| `src/modules/tasks/task.service.ts` | Domain logic validating project references, cursor decoding, and OCC conflict handling |
-| `src/modules/tasks/task.controller.ts` | HTTP controller binding tenant/user context and returning paginated/item envelopes |
-| `src/modules/tasks/task.routes.ts` | Express router wiring `authenticate`, `requireTenant`, `requireRole`, and Redis `idempotency` |
-| `tests/integration/tasks.test.ts` | 12 automated adversarial tests covering sequential numbering, keyset cursor pagination, OCC 409 conflict, and Redis idempotency |
+| File                                                  | Purpose / Architectural Standard                                                                                                                 |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `package.json`                                        | Pinned production & dev dependencies (no ORMs, raw `pg`, `ioredis`, `argon2`, `pino`, `cookie-parser`, `bullmq`)                                 |
+| `tsconfig.json`                                       | Strictest compiler checks (`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`)                                                             |
+| `tsconfig.build.json`                                 | Production build config excluding `tests/`                                                                                                       |
+| `eslint.config.mjs`                                   | ESLint 9 Flat Config enforcing async safety & flagging `console.log`                                                                             |
+| `.prettierrc` / `.editorconfig`                       | Unified indentation (2 spaces) and line endings (LF)                                                                                             |
+| `src/config/env.ts`                                   | Zod runtime environment schema validation (fail-fast on boot)                                                                                    |
+| `src/config/logger.ts`                                | High-performance Pino logger with PII redaction and AsyncLocalStorage mixin                                                                      |
+| `src/lib/context.ts`                                  | `AsyncLocalStorage` request context store (`correlationId`, `userId`, `tenantId`)                                                                |
+| `src/middleware/correlation.ts`                       | Ingests or generates UUID v7 correlation IDs and enters ALS boundary                                                                             |
+| `src/middleware/request-logger.ts`                    | `pino-http` middleware logging request/response with duration in ms                                                                              |
+| `src/lib/apiError.ts`                                 | RFC 9457 `ProblemDetails` schema, `sendProblemDetails` helper, and typed error classes                                                           |
+| `src/lib/asyncHandler.ts`                             | Async route wrapper catching rejected Promises and eliminating try/catch                                                                         |
+| `src/middleware/errorHandler.ts`                      | Centralized RFC 9457 error handler with Zod formatting and 500 stack masking                                                                     |
+| `src/config/database.ts`                              | `pg.Pool` connection pool with Neon SSL, `withTransaction`, `withTenantTransaction` (parameterized `set_config` RLS variable), and query logging |
+| `src/config/redis.ts`                                 | `ioredis` client with exponential backoff, exported `redisConnectionOptions` for BullMQ, and `checkRedisHealth`                                  |
+| `src/app.ts`                                          | Express application mounting middleware, `/api/v1/auth`, `/api/v1/health`, `/api/v1/ready`, and 404 handler                                      |
+| `src/index.ts`                                        | Server entrypoint with production-grade SIGTERM/SIGINT graceful shutdown (watchdog timer, pool drain, redis quit)                                |
+| `migrations/001_create-users-and-sessions.up.sql`     | Users table (lower email index), Sessions (family-based refresh tokens), Auth tokens                                                             |
+| `migrations/001_create-users-and-sessions.down.sql`   | Clean migration rollback statements                                                                                                              |
+| `src/lib/crypto.ts`                                   | Argon2id password hashing, RS256 asymmetric JWT sign/verify, SHA-256 token hashing, timingSafeCompare                                            |
+| `src/middleware/validate.ts`                          | Reusable Zod request validator forwarding schema violations to RFC 9457 errorHandler                                                             |
+| `src/modules/auth/auth.schemas.ts`                    | Zod validation schemas and TypeScript DTO contracts (SignupInput, LoginInput, UserResponse, AuthResponse)                                        |
+| `src/modules/auth/user.repository.ts`                 | Raw SQL user repository with lowercase email index scans (`idx_users_email_lower`)                                                               |
+| `src/modules/auth/session.repository.ts`              | Raw SQL session repository supporting atomic session rotation and token family revocation                                                        |
+| `src/modules/auth/auth.service.ts`                    | Authentication business logic: Argon2id verification, session rotation, family reuse detection                                                   |
+| `src/modules/auth/auth.controller.ts`                 | HTTP controller managing HttpOnly cookies, request metadata extraction, and response DTOs                                                        |
+| `src/modules/auth/auth.routes.ts`                     | Express router exposing `/signup`, `/login`, `/refresh`, and `/logout`                                                                           |
+| `tests/integration/auth.test.ts`                      | 12 automated integration tests covering health, auth lifecycle, and adversarial replay attacks                                                   |
+| `migrations/002_create-tenants-and-projects.up.sql`   | Tenants, Tenant Members (composite PK, RBAC), Projects with RLS policies & `FORCE ROW LEVEL SECURITY`                                            |
+| `migrations/002_create-tenants-and-projects.down.sql` | Clean teardown statements for Milestone 2 schema                                                                                                 |
+| `src/types/express.d.ts`                              | Express global Request type augmentation (`req.user`, `req.tenant`)                                                                              |
+| `src/middleware/authenticate.ts`                      | RS256 Bearer JWT guard extracting `sub` to `req.user` & `AsyncLocalStorage`                                                                      |
+| `src/middleware/tenant.ts`                            | Tenancy guard verifying `tenant_members` in Postgres & hierarchical RBAC `requireRole`                                                           |
+| `src/modules/projects/project.schema.ts`              | Zod validation schemas for project creation, updates, and param checking                                                                         |
+| `src/modules/projects/project.repository.ts`          | Raw SQL project repository using `withTenantTransaction` to enforce Postgres RLS                                                                 |
+| `src/modules/projects/project.service.ts`             | Domain logic enforcing key uniqueness, UUID v7 generation, and RFC 9457 error handling                                                           |
+| `src/modules/projects/project.controller.ts`          | HTTP controller binding tenant/user context and returning standardized response envelopes                                                        |
+| `src/modules/projects/project.routes.ts`              | Express router with layered guards (`authenticate` -> `requireTenant` -> `requireRole`)                                                          |
+| `tests/integration/tenant-projects.test.ts`           | 16 automated adversarial tests verifying tenant isolation, cross-tenant leak prevention, and RBAC hierarchy                                      |
+| `migrations/003_create-tasks-and-indexes.up.sql`      | Tasks table, generated TSVECTOR for full-text search, composite indexes, and RLS                                                                 |
+| `migrations/003_create-tasks-and-indexes.down.sql`    | Clean rollback statements for tasks table and policy                                                                                             |
+| `src/middleware/idempotency.ts`                       | Atomic Redis idempotency guard (`SET NX EX`) replaying cached responses                                                                          |
+| `src/lib/pagination.ts`                               | Opaque Base64 URL-safe cursor encoder/decoder and `LIMIT + 1` keyset pagination helper                                                           |
+| `src/modules/tasks/task.schema.ts`                    | Zod validation contracts (task creation, OCC version update, keyset filtering)                                                                   |
+| `src/modules/tasks/task.repository.ts`                | Raw SQL task repository with keyset pagination, next number resolution, and OCC updates                                                          |
+| `src/modules/tasks/task.service.ts`                   | Domain logic validating project references, cursor decoding, and OCC conflict handling                                                           |
+| `src/modules/tasks/task.controller.ts`                | HTTP controller binding tenant/user context and returning paginated/item envelopes                                                               |
+| `src/modules/tasks/task.routes.ts`                    | Express router wiring `authenticate`, `requireTenant`, `requireRole`, and Redis `idempotency`                                                    |
+| `tests/integration/tasks.test.ts`                     | 12 automated adversarial tests covering sequential numbering, keyset cursor pagination, OCC 409 conflict, and Redis idempotency                  |
 
 ---
 
 ## 6. Next Immediate Action for AI
-* **Current Step:** **Milestone 4 — Step 2: Define typed job contracts, queues, and Zod payload validation (`src/jobs/`).**
-* **Action:**
+
+- **Current Step:** **Milestone 4 — Step 2: Define typed job contracts, queues, and Zod payload validation (`src/jobs/`).**
+- **Action:**
   1. Define typed queue names and BullMQ job contracts (e.g., `EMAIL_QUEUE`, `TASK_NOTIFICATION_QUEUE`).
   2. Implement Zod payload schemas for background jobs.
   3. Set up the queue manager and connection factory for job dispatching.
   4. Implement the Transactional Email Service abstraction (mock console/logger).
-
-
-
-
-
