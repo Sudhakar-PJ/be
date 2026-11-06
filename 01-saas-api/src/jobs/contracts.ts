@@ -7,7 +7,7 @@ import { z } from "zod";
  */
 export const JobMetadataSchema = z.object({
   correlationId: z.string().uuid(),
-  tenantId: z.string().uuid(),
+  tenantId: z.string().uuid().optional(),
   actorId: z.string().uuid().optional(),
   enqueuedAt: z.string().datetime(),
 });
@@ -27,6 +27,7 @@ export type JobNameType = (typeof JobName)[keyof typeof JobName];
  * Task Assigned Job Payload
  */
 export const TaskAssignedPayloadSchema = JobMetadataSchema.extend({
+  tenantId: z.string().uuid(),
   taskId: z.string().uuid(),
   taskNumber: z.number().int().positive(),
   taskTitle: z.string().min(1),

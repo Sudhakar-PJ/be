@@ -10,11 +10,16 @@ import {
   type UpdateTaskInput,
 } from "./task.schema";
 import { taskRepository, TaskRepository, toTaskResponse } from "./task.repository";
+import { userRepository, UserRepository } from "../auth/user.repository";
+import { enqueueTaskAssignedNotification } from "../../jobs/queues";
+import { getCorrelationId } from "../../lib/context";
+import { logger } from "../../config/logger";
 
 export class TaskService {
   constructor(
     private readonly taskRepo: TaskRepository = taskRepository,
     private readonly projectRepo: ProjectRepository = projectRepository,
+    private readonly userRepo: UserRepository = userRepository,
   ) {}
 
   /**
@@ -53,6 +58,33 @@ export class TaskService {
       assigneeId: input.assigneeId,
       createdBy: userId,
     });
+
+    // 5. Asynchronously notify assignee if assigned
+    if (record.assignee_id) {
+      try {
+        const [assignee, assigner] = await Promise.all([
+          this.userRepo.findById(record.assignee_id),
+          this.userRepo.findById(userId),
+        ]);
+        if (assignee) {
+          await enqueueTaskAssignedNotification({
+            correlationId: getCorrelationId() ?? taskId,
+            tenantId,
+            actorId: userId,
+            enqueuedAt: new Date().toISOString(),
+            taskId: record.id,
+            taskNumber: record.number,
+            taskTitle: record.title,
+            projectId: record.project_id,
+            assigneeId: assignee.id,
+            assigneeEmail: assignee.email,
+            assignerName: assigner?.full_name ?? "A team member",
+          });
+        }
+      } catch (err) {
+        logger.error({ err, taskId: record.id }, "Failed to enqueue task: assigned notification");
+      }
+    }
 
     return toTaskResponse(record);
   }
@@ -119,6 +151,35 @@ export class TaskService {
         `Task with ID '${taskId}' was not found in this workspace`,
         "TASK_NOT_FOUND",
       );
+    }
+
+    if (input.assigneeId && record.assignee_id === input.assigneeId) {
+      try {
+        const [assignee, assigner] = await Promise.all([
+          this.userRepo.findById(input.assigneeId),
+          this.userRepo.findById(record.created_by),
+        ]);
+        if (assignee) {
+          await enqueueTaskAssignedNotification({
+            correlationId: getCorrelationId() ?? taskId,
+            tenantId,
+            actorId: record.created_by,
+            enqueuedAt: new Date().toISOString(),
+            taskId: record.id,
+            taskNumber: record.number,
+            taskTitle: record.title,
+            projectId: record.project_id,
+            assigneeId: assignee.id,
+            assigneeEmail: assignee.email,
+            assignerName: assigner?.full_name ?? "A team member",
+          });
+        }
+      } catch (err) {
+        logger.error(
+          { err, taskId: record.id },
+          "Failed to enqueue task:assigned notification on update",
+        );
+      }
     }
 
     return toTaskResponse(record);

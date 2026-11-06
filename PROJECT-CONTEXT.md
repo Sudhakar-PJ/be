@@ -2,8 +2,8 @@
 
 > **Purpose:** Central living reference and handoff document. Any developer or AI assistant working in this workspace must read this document first before giving any guidance or suggestions.  
 > **Learner:** PJ Sudhakar  
-> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 4 in progress (Steps 1 & 2 Complete: BullMQ, typed Zod contracts & queue factory configured, 40/40 tests passing). Ready for Step 3.  
-> **Last Updated:** 2026-11-02
+> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 4 Complete (Asynchronous Processing, BullMQ, Worker, DLQ & Retries: 43/43 Tests Passing)! Ready for Milestone 5.
+> **Last Updated:** 2026-11-06
 
 ---
 
@@ -118,14 +118,14 @@ c:\Users\DMC\Desktop\be\
 - [x] **Step 4:** Tasks Feature Module (Zod schemas, repository with keyset pagination & OCC, service, controller, routes).
 - [x] **Step 5:** Adversarial Concurrency & Idempotency Integration Tests.
 
-#### Milestone 4 Checklist: (In Progress)
+#### Milestone 4 Checklist: (100% Complete)
 
 - [x] **Step 1:** Install BullMQ, establish Redis connection options & queue connection factory.
-- [ ] **Step 2:** Define typed job contracts, queues, and Zod payload validation (`src/jobs/`).
-- [ ] **Step 3:** Implement Transactional Email Service abstraction (mock console/logger).
-- [ ] **Step 4:** Implement dedicated background Worker process (`src/workers/index.ts`) with concurrency & graceful shutdown.
-- [ ] **Step 5:** Wire asynchronous job dispatching into Tasks module (task assignment notifications).
-- [ ] **Step 6:** Dead Letter Queue (DLQ) inspection, retry mechanism, and adversarial tests.
+- [x] **Step 2:** Define typed job contracts, queues, and Zod payload validation (`src/jobs/contracts.ts`, `src/jobs/queues.ts`).
+- [x] **Step 3:** Implement Transactional Email Service abstraction (`src/services/email.service.ts`).
+- [x] **Step 4:** Implement dedicated background Worker process (`src/jobs/worker.ts`) with concurrency & graceful shutdown.
+- [x] **Step 5:** Wire asynchronous job dispatching into Tasks & Auth modules (`task.service.ts`, `auth.service.ts`).
+- [x] **Step 6:** Dead Letter Queue (DLQ) inspection, retry mechanism with backoff, and 3 automated integration tests.
 
 ---
 
@@ -182,14 +182,19 @@ c:\Users\DMC\Desktop\be\
 | `src/modules/tasks/task.controller.ts`                | HTTP controller binding tenant/user context and returning paginated/item envelopes                                                               |
 | `src/modules/tasks/task.routes.ts`                    | Express router wiring `authenticate`, `requireTenant`, `requireRole`, and Redis `idempotency`                                                    |
 | `tests/integration/tasks.test.ts`                     | 12 automated adversarial tests covering sequential numbering, keyset cursor pagination, OCC 409 conflict, and Redis idempotency                  |
+| `src/jobs/contracts.ts`                               | Zod validation schemas & typed contracts for background jobs (TaskAssigned, WelcomeEmail)                                                        |
+| `src/jobs/queues.ts`                                  | BullMQ queue factory with exponential backoff, retention cleanup, and type-safe enqueue helpers                                                   |
+| `src/services/email.service.ts`                       | Transactional email provider abstraction with mock in-memory delivery & test inspection                                                          |
+| `src/jobs/worker.ts`                                  | Dedicated BullMQ worker with ALS context re-hydration, concurrency controls & graceful shutdown                                                  |
+| `tests/integration/jobs.test.ts`                      | 3 automated integration tests verifying async dispatch, retry backoff, and DLQ capture                                                          |
 
 ---
 
 ## 6. Next Immediate Action for AI
 
-- **Current Step:** **Milestone 4 — Step 2: Define typed job contracts, queues, and Zod payload validation (`src/jobs/`).**
+- **Current Step:** **Milestone 5 — Developer Platform (Personal Access Tokens & Outbound Webhooks)**.
 - **Action:**
-  1. Define typed queue names and BullMQ job contracts (e.g., `EMAIL_QUEUE`, `TASK_NOTIFICATION_QUEUE`).
-  2. Implement Zod payload schemas for background jobs.
-  3. Set up the queue manager and connection factory for job dispatching.
-  4. Implement the Transactional Email Service abstraction (mock console/logger).
+  1. Deep-dive into developer platform security: Personal Access Tokens (PATs) vs JWTs.
+  2. Raw SQL Migration 004 for Personal Access Tokens (pats) and Webhook Subscriptions (webhook_subscriptions, webhook_deliveries).
+  3. Implement PAT authentication middleware with SHA-256 token hashing and granular permission scopes.
+  4. Build HMAC-SHA256 signed outbound webhook dispatcher with exponential backoff and delivery attempt audit logs.

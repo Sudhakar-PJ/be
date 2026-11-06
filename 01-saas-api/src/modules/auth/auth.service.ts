@@ -17,6 +17,8 @@ import {
 } from "./auth.schemas";
 import { sessionRepository } from "./session.repository";
 import { userRepository, type UserRecord } from "./user.repository";
+import { enqueueWelcomeEmail } from "../../jobs/queues";
+import { getCorrelationId } from "../../lib/context";
 
 export interface RequestMetadata {
   userAgent?: string | null;
@@ -83,6 +85,19 @@ export class AuthService {
       userAgent: meta.userAgent ?? null,
       ipAddress: meta.ipAddress ?? null,
     });
+
+    try {
+      await enqueueWelcomeEmail({
+        correlationId: getCorrelationId() ?? userId,
+        actorId: user.id,
+        enqueuedAt: new Date().toISOString(),
+        userId: user.id,
+        email: user.email,
+        name: user.full_name,
+      });
+    } catch (err) {
+      logger.error({ err, userId: user.id }, "Failed to enqueue email:welcome background job");
+    }
 
     // 5. Mint stateless RS256 Access Token
     const accessToken = signAccessToken({
