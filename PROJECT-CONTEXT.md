@@ -2,8 +2,8 @@
 
 > **Purpose:** Central living reference and handoff document. Any developer or AI assistant working in this workspace must read this document first before giving any guidance or suggestions.  
 > **Learner:** PJ Sudhakar  
-> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 4 Complete (Asynchronous Processing, BullMQ, Worker, DLQ & Retries: 43/43 Tests Passing)! Ready for Milestone 5.
-> **Last Updated:** 2026-11-06
+> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 5 in Progress (Migration 004 Applied, 43/43 Tests Passing)!
+> **Last Updated:** 2026-11-07
 
 ---
 
@@ -24,6 +24,14 @@
 - **Zero ORMs:** We use raw SQL drivers (`pg` for PostgreSQL, `ioredis` for Redis, ClickHouse client, etc.). The goal is genuine mastery of relational algebra, execution plans (`EXPLAIN ANALYZE`), lock modes, and connection pool dynamics.
 - **Production-Grade from Day One:** Strict TypeScript (all strict compiler flags enabled), strict runtime validation (`zod`), RFC 9457 Problem Details for all error responses, and structured logging (`pino`) with `AsyncLocalStorage` correlation IDs. No `console.log` in backend code.
 - **No Code Without Design:** Each module begins with an understanding of the domain requirements, database schemas, and failure modes before any implementation begins.
+
+### Rule 3: Extreme Pedagogical Depth & Real-World Framing (Staff Architect Mentorship)
+
+- **Novice-Friendly, Exhaustive Explanations:** PJ is venturing into unknown territory with advanced backend concepts (cryptographic token structures, granular permission scopes, dual-authentication cascades, outbound webhook signing, delivery worker pipelines, circuit breakers, etc.).
+- **Teach Concepts Thoroughly Before Showing Code:**
+  1. Break down every concept from first principles using **concrete real-world analogies** and industry benchmarks (e.g. Stripe, GitHub, AWS, Slack, Linear) that match our exact situation.
+  2. Explain *why* something is designed the way it is, what security or performance hazards it avoids, and what catastrophic bugs would occur if done naively.
+  3. Walk through the code thoroughly: explain what each TypeScript type, cryptographic primitive, SQL clause, or architectural boundary does so PJ builds deep intuition and confidence.
 
 ---
 
@@ -127,6 +135,16 @@ c:\Users\DMC\Desktop\be\
 - [x] **Step 5:** Wire asynchronous job dispatching into Tasks & Auth modules (`task.service.ts`, `auth.service.ts`).
 - [x] **Step 6:** Dead Letter Queue (DLQ) inspection, retry mechanism with backoff, and 3 automated integration tests.
 
+#### Milestone 5 Checklist: (In Progress)
+
+- [x] **Step 1:** Raw SQL Migration 004: Personal Access Tokens (`personal_access_tokens`), Webhook Subscriptions (`webhook_subscriptions`), and Delivery logs (`webhook_deliveries`) with RLS.
+- [x] **Step 2:** Cryptographic PAT generation, SHA-256 token hashing, token prefixing, and granular scopes definition (`src/lib/pat.ts`).
+- [ ] **Step 3:** Dual-Authentication Middleware & Scope Guard (`src/middleware/authenticate.ts` supporting both RS256 Bearer JWTs and hashed PATs, plus `requireScope`).
+- [ ] **Step 4:** PAT Management Feature Module (Repository, Service, Controller, Routes: list, create, revoke tokens).
+- [ ] **Step 5:** Webhook Subscriptions Feature Module (Repository, Service, Controller, Routes: register, test, rotate secret, list deliveries).
+- [ ] **Step 6:** Webhook Dispatcher, BullMQ Outbound Delivery Worker with HMAC-SHA256 signatures, exponential backoff, and circuit breaker.
+- [ ] **Step 7:** Adversarial Integration Tests for PAT Scopes, Webhook Signature Verification, and Circuit Breaker Deactivation.
+
 ---
 
 ## 5. Completed Implementation Inventory
@@ -187,14 +205,19 @@ c:\Users\DMC\Desktop\be\
 | `src/services/email.service.ts`                       | Transactional email provider abstraction with mock in-memory delivery & test inspection                                                          |
 | `src/jobs/worker.ts`                                  | Dedicated BullMQ worker with ALS context re-hydration, concurrency controls & graceful shutdown                                                  |
 | `tests/integration/jobs.test.ts`                      | 3 automated integration tests verifying async dispatch, retry backoff, and DLQ capture                                                          |
+| `migrations/004_create-pats-and-webhooks.up.sql`      | Migration 004: PATs, Webhook Subscriptions, Webhook Deliveries with GIN indexes & RLS                                                             |
+| `migrations/004_create-pats-and-webhooks.down.sql`    | Clean rollback statements for PATs and Webhook tables                                                                                            |
+| `src/lib/pat.ts`                                      | Cryptographic PAT generation (CSPRNG), SHA-256 token hasher, prefixing, and granular scope validation algebra                                     |
 
 ---
 
 ## 6. Next Immediate Action for AI
 
-- **Current Step:** **Milestone 5 — Developer Platform (Personal Access Tokens & Outbound Webhooks)**.
+- **Current Step:** **Milestone 5 — Step 3: Dual-Authentication Middleware & Scope Guard (`src/types/express.d.ts`, `src/middleware/authenticate.ts`, `src/middleware/tenant.ts`)**.
 - **Action:**
-  1. Deep-dive into developer platform security: Personal Access Tokens (PATs) vs JWTs.
-  2. Raw SQL Migration 004 for Personal Access Tokens (pats) and Webhook Subscriptions (webhook_subscriptions, webhook_deliveries).
-  3. Implement PAT authentication middleware with SHA-256 token hashing and granular permission scopes.
-  4. Build HMAC-SHA256 signed outbound webhook dispatcher with exponential backoff and delivery attempt audit logs.
+  1. Review the Dual-Auth Cascade concept (RS256 JWT vs hashed PAT).
+  2. PJ applies changes to `src/types/express.d.ts` (adding `AuthContext` to Express `Request`).
+  3. PJ applies changes to `src/middleware/authenticate.ts` (adding `authenticatePat`, `authenticateJwt`, non-blocking `last_used_at` update, and `requireScope` guard).
+  4. PJ applies changes to `src/middleware/tenant.ts` (handling PAT pre-bound tenant resolution with cross-tenant mismatch guard).
+  5. Run `npm test` to verify baseline integrity (all 43 tests passing green).
+  6. Proceed to Step 4 (PAT Feature Module: repository, service, controller, routes).
