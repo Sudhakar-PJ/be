@@ -2,8 +2,8 @@
 
 > **Purpose:** Central living reference and handoff document. Any developer or AI assistant working in this workspace must read this document first before giving any guidance or suggestions.  
 > **Learner:** PJ Sudhakar  
-> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 5 in Progress (Migration 004 Applied, 43/43 Tests Passing)!
-> **Last Updated:** 2026-11-07
+> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 5 in Progress (Dual-Auth & Scope Guard Complete, 43/43 Tests Passing)!
+> **Last Updated:** 2026-11-08
 
 ---
 
@@ -139,7 +139,7 @@ c:\Users\DMC\Desktop\be\
 
 - [x] **Step 1:** Raw SQL Migration 004: Personal Access Tokens (`personal_access_tokens`), Webhook Subscriptions (`webhook_subscriptions`), and Delivery logs (`webhook_deliveries`) with RLS.
 - [x] **Step 2:** Cryptographic PAT generation, SHA-256 token hashing, token prefixing, and granular scopes definition (`src/lib/pat.ts`).
-- [ ] **Step 3:** Dual-Authentication Middleware & Scope Guard (`src/middleware/authenticate.ts` supporting both RS256 Bearer JWTs and hashed PATs, plus `requireScope`).
+- [x] **Step 3:** Dual-Authentication Middleware & Scope Guard (`src/middleware/authenticate.ts` supporting both RS256 Bearer JWTs and hashed PATs, plus `requireScope`).
 - [ ] **Step 4:** PAT Management Feature Module (Repository, Service, Controller, Routes: list, create, revoke tokens).
 - [ ] **Step 5:** Webhook Subscriptions Feature Module (Repository, Service, Controller, Routes: register, test, rotate secret, list deliveries).
 - [ ] **Step 6:** Webhook Dispatcher, BullMQ Outbound Delivery Worker with HMAC-SHA256 signatures, exponential backoff, and circuit breaker.
@@ -213,11 +213,12 @@ c:\Users\DMC\Desktop\be\
 
 ## 6. Next Immediate Action for AI
 
-- **Current Step:** **Milestone 5 — Step 3: Dual-Authentication Middleware & Scope Guard (`src/types/express.d.ts`, `src/middleware/authenticate.ts`, `src/middleware/tenant.ts`)**.
+- **Current Step:** **Milestone 5 — Step 4: PAT Management Feature Module (`src/modules/pats/`)**.
 - **Action:**
-  1. Review the Dual-Auth Cascade concept (RS256 JWT vs hashed PAT).
-  2. PJ applies changes to `src/types/express.d.ts` (adding `AuthContext` to Express `Request`).
-  3. PJ applies changes to `src/middleware/authenticate.ts` (adding `authenticatePat`, `authenticateJwt`, non-blocking `last_used_at` update, and `requireScope` guard).
-  4. PJ applies changes to `src/middleware/tenant.ts` (handling PAT pre-bound tenant resolution with cross-tenant mismatch guard).
-  5. Run `npm test` to verify baseline integrity (all 43 tests passing green).
-  6. Proceed to Step 4 (PAT Feature Module: repository, service, controller, routes).
+  1. Review PAT CRUD architecture & security requirements (minting, one-time raw token exposure, listing metadata without hash/entropy leakage, revocation with ownership/admin checks).
+  2. Implement Zod validation schemas & TypeScript DTOs (`src/modules/pats/pat.schema.ts`).
+  3. Implement raw SQL PAT repository with RLS enforcement via `withTenantTransaction` (`src/modules/pats/pat.repository.ts`).
+  4. Implement business logic service (`src/modules/pats/pat.service.ts`).
+  5. Implement HTTP controller (`src/modules/pats/pat.controller.ts`).
+  6. Wire routes (`src/modules/pats/pat.routes.ts`) with `authenticate` -> `requireTenant` -> `requireRole` and mount under `/api/v1/pats` in `src/app.ts`.
+  7. Proceed to Step 5 (Webhook Subscriptions Feature Module).

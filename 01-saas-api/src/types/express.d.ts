@@ -10,11 +10,18 @@ export interface TenantContext {
   role: TenantRole;
 }
 
+export interface AuthContext {
+  type: "JWT" | "PAT";
+  scopes: readonly string[];
+  patId?: string;
+}
+
 declare global {
   namespace Express {
     interface Request {
       user?: AuthenticatedUser;
-      tenant: TenantContext;
+      tenant?: TenantContext;
+      auth?: AuthContext;
     }
   }
 }

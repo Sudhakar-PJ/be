@@ -39,6 +39,17 @@ export async function requireTenant(
     const tenantHeader = req.headers["x-tenant-id"];
     const rawTenantId = Array.isArray(tenantHeader) ? tenantHeader[0] : tenantHeader;
 
+        // PAT requests are pre-bound to a specific tenant
+    if (req.auth?.type === "PAT" && req.tenant) {
+      if (rawTenantId && rawTenantId !== req.tenant.id) {
+        throw new ForbiddenError(
+          "Personal Access Token is not authorized for the requested tenant",
+          "TENANT_MISMATCH",
+        );
+      }
+      return next();
+    }
+    
     if (!rawTenantId) {
       throw new BadRequestError("Missing required 'X-Tenant-ID' header", "MISSING_TENANT_HEADER");
     }
