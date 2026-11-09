@@ -152,3 +152,18 @@ export function requireScope(requiredScope: PatScope) {
       next();
   }
 }
+
+/**
+ * Ensures the request originates from an interactive user session (JWT).
+ * Rejects machine-to-machine API keys (PATs) to prevent token nesting
+ * and unauthorized administrative credential creation.
+ */
+export function requireUserSession(req: Request, _res: Response, next: NextFunction): void {
+  if (req.auth?.type === "PAT") {
+    throw new ForbiddenError(
+      "Personal Access Tokens cannot perform this administrative action. Interactive user session authentication (JWT) is required.",
+      "PAT_ACTION_DISALLOWED",
+    );
+  }
+  next();
+}

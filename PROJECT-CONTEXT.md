@@ -2,8 +2,8 @@
 
 > **Purpose:** Central living reference and handoff document. Any developer or AI assistant working in this workspace must read this document first before giving any guidance or suggestions.  
 > **Learner:** PJ Sudhakar  
-> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 5 in Progress (Dual-Auth & Scope Guard Complete, 43/43 Tests Passing)!
-> **Last Updated:** 2026-11-08
+> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 5 (Step 4 PAT Module Complete, Step 5 Next)!
+> **Last Updated:** 2026-11-09
 
 ---
 
@@ -139,8 +139,8 @@ c:\Users\DMC\Desktop\be\
 
 - [x] **Step 1:** Raw SQL Migration 004: Personal Access Tokens (`personal_access_tokens`), Webhook Subscriptions (`webhook_subscriptions`), and Delivery logs (`webhook_deliveries`) with RLS.
 - [x] **Step 2:** Cryptographic PAT generation, SHA-256 token hashing, token prefixing, and granular scopes definition (`src/lib/pat.ts`).
-- [x] **Step 3:** Dual-Authentication Middleware & Scope Guard (`src/middleware/authenticate.ts` supporting both RS256 Bearer JWTs and hashed PATs, plus `requireScope`).
-- [ ] **Step 4:** PAT Management Feature Module (Repository, Service, Controller, Routes: list, create, revoke tokens).
+- [x] **Step 3:** Dual-Authentication Middleware & Scope Guard (`src/middleware/authenticate.ts` supporting both RS256 Bearer JWTs and hashed PATs, plus `requireScope` and `requireUserSession`).
+- [x] **Step 4:** PAT Management Feature Module (Zod schemas, raw SQL repository with RLS, service with zero-knowledge minting & RBAC, controller, and routes mounted at `/api/v1/pats`).
 - [ ] **Step 5:** Webhook Subscriptions Feature Module (Repository, Service, Controller, Routes: register, test, rotate secret, list deliveries).
 - [ ] **Step 6:** Webhook Dispatcher, BullMQ Outbound Delivery Worker with HMAC-SHA256 signatures, exponential backoff, and circuit breaker.
 - [ ] **Step 7:** Adversarial Integration Tests for PAT Scopes, Webhook Signature Verification, and Circuit Breaker Deactivation.
@@ -208,17 +208,22 @@ c:\Users\DMC\Desktop\be\
 | `migrations/004_create-pats-and-webhooks.up.sql`      | Migration 004: PATs, Webhook Subscriptions, Webhook Deliveries with GIN indexes & RLS                                                             |
 | `migrations/004_create-pats-and-webhooks.down.sql`    | Clean rollback statements for PATs and Webhook tables                                                                                            |
 | `src/lib/pat.ts`                                      | Cryptographic PAT generation (CSPRNG), SHA-256 token hasher, prefixing, and granular scope validation algebra                                     |
+| `src/modules/pats/pat.schema.ts`                      | Zod validation schemas (token creation, param checking) and camelCase response DTO contracts                                                      |
+| `src/modules/pats/pat.repository.ts`                  | Raw SQL PAT repository with RLS enforcement via `withTenantTransaction`, index scans, and atomic revocation                                       |
+| `src/modules/pats/pat.service.ts`                     | Business logic for zero-knowledge CSPRNG minting, one-time raw exposure, and RBAC token revocation                                               |
+| `src/modules/pats/pat.controller.ts`                  | HTTP controller for PAT lifecycle endpoints with 201 Created and 204 No Content                                                                  |
+| `src/modules/pats/pat.routes.ts`                      | Express router mounting PAT management with `authenticate`, `requireTenant`, `requireUserSession`, and RBAC guards                                |
 
 ---
 
 ## 6. Next Immediate Action for AI
 
-- **Current Step:** **Milestone 5 — Step 4: PAT Management Feature Module (`src/modules/pats/`)**.
+- **Current Step:** **Milestone 5 — Step 5: Webhook Subscriptions Feature Module (`src/modules/webhooks/`)**.
 - **Action:**
-  1. Review PAT CRUD architecture & security requirements (minting, one-time raw token exposure, listing metadata without hash/entropy leakage, revocation with ownership/admin checks).
-  2. Implement Zod validation schemas & TypeScript DTOs (`src/modules/pats/pat.schema.ts`).
-  3. Implement raw SQL PAT repository with RLS enforcement via `withTenantTransaction` (`src/modules/pats/pat.repository.ts`).
-  4. Implement business logic service (`src/modules/pats/pat.service.ts`).
-  5. Implement HTTP controller (`src/modules/pats/pat.controller.ts`).
-  6. Wire routes (`src/modules/pats/pat.routes.ts`) with `authenticate` -> `requireTenant` -> `requireRole` and mount under `/api/v1/pats` in `src/app.ts`.
-  7. Proceed to Step 5 (Webhook Subscriptions Feature Module).
+  1. Deep-dive into Webhook Subscription architecture: HTTPS URL validation, SSRF protection mechanics, CSPRNG secret generation for HMAC-SHA256 signatures, event topic subscription filtering.
+  2. Implement Zod validation schemas & TypeScript DTOs (`src/modules/webhooks/webhook.schema.ts`).
+  3. Implement raw SQL Webhook repository with RLS enforcement via `withTenantTransaction` (`src/modules/webhooks/webhook.repository.ts`).
+  4. Implement business logic service (`src/modules/webhooks/webhook.service.ts`).
+  5. Implement HTTP controller (`src/modules/webhooks/webhook.controller.ts`).
+  6. Wire routes (`src/modules/webhooks/webhook.routes.ts`) with `authenticate` -> `requireTenant` -> `requireRole("ADMIN")` -> `requireUserSession` and mount under `/api/v1/webhooks` in `src/app.ts`.
+  7. Proceed to Step 6 (Webhook Dispatcher & BullMQ Outbound Delivery Worker with circuit breaker).
