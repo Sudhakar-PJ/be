@@ -12,6 +12,7 @@ import { authRouter } from "./modules/auth/auth.routes";
 import { projectRouter } from "./modules/projects/project.routes";
 import { taskRouter } from "./modules/tasks/task.routes";
 import { patRouter } from "./modules/pats/pat.routes";
+import { webhookRouter } from "./modules/webhooks/webhook.routes";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/projects", projectRouter);
 app.use("/api/v1/tasks", taskRouter);
 app.use("/api/v1/pats", patRouter);
+app.use("/api/v1/webhooks", webhookRouter);
 
 app.get("/api/v1/health", (_req: Request, res: Response) => {
   logger.info("Health check endpoint was pinged");

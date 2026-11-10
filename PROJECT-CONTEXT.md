@@ -2,8 +2,8 @@
 
 > **Purpose:** Central living reference and handoff document. Any developer or AI assistant working in this workspace must read this document first before giving any guidance or suggestions.  
 > **Learner:** PJ Sudhakar  
-> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 5 (Step 4 PAT Module Complete, Step 5 Next)!
-> **Last Updated:** 2026-11-09
+> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 5 (Step 5 Webhook Subscriptions Complete, Step 6 Next)!
+> **Last Updated:** 2026-11-10
 
 ---
 
@@ -141,7 +141,7 @@ c:\Users\DMC\Desktop\be\
 - [x] **Step 2:** Cryptographic PAT generation, SHA-256 token hashing, token prefixing, and granular scopes definition (`src/lib/pat.ts`).
 - [x] **Step 3:** Dual-Authentication Middleware & Scope Guard (`src/middleware/authenticate.ts` supporting both RS256 Bearer JWTs and hashed PATs, plus `requireScope` and `requireUserSession`).
 - [x] **Step 4:** PAT Management Feature Module (Zod schemas, raw SQL repository with RLS, service with zero-knowledge minting & RBAC, controller, and routes mounted at `/api/v1/pats`).
-- [ ] **Step 5:** Webhook Subscriptions Feature Module (Repository, Service, Controller, Routes: register, test, rotate secret, list deliveries).
+- [x] **Step 5:** Webhook Subscriptions Feature Module (Repository with RLS, Service with CSPRNG secrets & SSRF guards, Controller, Routes with `ADMIN` and `webhooks:read`/`webhooks:write` scopes mounted at `/api/v1/webhooks`).
 - [ ] **Step 6:** Webhook Dispatcher, BullMQ Outbound Delivery Worker with HMAC-SHA256 signatures, exponential backoff, and circuit breaker.
 - [ ] **Step 7:** Adversarial Integration Tests for PAT Scopes, Webhook Signature Verification, and Circuit Breaker Deactivation.
 
@@ -213,17 +213,26 @@ c:\Users\DMC\Desktop\be\
 | `src/modules/pats/pat.service.ts`                     | Business logic for zero-knowledge CSPRNG minting, one-time raw exposure, and RBAC token revocation                                               |
 | `src/modules/pats/pat.controller.ts`                  | HTTP controller for PAT lifecycle endpoints with 201 Created and 204 No Content                                                                  |
 | `src/modules/pats/pat.routes.ts`                      | Express router mounting PAT management with `authenticate`, `requireTenant`, `requireUserSession`, and RBAC guards                                |
+| `src/modules/webhooks/webhook.schema.ts`              | Zod validation schemas (URL, supported events, SSRF guards), request wrappers, and camelCase response DTOs                                      |
+| `src/modules/webhooks/webhook.repository.ts`          | Raw SQL Webhook repository with PostgreSQL RLS enforcement, GIN array matching, and delivery audit logging                                       |
+| `src/modules/webhooks/webhook.service.ts`             | Business logic with CSPRNG 256-bit secret generation (`whsec_`), SSRF hostname filter, secret rotation, and status toggling                       |
+| `src/modules/webhooks/webhook.controller.ts`          | HTTP controller exposing standard CRUD, secret rotation, and delivery logs with RFC 9457 error handling                                         |
+| `src/modules/webhooks/webhook.routes.ts`              | Express router wiring `authenticate`, `requireTenant`, `requireRole("ADMIN")`, and `requireScope` mounted at `/api/v1/webhooks`                |
 
 ---
 
 ## 6. Next Immediate Action for AI
 
-- **Current Step:** **Milestone 5 — Step 5: Webhook Subscriptions Feature Module (`src/modules/webhooks/`)**.
+- **Current Step:** **Milestone 5 — Step 6: Webhook Dispatcher & BullMQ Outbound Delivery Worker (`src/jobs/webhook-delivery.worker.ts` & event dispatcher)**.
 - **Action:**
-  1. Deep-dive into Webhook Subscription architecture: HTTPS URL validation, SSRF protection mechanics, CSPRNG secret generation for HMAC-SHA256 signatures, event topic subscription filtering.
-  2. Implement Zod validation schemas & TypeScript DTOs (`src/modules/webhooks/webhook.schema.ts`).
-  3. Implement raw SQL Webhook repository with RLS enforcement via `withTenantTransaction` (`src/modules/webhooks/webhook.repository.ts`).
-  4. Implement business logic service (`src/modules/webhooks/webhook.service.ts`).
-  5. Implement HTTP controller (`src/modules/webhooks/webhook.controller.ts`).
-  6. Wire routes (`src/modules/webhooks/webhook.routes.ts`) with `authenticate` -> `requireTenant` -> `requireRole("ADMIN")` -> `requireUserSession` and mount under `/api/v1/webhooks` in `src/app.ts`.
-  7. Proceed to Step 6 (Webhook Dispatcher & BullMQ Outbound Delivery Worker with circuit breaker).
+  1. Deep-dive into Webhook Outbound Delivery Pipeline:
+     - Asynchronous decoupling: Why HTTP requests must never be performed synchronously inside request-response cycles.
+     - HMAC-SHA256 signature generation: Payload formatting, timestamp generation, header assembly (`X-Signature-SHA256: t=...,v1=...`).
+     - Exponential backoff retry strategy with jitter (e.g. 5 attempts: 5s, 15s, 1m, 5m, 15m).
+     - Circuit breaker & automatic subscription disabling: Incrementing `consecutive_failures`, auto-deactivating at threshold (e.g., 10 consecutive failures).
+     - Audit logging: Recording every attempt into `webhook_deliveries`.
+  2. Implement BullMQ Webhook Delivery Job Contract & Queue helper (`src/jobs/contracts.ts`, `src/jobs/queues.ts`).
+  3. Implement domain event dispatcher utility (`src/services/webhook-dispatcher.service.ts` or `src/lib/webhook-dispatcher.ts`).
+  4. Implement Webhook Delivery Worker processor in `src/jobs/worker.ts`.
+  5. Hook dispatching into Task and Project services (`task.service.ts`, `project.service.ts`).
+  6. Proceed to Step 7 (Adversarial Integration Tests).
