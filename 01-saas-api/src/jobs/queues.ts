@@ -8,6 +8,8 @@ import {
   TaskAssignedPayloadSchema,
   WelcomeEmailPayload,
   WelcomeEmailPayloadSchema,
+  WebhookDeliveryPayload,
+  WebhookDeliveryPayloadSchema,
 } from "./contracts";
 
 /**
@@ -40,12 +42,49 @@ const defaultQueueOptions: QueueOptions = {
 };
 
 /**
+ * Webhook-specific backoff options:
+ * - 5 attempts with exponential backoff + jitter (prevents thundering herds)
+ * - Initial delay of 5,000ms (~5s -> 10s -> 20s -> 40s -> 80s)
+ */
+export const webhookJobOptions: JobsOptions = {
+  attempts: 5,
+  backoff: {
+    type: "exponential",
+    delay: 5000,
+    jitter: 0.2,
+  },
+  removeOnComplete: {
+    count: 1000,
+    age: 24 * 3600,
+  },
+  removeOnFail: {
+    count: 5000,
+  },
+};
+
+const webhookQueueOptions: QueueOptions = {
+  connection: {
+    url: env.REDIS_URL,
+    maxRetriesPerRequest: null,
+  },
+  defaultJobOptions: webhookJobOptions,
+};
+
+/**
  * Notifications Queue: Handles task assignments, system alerts, and transactional emails.
  */
 export const notificationsQueue = new Queue(QUEUE_NAMES.NOTIFICATIONS, defaultQueueOptions);
 
 notificationsQueue.on("error", (err: Error) => {
   logger.error({ err: err.message }, "BullMQ notificationsQueue encountered an error");
+});
+
+/**
+ * Webhooks Queue: Isolated bulkhead queue for outbound third-party HTTP webhook deliveries.
+ */
+export const webhooksQueue = new Queue(QUEUE_NAMES.WEBHOOKS, webhookQueueOptions);
+webhooksQueue.on("error", (err: Error) => {
+  logger.error({ err: err.message }, "BullMQ webhooksQueue encountered an error");
 });
 
 /**
@@ -65,6 +104,25 @@ export async function enqueueWelcomeEmail(payload: WelcomeEmailPayload): Promise
   const validated = WelcomeEmailPayloadSchema.parse(payload);
   await notificationsQueue.add(JobName.WELCOME_EMAIL, validated);
   logger.debug({ email: validated.email }, "Enqueued email:welcome job");
+}
+
+export async function enqueueWebhookDelivery(
+  payload: WebhookDeliveryPayload,
+  options?: JobsOptions,
+): Promise<void> {
+  const validated = WebhookDeliveryPayloadSchema.parse(payload);
+  await webhooksQueue.add(JobName.WEBHOOK_DELIVERY, validated, {
+    jobId: validated.deliveryId, // Deduplicates duplicate enqueue attempts for the same deliveryId
+    ...options,
+  });
+  logger.debug(
+    {
+      deliveryId: validated.deliveryId,
+      subscriptionId: validated.subscriptionId,
+      event: validated.event,
+    },
+    "Enqueued webhook:delivery job",
+  );
 }
 
 /**

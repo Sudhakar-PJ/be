@@ -2,8 +2,8 @@
 
 > **Purpose:** Central living reference and handoff document. Any developer or AI assistant working in this workspace must read this document first before giving any guidance or suggestions.  
 > **Learner:** PJ Sudhakar  
-> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 5 (Step 5 Webhook Subscriptions Complete, Step 6 Next)!
-> **Last Updated:** 2026-11-10
+> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 5 (Step 6.1 Webhook Queue & Circuit Breaker Repo Complete, Step 6.2 Next)!
+> **Last Updated:** 2026-11-11
 
 ---
 
@@ -200,8 +200,8 @@ c:\Users\DMC\Desktop\be\
 | `src/modules/tasks/task.controller.ts`                | HTTP controller binding tenant/user context and returning paginated/item envelopes                                                               |
 | `src/modules/tasks/task.routes.ts`                    | Express router wiring `authenticate`, `requireTenant`, `requireRole`, and Redis `idempotency`                                                    |
 | `tests/integration/tasks.test.ts`                     | 12 automated adversarial tests covering sequential numbering, keyset cursor pagination, OCC 409 conflict, and Redis idempotency                  |
-| `src/jobs/contracts.ts`                               | Zod validation schemas & typed contracts for background jobs (TaskAssigned, WelcomeEmail)                                                        |
-| `src/jobs/queues.ts`                                  | BullMQ queue factory with exponential backoff, retention cleanup, and type-safe enqueue helpers                                                   |
+| `src/jobs/contracts.ts`                               | Zod validation schemas & typed contracts for background jobs (TaskAssigned, WelcomeEmail, WebhookDelivery)                                       |
+| `src/jobs/queues.ts`                                  | BullMQ queue factory (`notifications`, isolated `webhooks` bulkhead queue with jittered exponential backoff) & enqueue helpers                    |
 | `src/services/email.service.ts`                       | Transactional email provider abstraction with mock in-memory delivery & test inspection                                                          |
 | `src/jobs/worker.ts`                                  | Dedicated BullMQ worker with ALS context re-hydration, concurrency controls & graceful shutdown                                                  |
 | `tests/integration/jobs.test.ts`                      | 3 automated integration tests verifying async dispatch, retry backoff, and DLQ capture                                                          |
@@ -214,7 +214,7 @@ c:\Users\DMC\Desktop\be\
 | `src/modules/pats/pat.controller.ts`                  | HTTP controller for PAT lifecycle endpoints with 201 Created and 204 No Content                                                                  |
 | `src/modules/pats/pat.routes.ts`                      | Express router mounting PAT management with `authenticate`, `requireTenant`, `requireUserSession`, and RBAC guards                                |
 | `src/modules/webhooks/webhook.schema.ts`              | Zod validation schemas (URL, supported events, SSRF guards), request wrappers, and camelCase response DTOs                                      |
-| `src/modules/webhooks/webhook.repository.ts`          | Raw SQL Webhook repository with PostgreSQL RLS enforcement, GIN array matching, and delivery audit logging                                       |
+| `src/modules/webhooks/webhook.repository.ts`          | Raw SQL Webhook repository with RLS enforcement, GIN array matching, delivery audit logging & atomic circuit breaker updates                     |
 | `src/modules/webhooks/webhook.service.ts`             | Business logic with CSPRNG 256-bit secret generation (`whsec_`), SSRF hostname filter, secret rotation, and status toggling                       |
 | `src/modules/webhooks/webhook.controller.ts`          | HTTP controller exposing standard CRUD, secret rotation, and delivery logs with RFC 9457 error handling                                         |
 | `src/modules/webhooks/webhook.routes.ts`              | Express router wiring `authenticate`, `requireTenant`, `requireRole("ADMIN")`, and `requireScope` mounted at `/api/v1/webhooks`                |
@@ -223,16 +223,15 @@ c:\Users\DMC\Desktop\be\
 
 ## 6. Next Immediate Action for AI
 
-- **Current Step:** **Milestone 5 — Step 6: Webhook Dispatcher & BullMQ Outbound Delivery Worker (`src/jobs/webhook-delivery.worker.ts` & event dispatcher)**.
-- **Action:**
-  1. Deep-dive into Webhook Outbound Delivery Pipeline:
-     - Asynchronous decoupling: Why HTTP requests must never be performed synchronously inside request-response cycles.
-     - HMAC-SHA256 signature generation: Payload formatting, timestamp generation, header assembly (`X-Signature-SHA256: t=...,v1=...`).
-     - Exponential backoff retry strategy with jitter (e.g. 5 attempts: 5s, 15s, 1m, 5m, 15m).
-     - Circuit breaker & automatic subscription disabling: Incrementing `consecutive_failures`, auto-deactivating at threshold (e.g., 10 consecutive failures).
-     - Audit logging: Recording every attempt into `webhook_deliveries`.
-  2. Implement BullMQ Webhook Delivery Job Contract & Queue helper (`src/jobs/contracts.ts`, `src/jobs/queues.ts`).
-  3. Implement domain event dispatcher utility (`src/services/webhook-dispatcher.service.ts` or `src/lib/webhook-dispatcher.ts`).
-  4. Implement Webhook Delivery Worker processor in `src/jobs/worker.ts`.
-  5. Hook dispatching into Task and Project services (`task.service.ts`, `project.service.ts`).
+- **Current Step:** **Milestone 5 — Step 6.2: Webhook Signature Helper, Dispatcher, Delivery Service & Worker (`src/jobs/worker.ts`)**.
+- **Completed in Step 6.1:**
+  - Atomic circuit breaker methods (`recordDeliverySuccess`, `recordDeliveryFailure`) added to `src/modules/webhooks/webhook.repository.ts`.
+  - `WebhookDeliveryPayloadSchema`, `JobName.WEBHOOK_DELIVERY`, and `QUEUE_NAMES.WEBHOOKS` added to `src/jobs/contracts.ts`.
+  - Isolated `webhooksQueue` (with jittered exponential backoff) and `enqueueWebhookDelivery` added to `src/jobs/queues.ts`.
+- **Action Next:**
+  1. Teach & implement `src/lib/webhook-signature.ts` (HMAC-SHA256 `t=...,v1=...` signer and `timingSafeEqual` verifier with replay tolerance).
+  2. Teach & implement `src/services/webhook-dispatcher.service.ts` (fan-out dispatcher querying active subscribers via GIN index and enqueuing per-subscription BullMQ jobs).
+  3. Teach & implement `src/services/webhook-delivery.service.ts` (fresh Postgres lookup, runtime DNS-rebinding/SSRF guard, HTTP delivery with 5s `AbortSignal.timeout`, response truncation, `webhook_deliveries` audit logging, `UnrecoverableError` on permanent 4xx, and atomic circuit breaker tripping).
+  4. Wire `webhookWorker` into `src/jobs/worker.ts` (bulkhead concurrency, ALS re-hydration, graceful shutdown).
+  5. Step 6.3: Hook event dispatching into `task.service.ts` (`task.created`, `task.updated`, `task.deleted`) and `project.service.ts` (`project.created`, `project.updated`, `project.deleted`).
   6. Proceed to Step 7 (Adversarial Integration Tests).

@@ -19,6 +19,7 @@ export type JobMetadata = z.infer<typeof JobMetadataSchema>;
 export const JobName = {
   TASK_ASSIGNED: "task:assigned",
   WELCOME_EMAIL: "email:welcome",
+  WEBHOOK_DELIVERY: "webhook:delivery",
 } as const;
 
 export type JobNameType = (typeof JobName)[keyof typeof JobName];
@@ -49,10 +50,26 @@ export const WelcomeEmailPayloadSchema = JobMetadataSchema.extend({
 export type WelcomeEmailPayload = z.infer<typeof WelcomeEmailPayloadSchema>;
 
 /**
+ * Outbound Webhook Delivery Job Payload.
+ * Note: We intentionally do NOT put the plaintext `secret` or `url` inside Redis
+ * unless needed; instead, the worker fetches fresh subscription state from Postgres
+ * so revoked/disabled/rotated subscriptions take effect immediately!
+ */
+export const WebhookDeliveryPayloadSchema = JobMetadataSchema.extend({
+  tenantId: z.string().uuid(),
+  deliveryId: z.string().uuid(),
+  subscriptionId: z.string().uuid(),
+  event: z.string().min(1),
+  payload: z.record(z.unknown()),
+});
+export type WebhookDeliveryPayload = z.infer<typeof WebhookDeliveryPayloadSchema>;
+
+/**
  * Queue Names in BullMQ
  */
 export const QUEUE_NAMES = {
   NOTIFICATIONS: "notifications",
+  WEBHOOKS: "webhooks",
 } as const;
 
 export type QueueName = (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES];

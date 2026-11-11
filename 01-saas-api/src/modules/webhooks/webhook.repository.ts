@@ -466,6 +466,69 @@ export class WebhookRepository {
 
     return client ? run(client) : withTenantTransaction(tenantId, run);
   }
+  /**
+   * Resets consecutive_failures to 0 after a successful delivery.
+   * Uses `AND consecutive_failures > 0` to avoid unnecessary row writes on healthy endpoints.
+   */
+  async recordDeliverySuccess(
+    tenantId: string,
+    subscriptionId: string,
+    client?: PoolClient,
+  ): Promise<void> {
+    const run = async (c: PoolClient): Promise<void> => {
+      const sql = `
+      UPDATE webhook_subscriptions
+      SET
+       consecutive_failures = 0,
+       updated_at = CURRENT_TIMESTAMP
+      WHERE id = $1
+       AND consecutive_failures > 0;
+      `;
+      await c.query(sql, [subscriptionId]);
+    };
+    return client ? run(client) : withTenantTransaction(tenantId, run);
+  }
+  /**
+   * Atomically increments consecutive_failures and trips the circuit breaker
+   * (sets is_active = FALSE) if the failure threshold is reached.
+   */
+  async recoedDeliveryFailure(
+    tenantId: string,
+    subscriptionId: string,
+    maxFailuresThreshold: number,
+    client?: PoolClient,
+  ): Promise<WebhookSubscriptionRecord | null> {
+    const run = async (c: PoolClient): Promise<WebhookSubscriptionRecord | null> => {
+      const sql = `
+        UPDATE webhook_subscriptions
+        SET
+          consecutive_failures = consecutive_failures + 1,
+          is_active = CASE
+            WHEN consecutive_failures + 1 >= $2 THEN FALSE
+            ELSE is_active
+          END,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = $1
+        RETURNING
+          id,
+          tenant_id,
+          created_by,
+          url,
+          secret,
+          events,
+          is_active,
+          consecutive_failures,
+          created_at,
+          updated_at;
+      `;
+      const result = await c.query<WebhookSubscriptionRecord>(sql, [
+        subscriptionId,
+        maxFailuresThreshold,
+      ]);
+      return result.rows[0] ?? null;
+    };
+    return client ? run(client) : withTenantTransaction(tenantId, run);
+  }
 }
 
 export const webhookRepository = new WebhookRepository();
