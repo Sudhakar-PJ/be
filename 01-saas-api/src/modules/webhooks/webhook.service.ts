@@ -23,7 +23,7 @@ export const WEBHOOK_SECRET_PREFIX = "whsec_";
  * Generates a cryptographically secure 256-bit secret for HMAC-SHA256 signing.
  */
 export function generateWebhookSecret(): string {
-  const entropy = crypto.randomBytes(32).toString("hex");
+  const entropy = crypto.randomBytes(32).toString("base64url");
   return `${WEBHOOK_SECRET_PREFIX}${entropy}`;
 }
 

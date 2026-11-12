@@ -37,7 +37,7 @@ export interface GeneratedPat {
 export function generatePat(): GeneratedPat {
   const entropy = crypto.randomBytes(32).toString("hex");
   const rawToken = `${PAT_PREFIX}${entropy}`;
-  const tokenPreview = `${PAT_PREFIX}${entropy.slice(0, 8)}...`;
+  const tokenPreview = `${PAT_PREFIX}${entropy.slice(0, 4)}...`;
 
   const tokenHash = hashPat(rawToken);
 

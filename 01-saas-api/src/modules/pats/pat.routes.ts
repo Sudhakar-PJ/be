@@ -1,11 +1,11 @@
-import { Router} from "express";
+import { Router } from "express";
 import { asyncHandler } from "../../lib/asyncHandler";
 
 import { authenticate, requireUserSession } from "../../middleware/authenticate";
 import { requireRole, requireTenant } from "../../middleware/tenant";
 import { validate } from "../../middleware/validate";
 import { patController } from "./pat.controller";
-import { createPatSchema, patIdParamSchema } from "./pat.schema";
+import { createPatRequestSchema, patIdParamRequestSchema } from "./pat.schema";
 
 const patRouter = Router();
 
@@ -16,7 +16,7 @@ patRouter.use(authenticate, requireTenant, requireUserSession);
 patRouter.post(
   "/",
   requireRole("MEMBER"),
-  validate(createPatSchema),
+  validate(createPatRequestSchema),
   asyncHandler((req, res) => patController.createPat(req, res)),
 );
 
@@ -31,7 +31,7 @@ patRouter.get(
 patRouter.get(
   "/:id",
   requireRole("VIEWER"),
-  validate(patIdParamSchema),
+  validate(patIdParamRequestSchema),
   asyncHandler((req, res) => patController.getPatById(req, res)),
 );
 
@@ -39,7 +39,7 @@ patRouter.get(
 patRouter.delete(
   "/:id",
   requireRole("MEMBER"),
-  validate(patIdParamSchema),
+  validate(patIdParamRequestSchema),
   asyncHandler((req, res) => patController.revokePat(req, res)),
 );
 

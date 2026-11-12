@@ -4,14 +4,11 @@ import { VALID_PAT_SCOPES, PatScope } from "../../lib/pat";
 /**
  * Zod enum reflecting all platform-supported scopes.
  */
-export const patScopeSchema = z.enum(
-  VALID_PAT_SCOPES as unknown as[PatScope, ...PatScope[]],
-  {
-    errorMap: () => ({
-      message: `Invalid scope. Allowed scopes: ${VALID_PAT_SCOPES.join(", ")}`,
-    }),
-  },
-);
+export const patScopeSchema = z.enum(VALID_PAT_SCOPES as unknown as [PatScope, ...PatScope[]], {
+  errorMap: () => ({
+    message: `Invalid scope. Allowed scopes: ${VALID_PAT_SCOPES.join(", ")}`,
+  }),
+});
 
 /**
  * Request payload for creating a new Personal Access Token.
@@ -76,3 +73,11 @@ export interface PatSummaryResponse {
 export interface PatCreatedResponse extends PatSummaryResponse {
   rawToken: string;
 }
+
+export const createPatRequestSchema = z.object({
+  body: createPatSchema,
+});
+
+export const patIdParamRequestSchema = z.object({
+  params: patIdParamSchema,
+});

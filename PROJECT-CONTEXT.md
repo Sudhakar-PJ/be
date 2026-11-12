@@ -2,8 +2,8 @@
 
 > **Purpose:** Central living reference and handoff document. Any developer or AI assistant working in this workspace must read this document first before giving any guidance or suggestions.  
 > **Learner:** PJ Sudhakar  
-> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 5 (Step 6.1 Webhook Queue & Circuit Breaker Repo Complete, Step 6.2 Next)!
-> **Last Updated:** 2026-11-11
+> **Status:** Project #1 (Multi-Tenant SaaS API) — Milestone 5 Complete (50/50 Integration Tests Passing), Milestone 5.5 (Missed Security & Audit Items) Next!
+> **Last Updated:** 2026-11-12
 
 ---
 
@@ -135,15 +135,24 @@ c:\Users\DMC\Desktop\be\
 - [x] **Step 5:** Wire asynchronous job dispatching into Tasks & Auth modules (`task.service.ts`, `auth.service.ts`).
 - [x] **Step 6:** Dead Letter Queue (DLQ) inspection, retry mechanism with backoff, and 3 automated integration tests.
 
-#### Milestone 5 Checklist: (In Progress)
+#### Milestone 5 Checklist: (100% Complete)
 
 - [x] **Step 1:** Raw SQL Migration 004: Personal Access Tokens (`personal_access_tokens`), Webhook Subscriptions (`webhook_subscriptions`), and Delivery logs (`webhook_deliveries`) with RLS.
 - [x] **Step 2:** Cryptographic PAT generation, SHA-256 token hashing, token prefixing, and granular scopes definition (`src/lib/pat.ts`).
 - [x] **Step 3:** Dual-Authentication Middleware & Scope Guard (`src/middleware/authenticate.ts` supporting both RS256 Bearer JWTs and hashed PATs, plus `requireScope` and `requireUserSession`).
 - [x] **Step 4:** PAT Management Feature Module (Zod schemas, raw SQL repository with RLS, service with zero-knowledge minting & RBAC, controller, and routes mounted at `/api/v1/pats`).
 - [x] **Step 5:** Webhook Subscriptions Feature Module (Repository with RLS, Service with CSPRNG secrets & SSRF guards, Controller, Routes with `ADMIN` and `webhooks:read`/`webhooks:write` scopes mounted at `/api/v1/webhooks`).
-- [ ] **Step 6:** Webhook Dispatcher, BullMQ Outbound Delivery Worker with HMAC-SHA256 signatures, exponential backoff, and circuit breaker.
-- [ ] **Step 7:** Adversarial Integration Tests for PAT Scopes, Webhook Signature Verification, and Circuit Breaker Deactivation.
+- [x] **Step 6:** Webhook Dispatcher, BullMQ Outbound Delivery Worker with HMAC-SHA256 signatures, exponential backoff, and circuit breaker.
+- [x] **Step 7:** Adversarial Integration Tests for PAT Scopes, Webhook Signature Verification, and Circuit Breaker Deactivation (`tests/integration/pats-webhooks.test.ts`).
+
+#### Milestone 5.5 Checklist: (Catch-Up: Missed Items from Milestones 1–5)
+
+- [ ] **Step 1:** Security Headers & Edge Hardening (`src/app.ts` — wire `helmet`, `cors` with `env.CORS_ORIGIN`, `hpp`, and `compression`).
+- [ ] **Step 2:** Atomic Redis Lua Sliding-Window Rate Limiter (`src/middleware/rate-limiter.ts` — `ip:<address>` on public auth routes, `user:<id>` on authenticated routes, `RateLimit-*` headers, `429` RFC 9457).
+- [ ] **Step 3:** JWT `jti` Access Token Denylist in Redis (`src/lib/crypto.ts`, `src/modules/auth/auth.service.ts`, `src/middleware/authenticate.ts` — revoke active access tokens on `/logout` with remaining-TTL expiration and $O(1)$ middleware verification).
+- [ ] **Step 4:** Tamper-Evident Hash-Chained Audit Logging Service (`migrations/005_create-audit-logs.up.sql`, `src/modules/audit/` — RLS-protected append-only `audit_logs` where each entry stores `SHA-256(previous_hash + payload)`, hooked into PAT/Webhook/Auth mutations + chain verification endpoint).
+- [ ] **Step 5:** `labels`, `task_labels`, `comments` & `pg_trgm` Fuzzy Search (`migrations/006_create-labels-comments-trgm.up.sql` — many-to-many task labels, task comments with RLS, `CREATE EXTENSION pg_trgm` + GIN trigram index on `tasks.title` for typo-tolerant fuzzy search alongside `tsvector`).
+- [ ] **Step 6:** Adversarial Integration Tests (`tests/integration/security-audit.test.ts` — rate limiting `429`, immediate post-logout JWT revocation, hash-chain tamper detection, labels/comments CRUD, and `pg_trgm` fuzzy search).
 
 ---
 
@@ -218,20 +227,20 @@ c:\Users\DMC\Desktop\be\
 | `src/modules/webhooks/webhook.service.ts`             | Business logic with CSPRNG 256-bit secret generation (`whsec_`), SSRF hostname filter, secret rotation, and status toggling                       |
 | `src/modules/webhooks/webhook.controller.ts`          | HTTP controller exposing standard CRUD, secret rotation, and delivery logs with RFC 9457 error handling                                         |
 | `src/modules/webhooks/webhook.routes.ts`              | Express router wiring `authenticate`, `requireTenant`, `requireRole("ADMIN")`, and `requireScope` mounted at `/api/v1/webhooks`                |
+| `src/lib/webhook-signature.ts`                        | Stripe-style HMAC-SHA256 webhook signer (`t=...,v1=...`) and `timingSafeCompare` verifier with 300s replay tolerance                           |
+| `src/services/webhook-dispatcher.service.ts`          | Fan-out domain event dispatcher querying GIN-indexed active subscribers and enqueuing per-subscription BullMQ jobs                             |
+| `src/services/webhook-delivery.service.ts`            | Hardened outbound HTTP delivery engine (DNS-rebinding SSRF guard, `redirect: "manual"`, 5s timeout, 2KB stream cap, circuit breaker, audit log)  |
+| `tests/integration/pats-webhooks.test.ts`             | 7 automated adversarial tests covering PAT scopes, revocation, live HMAC-SHA256 webhook delivery, secret rotation, and circuit breaker tripping  |
 
 ---
 
 ## 6. Next Immediate Action for AI
 
-- **Current Step:** **Milestone 5 — Step 6.2: Webhook Signature Helper, Dispatcher, Delivery Service & Worker (`src/jobs/worker.ts`)**.
-- **Completed in Step 6.1:**
-  - Atomic circuit breaker methods (`recordDeliverySuccess`, `recordDeliveryFailure`) added to `src/modules/webhooks/webhook.repository.ts`.
-  - `WebhookDeliveryPayloadSchema`, `JobName.WEBHOOK_DELIVERY`, and `QUEUE_NAMES.WEBHOOKS` added to `src/jobs/contracts.ts`.
-  - Isolated `webhooksQueue` (with jittered exponential backoff) and `enqueueWebhookDelivery` added to `src/jobs/queues.ts`.
-- **Action Next:**
-  1. Teach & implement `src/lib/webhook-signature.ts` (HMAC-SHA256 `t=...,v1=...` signer and `timingSafeEqual` verifier with replay tolerance).
-  2. Teach & implement `src/services/webhook-dispatcher.service.ts` (fan-out dispatcher querying active subscribers via GIN index and enqueuing per-subscription BullMQ jobs).
-  3. Teach & implement `src/services/webhook-delivery.service.ts` (fresh Postgres lookup, runtime DNS-rebinding/SSRF guard, HTTP delivery with 5s `AbortSignal.timeout`, response truncation, `webhook_deliveries` audit logging, `UnrecoverableError` on permanent 4xx, and atomic circuit breaker tripping).
-  4. Wire `webhookWorker` into `src/jobs/worker.ts` (bulkhead concurrency, ALS re-hydration, graceful shutdown).
-  5. Step 6.3: Hook event dispatching into `task.service.ts` (`task.created`, `task.updated`, `task.deleted`) and `project.service.ts` (`project.created`, `project.updated`, `project.deleted`).
-  6. Proceed to Step 7 (Adversarial Integration Tests).
+- **Current Milestone:** **Milestone 5.5 — Catch-Up: Security Hardening, Redis Rate Limiting, JWT Denylist & Hash-Chained Audit Logs**.
+- **Instruction:** Start teaching **Milestone 5.5** from Step 1 (one step at a time, with deep first-principles theory, real-world examples, and waiting for PJ to implement and test each step before advancing):
+  1. **Step 1:** Wire `helmet`, `cors`, `hpp`, and `compression` into `src/app.ts` (explain HTTP parameter pollution, CORS preflight, and security headers).
+  2. **Step 2:** Implement Redis Lua Sliding-Window Rate Limiter (`src/middleware/rate-limiter.ts`) — explain why Redis Lua scripts prevent race conditions vs naive `GET`+`INCR`, and mount on `/api/v1/auth` + authenticated routes.
+  3. **Step 3:** Implement JWT `jti` Access Token Denylist on `/logout` — explain stateless vs stateful revocation trade-offs and TTL sizing.
+  4. **Step 4:** Implement Hash-Chained Audit Logging Service (`migrations/005` + `src/modules/audit/`) — explain cryptographic hash chains, advisory/row locking to serialize `previous_hash` reads, and tamper detection.
+  5. **Step 5:** Implement `labels`, `task_labels`, `comments` (with RLS) and `pg_trgm` GIN trigram fuzzy search on `tasks.title` (`migrations/006`).
+  6. **Step 6:** Build `tests/integration/security-audit.test.ts` to verify all Milestone 5.5 defenses & features, then proceed to **Milestone 6 (Observability, Prometheus, OpenTelemetry, `EXPLAIN ANALYZE`, k6)**.

@@ -6,9 +6,16 @@ import {
   type UpdateProjectInput,
 } from "./project.schema";
 import { ProjectRepository, projectRepository, toProjectResponse } from "./project.repository";
+import {
+  webhookDispatcherService,
+  WebhookDispatcherService,
+} from "../../services/webhook-dispatcher.service";
 
 export class ProjectService {
-  constructor(private readonly projectRepo: ProjectRepository = projectRepository) {}
+  constructor(
+    private readonly projectRepo: ProjectRepository = projectRepository,
+    private readonly webhookDispatcher: WebhookDispatcherService = webhookDispatcherService,
+  ) {}
 
   /**
    * Creates a new project in the active tenant workspace.
@@ -40,7 +47,16 @@ export class ProjectService {
       createdBy: userId,
     });
 
-    return toProjectResponse(record);
+    const response = toProjectResponse(record);
+
+    await this.webhookDispatcher.dispatch({
+      tenantId,
+      actorId: userId,
+      event: "project.created",
+      data: { ...response },
+    });
+
+    return response;
   }
 
   /**
@@ -92,7 +108,15 @@ export class ProjectService {
       );
     }
 
-    return toProjectResponse(updated);
+    const response = toProjectResponse(updated);
+
+    await this.webhookDispatcher.dispatch({
+      tenantId,
+      event: "project.updated",
+      data: { ...response },
+    });
+
+    return response;
   }
 
   /**
@@ -106,6 +130,11 @@ export class ProjectService {
         "PROJECT_NOT_FOUND",
       );
     }
+    await this.webhookDispatcher.dispatch({
+      tenantId,
+      event: "project.deleted",
+      data: { id: projectId },
+    });
   }
 }
 

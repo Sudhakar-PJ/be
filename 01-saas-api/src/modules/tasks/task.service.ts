@@ -14,12 +14,17 @@ import { userRepository, UserRepository } from "../auth/user.repository";
 import { enqueueTaskAssignedNotification } from "../../jobs/queues";
 import { getCorrelationId } from "../../lib/context";
 import { logger } from "../../config/logger";
+import {
+  webhookDispatcherService,
+  WebhookDispatcherService,
+} from "../../services/webhook-dispatcher.service";
 
 export class TaskService {
   constructor(
     private readonly taskRepo: TaskRepository = taskRepository,
     private readonly projectRepo: ProjectRepository = projectRepository,
     private readonly userRepo: UserRepository = userRepository,
+    private readonly webhookDispatcher: WebhookDispatcherService = webhookDispatcherService,
   ) {}
 
   /**
@@ -86,7 +91,16 @@ export class TaskService {
       }
     }
 
-    return toTaskResponse(record);
+    const response = toTaskResponse(record);
+
+    await this.webhookDispatcher.dispatch({
+      tenantId,
+      actorId: userId,
+      event: "task.created",
+      data: { ...response },
+    });
+
+    return response;
   }
 
   /**
@@ -182,7 +196,15 @@ export class TaskService {
       }
     }
 
-    return toTaskResponse(record);
+    const response = toTaskResponse(record);
+
+    await this.webhookDispatcher.dispatch({
+      tenantId,
+      event: "task.updated",
+      data: { ...response },
+    });
+
+    return response;
   }
 
   /**
@@ -196,6 +218,12 @@ export class TaskService {
         "TASK_NOT_FOUND",
       );
     }
+
+    await this.webhookDispatcher.dispatch({
+      tenantId,
+      event: "task.deleted",
+      data: { id: taskId },
+    });
   }
 }
 

@@ -492,7 +492,7 @@ export class WebhookRepository {
    * Atomically increments consecutive_failures and trips the circuit breaker
    * (sets is_active = FALSE) if the failure threshold is reached.
    */
-  async recoedDeliveryFailure(
+  async recordDeliveryFailure(
     tenantId: string,
     subscriptionId: string,
     maxFailuresThreshold: number,
