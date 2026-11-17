@@ -4,8 +4,9 @@ import { verifyAccessToken } from "../lib/crypto";
 import { getRequestContext } from "../lib/context";
 import { TenantRole } from "../types/express";
 import { hashPat, hasRequiredScope, PAT_PREFIX, PatScope } from "../lib/pat";
-import { query } from "../config/database"
+import { query } from "../config/database";
 import { logger } from "../config/logger";
+import { redis } from "../config/redis";
 
 interface PatLookupRow {
   id: string;
@@ -24,34 +25,38 @@ interface PatLookupRow {
  * - Routes tokens starting with 'pat_live_' to database-backed PAT verification.
  * - Routes all other tokens to in-memory RS256 JWT verification.
  */
-export async function authenticate(req: Request, _res: Response, next: NextFunction): Promise<void> {
+export async function authenticate(
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith("Bearer")) {
-    throw new UnauthorizedError(
-      "Missing or Invalid Authorization header. Expected 'Bearer <token>",
-      "MISSING_TOKEN",
-    );
-  }
+    if (!authHeader || !authHeader.startsWith("Bearer")) {
+      throw new UnauthorizedError(
+        "Missing or Invalid Authorization header. Expected 'Bearer <token>",
+        "MISSING_TOKEN",
+      );
+    }
 
-  const token = authHeader.slice(7).trim();
-  if (!token) throw new UnauthorizedError("Bearer token is empty", "INVALID_TOKEN");
+    const token = authHeader.slice(7).trim();
+    if (!token) throw new UnauthorizedError("Bearer token is empty", "INVALID_TOKEN");
 
-  if (token.startsWith(PAT_PREFIX)) {
-    await authenticatePat(token, req)
-  } else {
-    authenticateJwt(token, req)
-  }
-next();
+    if (token.startsWith(PAT_PREFIX)) {
+      await authenticatePat(token, req);
+    } else {
+      await authenticateJwt(token, req);
+    }
+    next();
   } catch (error) {
     next(error);
   }
 }
 
 /**
-* Authenticates a Personal Access Token (PAT).
-*/
+ * Authenticates a Personal Access Token (PAT).
+ */
 async function authenticatePat(token: string, req: Request): Promise<void> {
   const tokenHash = hashPat(token);
 
@@ -70,57 +75,68 @@ async function authenticatePat(token: string, req: Request): Promise<void> {
       LEFT JOIN tenant_members tm ON tm.tenant_id = p.tenant_id AND tm.user_id = p.user_id
      WHERE p.token_hash = $1
      LIMIT 1`,
-     [tokenHash]
+    [tokenHash],
   );
   const pat = result.rows[0];
 
-  if(!pat) throw new UnauthorizedError("Invalid or non-existent Personal Access Token", "INVALID_PAT");
+  if (!pat)
+    throw new UnauthorizedError("Invalid or non-existent Personal Access Token", "INVALID_PAT");
 
-  if(pat.revoked_at) throw new UnauthorizedError("Personal Access Token has been revoked", "PAT_REVOKED");
+  if (pat.revoked_at)
+    throw new UnauthorizedError("Personal Access Token has been revoked", "PAT_REVOKED");
 
-  if(pat.expires_at && new Date(pat.expires_at).getTime() <= Date.now()) throw new UnauthorizedError("Personal Access Token has expired", "PAT_EXPIRED");
+  if (pat.expires_at && new Date(pat.expires_at).getTime() <= Date.now())
+    throw new UnauthorizedError("Personal Access Token has expired", "PAT_EXPIRED");
 
-  if(!pat.tenant_role) throw new UnauthorizedError(
+  if (!pat.tenant_role)
+    throw new UnauthorizedError(
       "The token creator is no longer an active member of this tenant",
       "PAT_TENANT_ACCESS_LOST",
     );
 
-// Non-blocking fire-and-forget audit timestamp update
- query(
-  `UPDATE personal_access_tokens SET last_used_at = CURRENT_TIMESTAMP WHERE id = $1`, [pat.id]
- ).catch((err: unknown) => {
-  logger.error({err, patId: pat.id}, "Failed to update PAT last_used_at timestamp")
- });
+  // Non-blocking fire-and-forget audit timestamp update
+  query(`UPDATE personal_access_tokens SET last_used_at = CURRENT_TIMESTAMP WHERE id = $1`, [
+    pat.id,
+  ]).catch((err: unknown) => {
+    logger.error({ err, patId: pat.id }, "Failed to update PAT last_used_at timestamp");
+  });
 
- req.user = {
-  id: pat.user_id,
-  email: pat.email
- }  
+  req.user = {
+    id: pat.user_id,
+    email: pat.email,
+  };
 
- req.auth = {
-  type: "PAT",
-  scopes: pat.scopes,
-  patId: pat.id,
- }
+  req.auth = {
+    type: "PAT",
+    scopes: pat.scopes,
+    patId: pat.id,
+  };
 
- req.tenant = {
-  id: pat.tenant_id,
-  role: pat.tenant_role
- }
+  req.tenant = {
+    id: pat.tenant_id,
+    role: pat.tenant_role,
+  };
 
- const store = getRequestContext();
- if(store) {
-  store.userId = pat.user_id;
-  store.tenantId = pat.tenant_id;
- }
+  const store = getRequestContext();
+  if (store) {
+    store.userId = pat.user_id;
+    store.tenantId = pat.tenant_id;
+  }
 }
 
 /**
- * Authenticates an RS256 JWT Access Token.
+ * Authenticates an RS256 JWT Access Token and verifies it against the Redis revocation denylist.
  */
-
- function authenticateJwt(token: string, req: Request): void {
+async function authenticateJwt(token: string, req: Request): Promise<void> {
   const decoded = verifyAccessToken(token);
+
+  if (decoded.jti) {
+    const isRevoked = await redis.exists(`denylist:jwt:${decoded.jti}`);
+    if (isRevoked === 1) {
+      throw new UnauthorizedError("Access token has been revoked", "TOKEN_REVOKED");
+    }
+  }
+
   req.user = {
     id: decoded.sub,
     email: decoded.email,
@@ -142,15 +158,20 @@ async function authenticatePat(token: string, req: Request): Promise<void> {
  */
 export function requireScope(requiredScope: PatScope) {
   return (req: Request, _res: Response, next: NextFunction): void => {
-    if(!req.auth) throw new UnauthorizedError("Authentication required before evaluating scopes", "AUTH_REQUIRED");
+    if (!req.auth)
+      throw new UnauthorizedError(
+        "Authentication required before evaluating scopes",
+        "AUTH_REQUIRED",
+      );
 
-    if(!hasRequiredScope(req.auth.scopes, requiredScope)) throw new ForbiddenError(
+    if (!hasRequiredScope(req.auth.scopes, requiredScope))
+      throw new ForbiddenError(
         `Insufficient token scopes. This endpoint requires the '${requiredScope}' permission.`,
         "INSUFFICIENT_SCOPE",
       );
 
-      next();
-  }
+    next();
+  };
 }
 
 /**

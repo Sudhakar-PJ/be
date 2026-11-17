@@ -90,7 +90,7 @@ c:\Users\DMC\Desktop\be\
 
 ### Current Active Project: **Project #1 (Multi-Tenant SaaS API)**
 
-**Current Milestone:** **Milestone 4 — Asynchronous Processing & Background Jobs**
+**Current Milestone:** **Milestone 6 — Production Hardening, Observability & Performance Profiling**
 
 #### Milestone 1 Checklist: (100% Complete)
 
@@ -145,14 +145,14 @@ c:\Users\DMC\Desktop\be\
 - [x] **Step 6:** Webhook Dispatcher, BullMQ Outbound Delivery Worker with HMAC-SHA256 signatures, exponential backoff, and circuit breaker.
 - [x] **Step 7:** Adversarial Integration Tests for PAT Scopes, Webhook Signature Verification, and Circuit Breaker Deactivation (`tests/integration/pats-webhooks.test.ts`).
 
-#### Milestone 5.5 Checklist: (Catch-Up: Missed Items from Milestones 1–5)
+#### Milestone 5.5 Checklist: (100% Complete)
 
-- [ ] **Step 1:** Security Headers & Edge Hardening (`src/app.ts` — wire `helmet`, `cors` with `env.CORS_ORIGIN`, `hpp`, and `compression`).
-- [ ] **Step 2:** Atomic Redis Lua Sliding-Window Rate Limiter (`src/middleware/rate-limiter.ts` — `ip:<address>` on public auth routes, `user:<id>` on authenticated routes, `RateLimit-*` headers, `429` RFC 9457).
-- [ ] **Step 3:** JWT `jti` Access Token Denylist in Redis (`src/lib/crypto.ts`, `src/modules/auth/auth.service.ts`, `src/middleware/authenticate.ts` — revoke active access tokens on `/logout` with remaining-TTL expiration and $O(1)$ middleware verification).
-- [ ] **Step 4:** Tamper-Evident Hash-Chained Audit Logging Service (`migrations/005_create-audit-logs.up.sql`, `src/modules/audit/` — RLS-protected append-only `audit_logs` where each entry stores `SHA-256(previous_hash + payload)`, hooked into PAT/Webhook/Auth mutations + chain verification endpoint).
-- [ ] **Step 5:** `labels`, `task_labels`, `comments` & `pg_trgm` Fuzzy Search (`migrations/006_create-labels-comments-trgm.up.sql` — many-to-many task labels, task comments with RLS, `CREATE EXTENSION pg_trgm` + GIN trigram index on `tasks.title` for typo-tolerant fuzzy search alongside `tsvector`).
-- [ ] **Step 6:** Adversarial Integration Tests (`tests/integration/security-audit.test.ts` — rate limiting `429`, immediate post-logout JWT revocation, hash-chain tamper detection, labels/comments CRUD, and `pg_trgm` fuzzy search).
+- [x] **Step 1:** Security Headers & Edge Hardening (`src/app.ts` — wire `helmet`, `cors` with `env.CORS_ORIGIN`, `hpp`, and `compression`).
+- [x] **Step 2:** Atomic Redis Lua Sliding-Window Rate Limiter (`src/middleware/rate-limiter.ts` — `ip:<address>` on public auth routes, `user:<id>` on authenticated routes, `RateLimit-*` headers, `429` RFC 9457).
+- [x] **Step 3:** JWT `jti` Access Token Denylist in Redis (`src/lib/crypto.ts`, `src/modules/auth/auth.service.ts`, `src/middleware/authenticate.ts` — revoke active access tokens on `/logout` with remaining-TTL expiration and $O(1)$ middleware verification).
+- [x] **Step 4:** Tamper-Evident Hash-Chained Audit Logging Service (`migrations/005_create-audit-logs.up.sql`, `src/modules/audit/` — RLS-protected append-only `audit_logs` where each entry stores `SHA-256(previous_hash + payload)`, advisory locking via `pg_advisory_xact_lock`, DB immutability trigger, and verification routine).
+- [x] **Step 5:** `labels`, `task_labels`, `comments` & `pg_trgm` Fuzzy Search (`migrations/006_create-labels-comments.up.sql` — many-to-many task labels, task comments with RLS, `pg_trgm` GIN trigram index + `word_similarity` fallback on `tasks.title` for typo-tolerant fuzzy search alongside `tsvector`).
+- [x] **Step 6:** Adversarial Integration Tests (`tests/integration/security-audit.test.ts` — rate limiting `429`, immediate post-logout JWT revocation, hash-chain tamper detection, labels/comments CRUD, and `pg_trgm` fuzzy search).
 
 ---
 
@@ -232,15 +232,25 @@ c:\Users\DMC\Desktop\be\
 | `src/services/webhook-delivery.service.ts`            | Hardened outbound HTTP delivery engine (DNS-rebinding SSRF guard, `redirect: "manual"`, 5s timeout, 2KB stream cap, circuit breaker, audit log)  |
 | `tests/integration/pats-webhooks.test.ts`             | 7 automated adversarial tests covering PAT scopes, revocation, live HMAC-SHA256 webhook delivery, secret rotation, and circuit breaker tripping  |
 
+| `src/middleware/rate-limiter.ts`                      | Atomic Redis Lua script implementing sliding-window rate limiting (`rl:auth:ip:*`, `rl:api:user:*`), IETF draft headers, RFC 9457 429 exceptions |
+| `migrations/005_create-audit-logs.up.sql`             | Audit log table with RLS, composite time-series/resource indexes, and DB-level immutability trigger (`BEFORE UPDATE OR DELETE RAISE EXCEPTION`) |
+| `migrations/005_create-audit-logs.down.sql`           | Rollback statements for audit logs table and immutability trigger                                                                                |
+| `src/modules/audit/audit.types.ts`                    | Strict TypeScript contracts for audit records, creation inputs, and cryptographic verification results                                           |
+| `src/modules/audit/audit.repository.ts`               | Raw SQL audit log repository supporting RLS, latest-hash retrieval, and ascending chain walk                                                      |
+| `src/modules/audit/audit.service.ts`                  | Canonical JSON serializer, SHA-256 hash chaining, tenant advisory locking (`pg_advisory_xact_lock`), and cryptographic tamper detection routine |
+| `migrations/006_create-labels-comments.up.sql`        | Labels table, Many-to-Many `task_labels` junction table with tenant RLS, and task `comments` table with RLS and ordering indexes                |
+| `migrations/006_create-labels-comments.down.sql`      | Clean rollback statements for comments, task_labels, and labels                                                                                  |
+| `tests/integration/security-audit.test.ts`            | 7 adversarial integration tests covering rate limits (429), post-logout JWT revocation (401), hash-chain tamper detection, and fuzzy search       |
+
 ---
 
 ## 6. Next Immediate Action for AI
 
-- **Current Milestone:** **Milestone 5.5 — Catch-Up: Security Hardening, Redis Rate Limiting, JWT Denylist & Hash-Chained Audit Logs**.
-- **Instruction:** Start teaching **Milestone 5.5** from Step 1 (one step at a time, with deep first-principles theory, real-world examples, and waiting for PJ to implement and test each step before advancing):
-  1. **Step 1:** Wire `helmet`, `cors`, `hpp`, and `compression` into `src/app.ts` (explain HTTP parameter pollution, CORS preflight, and security headers).
-  2. **Step 2:** Implement Redis Lua Sliding-Window Rate Limiter (`src/middleware/rate-limiter.ts`) — explain why Redis Lua scripts prevent race conditions vs naive `GET`+`INCR`, and mount on `/api/v1/auth` + authenticated routes.
-  3. **Step 3:** Implement JWT `jti` Access Token Denylist on `/logout` — explain stateless vs stateful revocation trade-offs and TTL sizing.
-  4. **Step 4:** Implement Hash-Chained Audit Logging Service (`migrations/005` + `src/modules/audit/`) — explain cryptographic hash chains, advisory/row locking to serialize `previous_hash` reads, and tamper detection.
-  5. **Step 5:** Implement `labels`, `task_labels`, `comments` (with RLS) and `pg_trgm` GIN trigram fuzzy search on `tasks.title` (`migrations/006`).
-  6. **Step 6:** Build `tests/integration/security-audit.test.ts` to verify all Milestone 5.5 defenses & features, then proceed to **Milestone 6 (Observability, Prometheus, OpenTelemetry, `EXPLAIN ANALYZE`, k6)**.
+- **Current Milestone:** **Milestone 6 — Production Hardening, Observability & Performance Profiling**.
+- **Instruction:** Start teaching **Milestone 6** step-by-step from first principles:
+  1. **Step 1:** Structured OpenTelemetry Tracing & Prometheus Metrics (`prom-client`, trace propagation, duration histograms, request counter by route/status).
+  2. **Step 2:** Deep Health Check Subsystem (Kubernetes liveness `/live` vs readiness `/ready` probes with dependency degradation reporting for Postgres & Redis).
+  3. **Step 3:** Performance Profiling & Query Optimization (`EXPLAIN (ANALYZE, BUFFERS)` execution plans, index tuning for multi-tenant queries, eliminating sequential scans).
+  4. **Step 4:** Multi-Stage Dockerfile & Container Optimization (`node:22-alpine`, non-root `nodejs` user, dumb-init, layer caching, minimal footprint).
+  5. **Step 5:** Production Docker Compose with health checks, resource limits, and secrets management.
+  6. **Step 6:** Automated Load & Stress Testing (k6 script testing concurrent throughput, rate limiting under load, and p95/p99 latency targets).

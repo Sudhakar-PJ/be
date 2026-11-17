@@ -195,7 +195,7 @@ export class TaskRepository {
       // Full-Text Search (TSVECTOR GIN + Trigram fallback)
       if (filter.search) {
         conditions.push(
-          `(tsv_search @@ websearch_to_tsquery('english', $${paramIndex}) OR title ILIKE $${paramIndex + 1})`,
+          `(tsv_search @@ websearch_to_tsquery('english', $${paramIndex}) OR title ILIKE $${paramIndex + 1} OR word_similarity($${paramIndex}, title) > 0.3)`,
         );
         values.push(filter.search);
         values.push(`%${filter.search}%`);

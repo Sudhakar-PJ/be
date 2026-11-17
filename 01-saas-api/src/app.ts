@@ -13,12 +13,34 @@ import { projectRouter } from "./modules/projects/project.routes";
 import { taskRouter } from "./modules/tasks/task.routes";
 import { patRouter } from "./modules/pats/pat.routes";
 import { webhookRouter } from "./modules/webhooks/webhook.routes";
+import helmet from "helmet";
+import cors from "cors";
+import { env } from "./config/env";
+import compression from "compression";
+import hpp from "hpp";
 
 const app = express();
 
 app.use(correlationMiddleware);
 app.use(requestLogger);
-app.use(express.json());
+app.use(helmet());
+app.use(
+  cors({
+    origin: env.CORS_ORIGIN,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Tenant-ID",
+      "Idempotency-Key",
+      "X-Correlation-ID",
+    ],
+  }),
+);
+app.use(compression());
+app.use(express.json({ limit: "1mb" }));
+app.use(hpp());
 app.use(cookieParser());
 
 app.use("/api/v1/auth", authRouter);

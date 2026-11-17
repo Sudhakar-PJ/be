@@ -22,7 +22,9 @@ function extractMetadata(req: Request): RequestMetadata {
 
 function extractRefreshToken(req: Request): string {
   // Check HttpOnly cookie first, then fall back to JSON body
-  const token = (req.cookies as Record<string, string> | undefined)?.[REFRESH_COOKIE_NAME] ?? req.body?.refreshToken;
+  const token =
+    (req.cookies as Record<string, string> | undefined)?.[REFRESH_COOKIE_NAME] ??
+    req.body?.refreshToken;
 
   if (!token || typeof token !== "string") {
     throw new UnauthorizedError("Refresh token is required", "REFRESH_TOKEN_REQUIRED");
@@ -94,10 +96,23 @@ export class AuthController {
    * POST /api/v1/auth/logout
    */
   async logout(req: Request, res: Response): Promise<void> {
-    const token = (req.cookies as Record<string, string> | undefined)?.[REFRESH_COOKIE_NAME] ?? req.body?.refreshToken;
+    const refreshToken =
+      (req.cookies as Record<string, string> | undefined)?.[REFRESH_COOKIE_NAME] ??
+      req.body?.refreshToken;
 
-    if (token && typeof token === "string") {
-      await authService.logout(token);
+    if (refreshToken && typeof refreshToken === "string") {
+      await authService.logout(refreshToken);
+    }
+
+    // Denylist the active Access Token if provided in Authorization header or body
+    const authHeader = req.headers.authorization;
+    const bearerToken =
+      authHeader && authHeader.startsWith("Bearer ")
+        ? authHeader.slice(7).trim()
+        : (req.body?.accessToken as string | undefined);
+
+    if (bearerToken) {
+      await authService.denylistAccessToken(bearerToken);
     }
 
     const { maxAge: _, ...clearCookieOptions } = COOKIE_OPTIONS;

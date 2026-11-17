@@ -7,6 +7,7 @@ import {
   hashPassword,
   hashToken,
   signAccessToken,
+  verifyAccessToken,
   verifyPassword,
 } from "../../lib/crypto";
 import {
@@ -19,6 +20,7 @@ import { sessionRepository } from "./session.repository";
 import { userRepository, type UserRecord } from "./user.repository";
 import { enqueueWelcomeEmail } from "../../jobs/queues";
 import { getCorrelationId } from "../../lib/context";
+import { redis } from "../../config/redis";
 
 export interface RequestMetadata {
   userAgent?: string | null;
@@ -232,6 +234,27 @@ export class AuthService {
   async logout(rawRefreshToken: string): Promise<void> {
     const tokenHash = hashToken(rawRefreshToken);
     await sessionRepository.revokeByTokenHash(tokenHash);
+  }
+
+  /**
+   * Immediately invalidates an active JWT access token by adding its jti to Redis
+   * with a TTL equal to the token's remaining lifespan.
+   */
+  async denylistAccessToken(rawAccessToken: string): Promise<void> {
+    try {
+      const decoded = verifyAccessToken(rawAccessToken);
+      if (!decoded.jti || !decoded.exp) return;
+
+      const nowInSeconds = Math.floor(Date.now() / 1000);
+      const ttlSeconds = decoded.exp - nowInSeconds;
+
+      if (ttlSeconds > 0) {
+        await redis.setex(`denylist:jwt:${decoded.jti}`, ttlSeconds, "1");
+        logger.info({ jti: decoded.jti, ttlSeconds }, "Access token added to revocation denylist");
+      }
+    } catch {
+      // If token is already invalid or expired, no denylist entry is needed
+    }
   }
 }
 

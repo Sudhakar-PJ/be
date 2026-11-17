@@ -20,6 +20,7 @@ export interface AccessTokenPayload {
 }
 
 export interface DecodedAccessToken extends AccessTokenPayload {
+  jti: string;
   iat: number;
   exp: number;
 }
@@ -70,6 +71,7 @@ export function signAccessToken(payload: AccessTokenPayload): string {
   const signOptions: jwt.SignOptions = {
     algorithm: "RS256",
     expiresIn: env.JWT_ACCESS_EXPIRES_IN as NonNullable<jwt.SignOptions["expiresIn"]>,
+    jwtid: crypto.randomUUID(),
   };
 
   return jwt.sign(payload, privateKey, signOptions);
