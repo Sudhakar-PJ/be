@@ -31,6 +31,29 @@ services:
     networks:
       - saas-network
 
+  # Dedicated Background Worker (Processes BullMQ notifications & webhooks)
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: saas-worker
+    restart: unless-stopped
+    command: ["node", "dist/jobs/worker.js"]
+    environment:
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=redis://redis:6379
+      - OTEL_TRACING_ENABLED=true
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318/v1/traces
+    depends_on:
+      redis:
+        condition: service_healthy
+      tempo:
+        condition: service_started
+    networks:
+      - saas-network
+
   # 2. Redis In-Memory Cache & Rate Limiter
   redis:
     image: redis:7-alpine
