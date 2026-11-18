@@ -1,6 +1,7 @@
 import { Pool, PoolClient, QueryResult, QueryResultRow } from "pg";
 import { env } from "./env";
 import { logger } from "./logger";
+import { dbErrorsTotal, dbQueryDurationSeconds } from "../metrics/database.metrics";
 
 const isNeon = env.DATABASE_URL.includes("neon.tech");
 const requireSsl = env.NODE_ENV === "production" || isNeon;
@@ -29,28 +30,40 @@ export async function query<T extends QueryResultRow = QueryResultRow>(
   text: string,
   params?: unknown[],
 ): Promise<QueryResult<T>> {
-  const queryStartTime = Date.now();
+  const queryStartTime = process.hrtime.bigint();
+  // Extract operation (first word: SELECT, INSERT, UPDATE, DELETE, etc.)
+  const operation = text.trim().split(/\s+/)[0]?.toUpperCase() || "UNKNOWN";
+
   try {
     const result = await pool.query<T>(text, params);
-    const queryDurationMs = Date.now() - queryStartTime;
+    const durationNs = process.hrtime.bigint() - queryStartTime;
+    const durationSeconds = Number(durationNs) / 1e9;
+
+    // Record Prometheus Histogram
+    dbQueryDurationSeconds.observe({ operation }, durationSeconds);
 
     logger.debug(
       {
         query: text,
         params,
-        durationMs: queryDurationMs,
+        durationMs: Math.round(durationSeconds * 1000),
         rowCount: result.rowCount,
       },
       "SQL query executed",
     );
     return result;
   } catch (error) {
-    const queryDurationMs = Date.now() - queryStartTime;
+    const durationNs = process.hrtime.bigint() - queryStartTime;
+    const durationSeconds = Number(durationNs) / 1e9;
+
+    // Record Prometheus Error Counter
+    dbErrorsTotal.inc({ error_type: (error as { code?: string })?.code || "UNKNOWN" });
+
     logger.error(
       {
         query: text,
         params,
-        durationMs: queryDurationMs,
+        durationMs: Math.round(durationSeconds * 1000),
         error,
       },
       "SQL query failed",
@@ -58,7 +71,6 @@ export async function query<T extends QueryResultRow = QueryResultRow>(
     throw error;
   }
 }
-
 export async function withTransaction<T>(callback: (client: PoolClient) => Promise<T>): Promise<T> {
   const client = await pool.connect();
   try {
@@ -74,7 +86,10 @@ export async function withTransaction<T>(callback: (client: PoolClient) => Promi
   }
 }
 
-export async function withTenantTransaction<T> (tenantId: string, callback: (Client: PoolClient) => Promise<T>): Promise<T> {
+export async function withTenantTransaction<T>(
+  tenantId: string,
+  callback: (Client: PoolClient) => Promise<T>,
+): Promise<T> {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");

@@ -1,3 +1,4 @@
+import { shutdownTelemetry } from "./config/telemetry";
 import { app } from "./app";
 import { closeDatabasePool } from "./config/database";
 import { env } from "./config/env";
@@ -48,6 +49,9 @@ async function handleGracefulShutdown(signal: string): Promise<void> {
 
     // 4. Close Redis client connection cleanly
     await closeRedisConnection();
+
+    // 5. Flush and shutdown OpenTelemetry tracer
+    await shutdownTelemetry();
 
     logger.info("All resources closed cleanly. Exiting process.");
     process.exit(0);

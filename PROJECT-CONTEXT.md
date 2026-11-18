@@ -154,6 +154,44 @@ c:\Users\DMC\Desktop\be\
 - [x] **Step 5:** `labels`, `task_labels`, `comments` & `pg_trgm` Fuzzy Search (`migrations/006_create-labels-comments.up.sql` — many-to-many task labels, task comments with RLS, `pg_trgm` GIN trigram index + `word_similarity` fallback on `tasks.title` for typo-tolerant fuzzy search alongside `tsvector`).
 - [x] **Step 6:** Adversarial Integration Tests (`tests/integration/security-audit.test.ts` — rate limiting `429`, immediate post-logout JWT revocation, hash-chain tamper detection, labels/comments CRUD, and `pg_trgm` fuzzy search).
 
+#### Milestone 6 Checklist: Production Hardening, Observability & Performance (100% Complete)
+
+```
+MILESTONE 6 EXECUTION ORDER:
+├── Stage 1: The Core Metrics Engine (@prometheus-io/client) (100% Complete)
+│   ├── [x] 1.1: Install @prometheus-io/client (Uninstall prom-client)
+│   ├── [x] 1.2: Build src/metrics/registry.ts (The central Prometheus Registry)
+│   ├── [x] 1.3: Build src/metrics/http.metrics.ts (HTTP Counter & Duration Histogram)
+│   ├── [x] 1.4: Build src/middleware/metrics.middleware.ts (Route-sanitizing Express middleware)
+│   └── [x] 1.5: Mount /metrics in src/app.ts and test live with curl/browser
+│
+├── Stage 2: Subsystem & Domain Metrics (100% Complete)
+│   ├── [x] 2.1: Database Pool & Query Metrics (src/metrics/database.metrics.ts)
+│   ├── [x] 2.2: Redis & Rate Limiter Metrics (src/metrics/redis.metrics.ts)
+│   ├── [x] 2.3: Security & Auth Metrics (src/metrics/auth.metrics.ts)
+│   ├── [x] 2.4: SaaS Business Metrics (src/metrics/business.metrics.ts)
+│   └── [x] 2.5: Queue & Async Email Metrics (src/metrics/queue.metrics.ts)
+│
+├── Stage 3: OpenTelemetry Distributed Tracing (100% Complete)
+│   ├── [x] 3.1: Install OpenTelemetry SDK (@opentelemetry/sdk-node, auto-instrumentations)
+│   ├── [x] 3.2: Build src/config/telemetry.ts (Auto-trace Express, PostgreSQL, Redis)
+│   └── [x] 3.3: Wire Telemetry into server boot (src/index.ts)
+│
+├── Stage 4: Kubernetes Health Probes (100% Complete)
+│   ├── [x] 4.1: Deep /api/v1/health/live (Liveness probe - event loop & process health)
+│   └── [x] 4.2: Deep /api/v1/health/ready (Readiness probe - DB & Redis ping with timeouts)
+│
+├── Stage 5: Database Query Profiling Sweep (100% Complete)
+│   └── [x] 5.1: Run EXPLAIN (ANALYZE, BUFFERS) on tasks keyset pagination & trigram search
+│
+├── Stage 6: The Docker Observability Stack (100% Complete)
+│   ├── [x] 6.1: Multi-stage Dockerfile for our SaaS API (node:22-alpine, non-root)
+│   └── [x] 6.2: docker-compose.yml running App + Prometheus + Grafana + Loki + Tempo
+│
+└── Stage 7: Automated k6 Load & Stress Testing (100% Complete)
+    └── [x] 7.1: Write tests/load/k6-stress.js (Simulate 1,500 concurrent QPS, verify p95/p99)
+```
+
 ---
 
 ## 5. Completed Implementation Inventory
@@ -237,20 +275,25 @@ c:\Users\DMC\Desktop\be\
 | `migrations/005_create-audit-logs.down.sql`           | Rollback statements for audit logs table and immutability trigger                                                                                |
 | `src/modules/audit/audit.types.ts`                    | Strict TypeScript contracts for audit records, creation inputs, and cryptographic verification results                                           |
 | `src/modules/audit/audit.repository.ts`               | Raw SQL audit log repository supporting RLS, latest-hash retrieval, and ascending chain walk                                                      |
-| `src/modules/audit/audit.service.ts`                  | Canonical JSON serializer, SHA-256 hash chaining, tenant advisory locking (`pg_advisory_xact_lock`), and cryptographic tamper detection routine |
-| `migrations/006_create-labels-comments.up.sql`        | Labels table, Many-to-Many `task_labels` junction table with tenant RLS, and task `comments` table with RLS and ordering indexes                |
-| `migrations/006_create-labels-comments.down.sql`      | Clean rollback statements for comments, task_labels, and labels                                                                                  |
-| `tests/integration/security-audit.test.ts`            | 7 adversarial integration tests covering rate limits (429), post-logout JWT revocation (401), hash-chain tamper detection, and fuzzy search       |
+| `src/metrics/registry.ts`                              | Central Prometheus registry using official `@prometheus-io/client` and Node.js process metrics                                                   |
+| `src/metrics/http.metrics.ts`                          | HTTP request counter & duration histogram with fine-grained latency buckets                                                                       |
+| `src/middleware/metrics.middleware.ts`                 | Route-normalizing Express middleware recording HTTP metrics and preventing cardinality explosions                                                 |
+| `src/metrics/database.metrics.ts`                      | Neon PostgreSQL pool gauges (total, idle, active, waiting) and query duration histogram & error counters                                        |
+| `src/metrics/redis.metrics.ts`                         | Redis connection gauge, command duration histogram, and sliding-window rate limit hit counter                                                    |
+| `src/metrics/auth.metrics.ts`                          | Login attempts counter, refresh counter, revoked JWT denylist counter, and Argon2id execution duration histogram                                 |
+| `src/metrics/business.metrics.ts`                      | SaaS business metrics (tasks created by priority, projects created, PATs minted, webhooks delivered)                                              |
+| `src/metrics/queue.metrics.ts`                         | BullMQ queue & worker metrics (enqueued counter, job execution duration histogram, emails sent counter, email send latency histogram)             |
+| `src/config/telemetry.ts`                              | OpenTelemetry SDK runtime initialization with auto-instrumentations (pg, ioredis, express, pino) and graceful OTLP trace flush                     |
+| `src/modules/health/`                                 | Kubernetes deep liveness (`/health/live` event loop lag & V8 heap) and readiness (`/health/ready` timed DB & Redis pings with latency diagnostics) |
+| `scripts/profile-queries.ts`                           | Automated database query planner profiling sweep validating B-tree, GIN trigram, and buffer cache performance with zero sequential scans            |
+| `Dockerfile`                                          | Multi-stage production container build (node:22-alpine, non-root user, dumb-init PID 1, layer-cached npm ci, ~150MB image)                          |
+| `docker-compose.yml`                                  | Orchestrates full LGTM observability stack (SaaS API, Redis, Prometheus, Tempo OTLP, Loki, Grafana with unified correlation)                        |
+| `tests/load/k6-stress.js`                             | Automated k6 load & stress testing suite (multi-stage ramp-up to 150 VUs, SLA thresholds, rate limiter saturation verification)                       |
 
 ---
 
 ## 6. Next Immediate Action for AI
 
-- **Current Milestone:** **Milestone 6 — Production Hardening, Observability & Performance Profiling**.
-- **Instruction:** Start teaching **Milestone 6** step-by-step from first principles:
-  1. **Step 1:** Structured OpenTelemetry Tracing & Prometheus Metrics (`prom-client`, trace propagation, duration histograms, request counter by route/status).
-  2. **Step 2:** Deep Health Check Subsystem (Kubernetes liveness `/live` vs readiness `/ready` probes with dependency degradation reporting for Postgres & Redis).
-  3. **Step 3:** Performance Profiling & Query Optimization (`EXPLAIN (ANALYZE, BUFFERS)` execution plans, index tuning for multi-tenant queries, eliminating sequential scans).
-  4. **Step 4:** Multi-Stage Dockerfile & Container Optimization (`node:22-alpine`, non-root `nodejs` user, dumb-init, layer caching, minimal footprint).
-  5. **Step 5:** Production Docker Compose with health checks, resource limits, and secrets management.
-  6. **Step 6:** Automated Load & Stress Testing (k6 script testing concurrent throughput, rate limiting under load, and p95/p99 latency targets).
+- **Current Milestone:** **Milestone 6 — Production Hardening, Observability & Performance Profiling (100% COMPLETE)**.
+- **Pedagogical Mandate:** Go extremely slow, topic by topic, file by file. Teach concepts with real-world analogies before touching code. PJ codes all files himself. Never edit implementation files directly.
+- **Project 1 Status:** **100% Complete across all 6 Milestones (Architecture, Auth, Multi-Tenancy RLS, Task Keyset Pagination, Asynchronous Queues & Webhooks, Security Hardening, Observability & Load Testing)**!

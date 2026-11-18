@@ -18,6 +18,7 @@ import {
   webhookDispatcherService,
   WebhookDispatcherService,
 } from "../../services/webhook-dispatcher.service";
+import { tasksCreatedTotal } from "../../metrics/business.metrics";
 
 export class TaskService {
   constructor(
@@ -99,6 +100,8 @@ export class TaskService {
       event: "task.created",
       data: { ...response },
     });
+
+    tasksCreatedTotal.inc({ priority: response.priority });
 
     return response;
   }

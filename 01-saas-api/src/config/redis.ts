@@ -1,6 +1,7 @@
 import Redis, { RedisOptions } from "ioredis";
 import { env } from "./env";
 import { logger } from "./logger";
+import { redisConnectedStatus } from "../metrics/redis.metrics";
 
 export const redisConnectionOptions: RedisOptions = {
   maxRetriesPerRequest: null,
@@ -23,12 +24,15 @@ redis.on("connect", () => {
 });
 redis.on("ready", () => {
   logger.info("Redis client connected and ready to accept commands");
+  redisConnectedStatus.set(1);
 });
 redis.on("error", (err: Error) => {
   logger.error({ err: err.message }, "Redis client encountered an error");
+  redisConnectedStatus.set(0);
 });
 redis.on("close", () => {
   logger.warn("Redis client connection closed");
+  redisConnectedStatus.set(0);
 });
 
 export async function checkRedisHealth(): Promise<boolean> {

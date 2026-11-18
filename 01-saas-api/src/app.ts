@@ -1,12 +1,11 @@
 import express, { Request, Response } from "express";
 import { correlationMiddleware } from "./middleware/correlation";
 import { requestLogger } from "./middleware/request-logger";
-import { logger } from "./config/logger";
 import { errorHandler } from "./middleware/errorHandler";
 import { NotFoundError } from "./lib/apiError";
 import { asyncHandler } from "./lib/asyncHandler";
-import { checkDatabaseHealth } from "./config/database";
-import { checkRedisHealth } from "./config/redis";
+import { healthRouter } from "./modules/health/health.routes";
+import { healthController } from "./modules/health/health.controller";
 import cookieParser from "cookie-parser";
 import { authRouter } from "./modules/auth/auth.routes";
 import { projectRouter } from "./modules/projects/project.routes";
@@ -18,10 +17,13 @@ import cors from "cors";
 import { env } from "./config/env";
 import compression from "compression";
 import hpp from "hpp";
+import { metricsMiddleware } from "./middleware/metrics.middleware";
+import { register } from "./metrics/registry";
 
 const app = express();
 
 app.use(correlationMiddleware);
+app.use(metricsMiddleware);
 app.use(requestLogger);
 app.use(helmet());
 app.use(
@@ -49,37 +51,20 @@ app.use("/api/v1/tasks", taskRouter);
 app.use("/api/v1/pats", patRouter);
 app.use("/api/v1/webhooks", webhookRouter);
 
-app.get("/api/v1/health", (_req: Request, res: Response) => {
-  logger.info("Health check endpoint was pinged");
-  res.status(200).json({
-    status: "healthy",
-    timestamp: new Date().toISOString(),
-  });
-});
-
+// Prometheus scraping endpoint
 app.get(
-  "/api/v1/ready",
+  "/metrics",
   asyncHandler(async (_req: Request, res: Response) => {
-    const [isDbHealthy, isRedisHealthy] = await Promise.all([
-      checkDatabaseHealth(),
-      checkRedisHealth(),
-    ]);
-    const isReady = isDbHealthy && isRedisHealthy;
-    const responsePayload = {
-      status: isReady ? "ready" : "unhealthy",
-      checks: {
-        database: isDbHealthy ? "connected" : "disconnected",
-        redis: isRedisHealthy ? "connected" : "disconnected",
-      },
-      timestamp: new Date().toISOString(),
-    };
-    if (!isReady) {
-      res.status(503).json(responsePayload);
-      return;
-    }
-    res.status(200).json(responsePayload);
+    res.setHeader("Content-Type", register.contentType);
+    res.send(await register.metrics());
   }),
 );
+
+// Health & Readiness Probes (Root & Versioned paths for Kubernetes / Cloud Run)
+app.use("/api/v1/health", healthRouter);
+app.use("/health", healthRouter);
+app.get("/api/v1/ready", asyncHandler(healthController.getReady));
+app.get("/ready", asyncHandler(healthController.getReady));
 
 app.get(
   "/api/v1/test-error",

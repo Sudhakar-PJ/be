@@ -8,11 +8,8 @@ import {
   type PatCreatedResponse,
   type PatSummaryResponse,
 } from "./pat.schema";
-import {
-  PatRepository,
-  patRepository,
-  toPatSummaryResponse,
-} from "./pat.repository";
+import { PatRepository, patRepository, toPatSummaryResponse } from "./pat.repository";
+import { patsCreatedTotal } from "../../metrics/business.metrics";
 
 export class PatService {
   constructor(private readonly patRepo: PatRepository = patRepository) {}
@@ -47,6 +44,8 @@ export class PatService {
       { patId, tenantId, userId, tokenPreview, scopes: input.scopes },
       "Personal Access Token minted successfully",
     );
+
+    patsCreatedTotal.inc();
 
     // 4. Return one-time response containing rawToken
     return {

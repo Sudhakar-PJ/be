@@ -11,6 +11,7 @@ import {
   WebhookDeliveryPayload,
   WebhookDeliveryPayloadSchema,
 } from "./contracts";
+import { bullmqJobsEnqueuedTotal } from "../metrics/queue.metrics";
 
 /**
  * Default options applied to every job in the queue:
@@ -94,6 +95,10 @@ webhooksQueue.on("error", (err: Error) => {
 export async function enqueueTaskAssignedNotification(payload: TaskAssignedPayload): Promise<void> {
   const validated = TaskAssignedPayloadSchema.parse(payload);
   await notificationsQueue.add(JobName.TASK_ASSIGNED, validated);
+  bullmqJobsEnqueuedTotal.inc({
+    queue: QUEUE_NAMES.NOTIFICATIONS,
+    job_name: JobName.TASK_ASSIGNED,
+  });
   logger.debug(
     { taskId: validated.taskId, assigneeEmail: validated.assigneeEmail },
     "Enqueued task:assigned job",
@@ -103,6 +108,10 @@ export async function enqueueTaskAssignedNotification(payload: TaskAssignedPaylo
 export async function enqueueWelcomeEmail(payload: WelcomeEmailPayload): Promise<void> {
   const validated = WelcomeEmailPayloadSchema.parse(payload);
   await notificationsQueue.add(JobName.WELCOME_EMAIL, validated);
+  bullmqJobsEnqueuedTotal.inc({
+    queue: QUEUE_NAMES.NOTIFICATIONS,
+    job_name: JobName.WELCOME_EMAIL,
+  });
   logger.debug({ email: validated.email }, "Enqueued email:welcome job");
 }
 
@@ -112,9 +121,10 @@ export async function enqueueWebhookDelivery(
 ): Promise<void> {
   const validated = WebhookDeliveryPayloadSchema.parse(payload);
   await webhooksQueue.add(JobName.WEBHOOK_DELIVERY, validated, {
-    jobId: validated.deliveryId, // Deduplicates duplicate enqueue attempts for the same deliveryId
+    jobId: validated.deliveryId,
     ...options,
   });
+  bullmqJobsEnqueuedTotal.inc({ queue: QUEUE_NAMES.WEBHOOKS, job_name: JobName.WEBHOOK_DELIVERY });
   logger.debug(
     {
       deliveryId: validated.deliveryId,

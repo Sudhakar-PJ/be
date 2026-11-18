@@ -10,6 +10,7 @@ import {
   webhookDispatcherService,
   WebhookDispatcherService,
 } from "../../services/webhook-dispatcher.service";
+import { projectsCreatedTotal } from "../../metrics/business.metrics";
 
 export class ProjectService {
   constructor(
@@ -55,6 +56,8 @@ export class ProjectService {
       event: "project.created",
       data: { ...response },
     });
+
+    projectsCreatedTotal.inc();
 
     return response;
   }

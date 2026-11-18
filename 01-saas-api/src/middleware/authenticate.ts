@@ -7,6 +7,7 @@ import { hashPat, hasRequiredScope, PAT_PREFIX, PatScope } from "../lib/pat";
 import { query } from "../config/database";
 import { logger } from "../config/logger";
 import { redis } from "../config/redis";
+import { authTokenDenylistHitsTotal } from "../metrics/auth.metrics";
 
 interface PatLookupRow {
   id: string;
@@ -133,6 +134,7 @@ async function authenticateJwt(token: string, req: Request): Promise<void> {
   if (decoded.jti) {
     const isRevoked = await redis.exists(`denylist:jwt:${decoded.jti}`);
     if (isRevoked === 1) {
+      authTokenDenylistHitsTotal.inc();
       throw new UnauthorizedError("Access token has been revoked", "TOKEN_REVOKED");
     }
   }

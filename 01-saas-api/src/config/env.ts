@@ -24,6 +24,16 @@ const envSchema = z.object({
   JWT_ACCESS_PUBLIC_KEY: z.string().min(1, "JWT_ACCESS_PUBLIC_KEY is required"),
   JWT_ACCESS_EXPIRES_IN: z.string().default("15m"),
   JWT_REFRESH_EXPIRES_IN_DAYS: z.coerce.number().int().positive().default(30),
+
+  // OpenTelemetry Tracing Configuration
+  OTEL_TRACING_ENABLED: z
+    .enum(["true", "false"])
+    .default("true")
+    .transform((val) => val === "true"),
+  OTEL_EXPORTER_OTLP_ENDPOINT: z
+    .string()
+    .url("OTEL_EXPORTER_OTLP_ENDPOINT must be a valid HTTP URL")
+    .default("http://localhost:4318/v1/traces"),
 });
 
 export type Env = z.infer<typeof envSchema>;

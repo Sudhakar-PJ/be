@@ -1,0 +1,25 @@
+# Dependency directories (never copy host node_modules into container)
+node_modules/
+dist/
+
+# Version control & IDE files
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Environment files with sensitive credentials
+.env
+.env.local
+.env.*.local
+
+# Test suites & coverage reports
+tests/
+coverage/
+*.log
+
+# Build & documentation artifacts
+docs/
+scratch/
+Dockerfile*
+docker-compose*.yml

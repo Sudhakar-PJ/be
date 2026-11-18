@@ -21,6 +21,11 @@ import { userRepository, type UserRecord } from "./user.repository";
 import { enqueueWelcomeEmail } from "../../jobs/queues";
 import { getCorrelationId } from "../../lib/context";
 import { redis } from "../../config/redis";
+import {
+  authArgon2DurationSeconds,
+  authLoginAttemptsTotal,
+  authTokenRefreshTotal,
+} from "../../metrics/auth.metrics";
 
 export interface RequestMetadata {
   userAgent?: string | null;
@@ -125,11 +130,18 @@ export class AuthService {
       throw new UnauthorizedError("Invalid email or password", "INVALID_CREDENTIALS");
     }
 
-    // 2. Verify Argon2id password hash
-    const isPasswordValid = await verifyPassword(user.password_hash, input.password);
-    if (!isPasswordValid) {
+    // 2. Verify password with Argon2id while measuring execution duration
+    const argonStart = process.hrtime.bigint();
+    const isValid = await verifyPassword(user.password_hash, input.password);
+    const argonDurationSeconds = Number(process.hrtime.bigint() - argonStart) / 1e9;
+    authArgon2DurationSeconds.observe(argonDurationSeconds);
+
+    if (!isValid) {
+      authLoginAttemptsTotal.inc({ status: "failure" }); // <-- Failure!
       throw new UnauthorizedError("Invalid email or password", "INVALID_CREDENTIALS");
     }
+
+    authLoginAttemptsTotal.inc({ status: "success" }); // <-- Success!
 
     // 3. Create fresh session family for this device login
     const sessionId = uuidv7();
@@ -176,6 +188,8 @@ export class AuthService {
 
     // 3. 🚨 THEFT DETECTION: If token was already revoked, someone is replaying an old token!
     if (session.is_revoked) {
+      authTokenRefreshTotal.inc({ status: "replay_detected" });
+
       logger.warn(
         { userId: session.user_id, familyId: session.family_id },
         "🚨 Refresh token reuse detected! Revoking entire session family.",
@@ -192,6 +206,7 @@ export class AuthService {
 
     // 4. Check expiration
     if (new Date() > new Date(session.expires_at)) {
+      authTokenRefreshTotal.inc({ status: "expired" });
       throw new UnauthorizedError("Refresh token has expired", "TOKEN_EXPIRED");
     }
 
@@ -222,6 +237,7 @@ export class AuthService {
       email: user.email,
     });
 
+    authTokenRefreshTotal.inc({ status: "success" });
     return {
       accessToken,
       rawRefreshToken: newRawToken,

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { redis } from "../config/redis";
 import { TooManyRequestsError } from "../lib/apiError";
+import { rateLimitHitsTotal } from "../metrics/redis.metrics";
 
 /**
  * Atomic Lua script implementing a Sliding Window rate limiter via Redis Sorted Sets (ZSET).
@@ -123,6 +124,10 @@ export function rateLimiter(options: RateLimiterOptions) {
       if (allowed === 1) {
         return next();
       }
+
+      // Record rate limit block in Prometheus
+      const limiterType = keyPrefix.includes("auth") ? "auth" : "api";
+      rateLimitHitsTotal.inc({ limiter: limiterType });
 
       // Rate limit exceeded: attach Retry-After header and reject with 429
       res.setHeader("Retry-After", retryAfter.toString());

@@ -14,6 +14,7 @@ import {
   WebhookDeliveryPayload,
   WebhookDeliveryPayloadSchema,
 } from "./contracts";
+import { bullmqJobDurationSeconds } from "../metrics/queue.metrics";
 
 /**
  * Worker Processor: Routes incoming notification jobs to the appropriate domain service.
@@ -21,43 +22,58 @@ import {
  * logging carries the originating HTTP request's correlationId and tenantId.
  */
 export async function processNotificationJob(job: Job): Promise<void> {
+  const start = process.hrtime.bigint();
   const metadata = {
     correlationId: (job.data as { correlationId?: string }).correlationId ?? "unknown",
     tenantId: (job.data as { tenantId?: string }).tenantId ?? "unknown",
     userId: (job.data as { actorId?: string }).actorId,
   };
 
-  // Re-hydrate AsyncLocalStorage boundary for this job execution
-  await asyncLocalStorage.run(metadata, async () => {
-    logger.info(
-      {
-        jobId: job.id,
-        jobName: job.name,
-        attempt: job.attemptsMade + 1,
-      },
-      "Processing background job",
+  try {
+    await asyncLocalStorage.run(metadata, async () => {
+      logger.info(
+        {
+          jobId: job.id,
+          jobName: job.name,
+          attempt: job.attemptsMade + 1,
+        },
+        "Processing background job",
+      );
+
+      switch (job.name) {
+        case JobName.TASK_ASSIGNED: {
+          const payload: TaskAssignedPayload = TaskAssignedPayloadSchema.parse(job.data);
+          await emailService.sendTaskAssignedEmail(payload);
+          break;
+        }
+
+        case JobName.WELCOME_EMAIL: {
+          const payload: WelcomeEmailPayload = WelcomeEmailPayloadSchema.parse(job.data);
+          await emailService.sendWelcomeEmail(payload);
+          break;
+        }
+
+        default:
+          logger.error({ jobName: job.name, jobId: job.id }, "Unrecognized job name encountered");
+          throw new Error(`Unrecognized job name: ${job.name}`);
+      }
+
+      logger.info({ jobId: job.id, jobName: job.name }, "Background job processed successfully");
+    });
+
+    const durationSec = Number(process.hrtime.bigint() - start) / 1e9;
+    bullmqJobDurationSeconds.observe(
+      { queue: QUEUE_NAMES.NOTIFICATIONS, job_name: job.name, status: "completed" },
+      durationSec,
     );
-
-    switch (job.name) {
-      case JobName.TASK_ASSIGNED: {
-        const payload: TaskAssignedPayload = TaskAssignedPayloadSchema.parse(job.data);
-        await emailService.sendTaskAssignedEmail(payload);
-        break;
-      }
-
-      case JobName.WELCOME_EMAIL: {
-        const payload: WelcomeEmailPayload = WelcomeEmailPayloadSchema.parse(job.data);
-        await emailService.sendWelcomeEmail(payload);
-        break;
-      }
-
-      default:
-        logger.error({ jobName: job.name, jobId: job.id }, "Unrecognized job name encountered");
-        throw new Error(`Unrecognized job name: ${job.name}`);
-    }
-
-    logger.info({ jobId: job.id, jobName: job.name }, "Background job processed successfully");
-  });
+  } catch (err) {
+    const durationSec = Number(process.hrtime.bigint() - start) / 1e9;
+    bullmqJobDurationSeconds.observe(
+      { queue: QUEUE_NAMES.NOTIFICATIONS, job_name: job.name, status: "failed" },
+      durationSec,
+    );
+    throw err;
+  }
 }
 
 /**
@@ -65,34 +81,50 @@ export async function processNotificationJob(job: Job): Promise<void> {
  * audit logging, and circuit breaker protection.
  */
 export async function processWebhookJob(job: Job): Promise<void> {
+  const start = process.hrtime.bigint();
   const metadata = {
     correlationId: (job.data as { correlationId?: string }).correlationId ?? "unknown",
     tenantId: (job.data as { tenantId?: string }).tenantId ?? "unknown",
     userId: (job.data as { actorId?: string }).actorId,
   };
 
-  await asyncLocalStorage.run(metadata, async () => {
-    const attemptNumber = job.attemptsMade + 1;
-    const maxAttempts = job.opts.attempts ?? 5;
+  try {
+    await asyncLocalStorage.run(metadata, async () => {
+      const attemptNumber = job.attemptsMade + 1;
+      const maxAttempts = job.opts.attempts ?? 5;
 
-    logger.info(
-      {
-        jobId: job.id,
-        jobName: job.name,
-        attempt: attemptNumber,
-        maxAttempts,
-      },
-      "Processing webhook delivery job",
+      logger.info(
+        {
+          jobId: job.id,
+          jobName: job.name,
+          attempt: attemptNumber,
+          maxAttempts,
+        },
+        "Processing webhook delivery job",
+      );
+
+      if (job.name !== JobName.WEBHOOK_DELIVERY) {
+        logger.error({ jobName: job.name, jobId: job.id }, "Unrecognized webhook job name");
+        throw new Error(`Unrecognized webhook job name: ${job.name}`);
+      }
+
+      const payload: WebhookDeliveryPayload = WebhookDeliveryPayloadSchema.parse(job.data);
+      await webhookDeliveryService.deliver(payload, attemptNumber, maxAttempts);
+    });
+
+    const durationSec = Number(process.hrtime.bigint() - start) / 1e9;
+    bullmqJobDurationSeconds.observe(
+      { queue: QUEUE_NAMES.WEBHOOKS, job_name: job.name, status: "completed" },
+      durationSec,
     );
-
-    if (job.name !== JobName.WEBHOOK_DELIVERY) {
-      logger.error({ jobName: job.name, jobId: job.id }, "Unrecognized webhook job name");
-      throw new Error(`Unrecognized webhook job name: ${job.name}`);
-    }
-
-    const payload: WebhookDeliveryPayload = WebhookDeliveryPayloadSchema.parse(job.data);
-    await webhookDeliveryService.deliver(payload, attemptNumber, maxAttempts);
-  });
+  } catch (err) {
+    const durationSec = Number(process.hrtime.bigint() - start) / 1e9;
+    bullmqJobDurationSeconds.observe(
+      { queue: QUEUE_NAMES.WEBHOOKS, job_name: job.name, status: "failed" },
+      durationSec,
+    );
+    throw err;
+  }
 }
 
 /**
