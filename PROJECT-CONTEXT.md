@@ -294,19 +294,59 @@ MILESTONE 6 EXECUTION ORDER:
 
 ## 6. Next Immediate Action for AI Assistants
 
-- **Project #1 Status:** **100% Complete across all 6 Milestones** (57/57 integration tests passing, production multi-stage Dockerfile, LGTM observability stack, and k6 stress benchmark verified).
+> [!IMPORTANT]
+> **VENUE FOR NEXT SESSION:** PJ will be working from his **personal Arch Linux PC** (which has native Docker and full system privileges, unlike the company Windows PC used previously).
+
+- **Project #1 Status:** **100% Complete across all 6 Milestones** (57/57 integration tests passing, production multi-stage Dockerfile, complete LGTM observability stack, and k6 stress benchmark verified).
 - **Pedagogical Mandate (Strict):** Continue adhering to Rule 1 (PJ codes everything himself, never directly write project implementation files) and Rule 3 (extreme pedagogical depth with real-world analogies before showing code).
 
-### Immediate Focus Areas for PJ & AI:
-1. **Docker & Arch Linux Deployment:**
-   - Assist PJ when he pulls this repository on his personal Arch Linux PC.
-   - Guide the execution of `docker compose up -d --build` and verify the 6-container cluster (`saas-api`, `saas-redis`, `saas-prometheus`, `saas-tempo`, `saas-loki`, `saas-grafana`).
-2. **Observability Visualization & Exploration:**
-   - Guide PJ through Grafana at `http://localhost:3001` (User: `admin` / Pass: `admin`).
-   - Demonstrate how to explore Tempo distributed trace waterfall graphs, correlate traces to Loki JSON logs, and build custom Prometheus metric dashboard panels.
-3. **Load Testing Tuning & Benchmarking:**
-   - If PJ wants to optimize or push load testing further:
-     - Tune `DATABASE_POOL_MAX` and test against local Docker PostgreSQL/Redis with near-zero latency.
-     - Refine `tests/load/k6-stress.js` virtual user concurrency, pacing, and SLA thresholds.
-4. **Transition to Project #2:**
+### Immediate Focus Areas for the Arch Linux Session:
+1. **Docker & Arch Linux Boot:**
+   - When PJ pulls the repository (`git pull`), guide him to run `docker compose up -d --build`.
+   - Verify all 7 containers are healthy:
+     - `saas-api` (Express backend on :4000)
+     - `saas-worker` (Dedicated BullMQ worker processing queues in background)
+     - `saas-redis` (Cache & queue store on :6379)
+     - `saas-prometheus` (Metrics scraper on :9090)
+     - `saas-tempo` (Distributed trace collector on :3200 & :4318)
+     - `saas-loki` (Log store on :3100)
+     - `saas-grafana` (Visualization on :3001)
+2. **Observability Visualization & Exploration (The LGTM Experience):**
+   - Guide PJ to open `http://localhost:3001` (User: `admin` / Pass: `admin`).
+   - Walk him through:
+     - **Tempo:** Searching for traces and viewing horizontal waterfall flame graphs.
+     - **Loki:** Querying JSON logs and using the "TraceID" derived field to jump directly into Tempo.
+     - **Prometheus:** Querying custom PromQL metrics (`http_requests_total`, `tasks_created_total`, `db_pool_active_connections`).
+3. **Load Testing at Bare-Metal Speed:**
+   - Install k6 on Arch: `sudo pacman -S k6`.
+   - Run `k6 run tests/load/k6-stress.js` against the containerized stack.
+   - Watch the Grafana dashboards and Tempo flame graphs update in real-time under live load.
+4. **Architecture Diagramming: Hands-On Evaluation (Mermaid.js vs Excalidraw):**
+   - Teach PJ **both** Mermaid.js and Excalidraw (via the VS Code extension) side-by-side using Project #1's architecture.
+   - PJ has never used either tool. Walk him through:
+     a) **Mermaid.js:** Write text-based diagrams in markdown (`docs/`), previewing with VS Code markdown preview.
+     b) **Excalidraw:** Create a visual diagram using the VS Code Excalidraw extension.
+   - After testing both hands-on, PJ will choose his preferred tool to standardize on for the rest of the 10-project series.
+5. **Transition to Project #2:**
    - When PJ indicates readiness to advance, introduce **Project #2: Real-Time Collaborative Document Editor** (WebSockets, CRDTs / Operational Transformation, Redis Pub/Sub, document snapshots).
+
+---
+
+## 7. System Architecture Diagramming Standards & Tool Evaluation
+
+- **Core Goal:** Master visual architecture communication through hands-on evaluation of the two leading tools:
+  1. **Mermaid.js (Diagrams as Code):**
+     - Zero installation; written in standard Markdown (````mermaid````) inside `docs/`.
+     - Git-native, renders automatically on GitHub and in VS Code Markdown preview.
+     - Best for sequence diagrams, state machines, and version-controlled architecture docs.
+  2. **Excalidraw (Visual Whiteboarding via VS Code Extension):**
+     - Hand-drawn, clean whiteboard aesthetic.
+     - Editable directly inside VS Code using the official free Excalidraw extension (`pomdtr.excalidraw-editor`).
+     - Best for high-level module topology, whiteboard brainstorms, and system design interviews.
+- **Evaluation Plan:**
+  - In the next session, PJ will build the architecture diagrams for Project #1 using **both** tools.
+  - After comparing the developer experience (DX), PJ will settle on one tool to use for all future projects.
+- **Three Essential Perspectives to Diagram for Project #1:**
+  1. **Data & Security Flow:** Inbound HTTP requests traversing middleware guards, database transactions, and RLS policies.
+  2. **Asynchronous / Event-Driven Topology:** Background job queues, workers, external third-party integrations, and circuit breakers.
+  3. **Infrastructure & Observability:** Container networks, Prometheus scrapers, OpenTelemetry collectors, and log pipelines.
