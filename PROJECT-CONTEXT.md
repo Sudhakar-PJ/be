@@ -2,8 +2,8 @@
 
 > **Purpose:** Central living reference and handoff document. Any developer or AI assistant working in this workspace must read this document first before giving any guidance or suggestions.  
 > **Learner:** PJ Sudhakar  
-> **Status:** Project #1 (Multi-Tenant SaaS API) — 100% Complete across all 6 Milestones (57/57 Integration Tests Passing, Full LGTM Observability Stack, k6 Load Benchmarked)  
-> **Last Updated:** 2026-11-18
+> **Status:** Project #1 (Multi-Tenant SaaS API) — Core Infrastructure Complete (57/57 Tests, Full LGTM Stack). Currently executing the **Enterprise Product Expansion** (Jira/Linear parity) detailed in [SAAS-ENTERPRISE-ROADMAP.md](file:///mnt/recovery/be/SAAS-ENTERPRISE-ROADMAP.md).  
+> **Last Updated:** 2026-11-22
 
 ---
 
@@ -11,13 +11,13 @@
 
 ### Rule 1: PJ Codes Everything Himself
 
-- **The AI must NEVER directly write, modify, or generate project implementation files** (such as files in `01-saas-api/src/`, `01-saas-api/migrations/`, `01-saas-api/tests/`, etc.).
-- **The AI's role is strictly as a senior mentor, tutor, and staff architect:**
+- **The AI must NEVER directly write, modify, or generate project implementation files** (such as files in `01-saas-api/backend/src/`, `01-saas-api/backend/migrations/`, `01-saas-api/backend/tests/`, etc.).
+- **The AI's role is strictly as a senior mentor, tutor, and staff architect (strictly adhering to [skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)):**
   1. Teach the underlying theory, data structures, and PostgreSQL/Redis mechanics deeply.
   2. Explain the architectural _why_ and evaluate trade-offs before showing any code.
   3. Provide exact terminal commands (e.g. `npm install ...`, `mkdir ...`) and complete, production-grade code snippets directly inside the chat interface.
   4. Wait for PJ to create, type, review, and test each file before advancing.
-- **The ONLY files the AI is authorized to create/update directly** are documentation tracking files in root or `docs/` (specifically `PROJECT-CONTEXT.md` to keep progress and next starting points synchronized).
+- **The ONLY files the AI is authorized to create/update directly** are documentation and skill files in root or `skills/` (specifically `PROJECT-CONTEXT.md`, `SAAS-ENTERPRISE-ROADMAP.md`, and workspace skills).
 
 ### Rule 2: No ORMs & No Hand-Wavy Shortcuts
 
@@ -33,6 +33,14 @@
   2. Explain *why* something is designed the way it is, what security or performance hazards it avoids, and what catastrophic bugs would occur if done naively.
   3. Walk through the code thoroughly: explain what each TypeScript type, cryptographic primitive, SQL clause, or architectural boundary does so PJ builds deep intuition and confidence.
 
+### Rule 4: Mandatory Visual System Design Modeling (Mermaid.js & Excalidraw)
+
+- **Design Before Implementation:** Before writing any database migration SQL or application code for a feature or sprint, the AI mentor and PJ must model the system visually.
+- **Two-Pronged Visual Modeling Toolset:**
+  1. **Mermaid.js (Diagrams as Code):** Written directly in Markdown (`sequenceDiagram`, `erDiagram`, `stateDiagram-v2`, `flowchart TD/LR`). Zero-overhead, Git-versioned, and rendered natively in the IDE and GitHub.
+  2. **Excalidraw (Visual Architecture Extension):** Visual whiteboarding (`.excalidraw` via the IDE extension) for system topologies, distributed network meshes, and failure boundary maps stored in `docs/architecture/`.
+- **Pedagogical Mandate:** The AI must teach PJ how to construct, interpret, and iterate on these diagrams from scratch so PJ develops senior-level visual system design fluency.
+
 ---
 
 ## 2. Workspace Directory Layout
@@ -40,6 +48,8 @@
 ```
 c:\Users\DMC\Desktop\be\
 ├── PROJECT-CONTEXT.md            # THIS FILE: Current status, AI instructions & progress log
+├── SAAS-ENTERPRISE-ROADMAP.md    # PRIMARY ACTIVE SPEC: Jira/Linear-grade enterprise sprint breakdown
+├── skills\                       # Workspace-scoped AI skills (security, frontend, auditing)
 ├── docs\                         # Comprehensive specifications for all 10 projects
 │   ├── 00-master-roadmap.md
 │   ├── 01-project-saas-api.md
@@ -52,16 +62,16 @@ c:\Users\DMC\Desktop\be\
 │   ├── 08-project-analytics-data-platform.md
 │   ├── 09-project-api-gateway-bff.md
 │   └── 10-project-cicd-reliability-engineering.md
-└── 01-saas-api\                  # Project #1 root directory (Multi-Tenant SaaS API)
-    ├── docs\                     # Project-specific ADRs and milestones
-    ├── src\                      # Application source code
-    │   ├── config\               # env, logger, database, redis
-    │   ├── lib\                  # context, apiError, asyncHandler, crypto
-    │   ├── middleware\           # correlation, request-logger, errorHandler
-    │   ├── modules\              # feature modules (auth, users, etc.)
-    │   └── types\                # type declarations & augmentations
-    ├── migrations\               # SQL-first raw database migrations (up/down)
-    └── tests\                    # Unit, integration, and adversarial tests
+└── 01-saas-api\                  # Project #1 root directory (Multi-Tenant SaaS Full-Stack Monorepo)
+    ├── docker-compose.yml        # Orchestrates Backend, Frontend, and LGTM Observability Stack
+    ├── frontend\                 # Frontend application workspace (to be implemented)
+    └── backend\                  # Backend application source code and migrations
+        ├── dist\
+        ├── docker\               # Prometheus, Tempo, Loki, Grafana provisioning configs
+        ├── Dockerfile
+        ├── migrations\           # SQL-first raw database migrations (up/down)
+        ├── src\                  # Application source code
+        └── tests\                # Unit, integration, and adversarial tests
 ```
 
 ---
@@ -295,40 +305,39 @@ MILESTONE 6 EXECUTION ORDER:
 ## 6. Next Immediate Action for AI Assistants
 
 > [!IMPORTANT]
-> **VENUE FOR NEXT SESSION:** PJ will be working from his **personal Arch Linux PC** (which has native Docker and full system privileges, unlike the company Windows PC used previously).
+> **CRITICAL DIRECTIVE — REFER TO `SAAS-ENTERPRISE-ROADMAP.md` FIRST:**  
+> Although the core infrastructure engine (Milestones 1–6) is 100% complete and passing in Docker on Arch Linux, PJ is expanding the SaaS backend to achieve full enterprise parity with commercial giants like **Jira**, **Linear**, and **GitHub Projects** before building the frontend or moving to Project #2.  
+> **ANY AI ASSISTANT STARTING A SESSION MUST REFER TO [SAAS-ENTERPRISE-ROADMAP.md](file:///mnt/recovery/be/SAAS-ENTERPRISE-ROADMAP.md) AS THE ACTIVE MASTER SPECIFICATION.**
+>
+> **Pedagogical Mandate (Strict):**
+> 1. Continue adhering to **Rule 1** (PJ codes everything himself; never write or modify implementation files directly in `src/`, `migrations/`, or `tests/`).
+> 2. Continue adhering to **Rule 2** (Zero ORMs, raw PostgreSQL, strict TypeScript, RFC 9457 errors).
+> 3. Continue adhering to **Rule 3** (Extreme pedagogical depth, real-world analogies, explain the architectural *why* before giving terminal commands and code snippets).
 
-- **Project #1 Status:** **100% Complete across all 6 Milestones** (57/57 integration tests passing, production multi-stage Dockerfile, complete LGTM observability stack, and k6 stress benchmark verified).
-- **Pedagogical Mandate (Strict):** Continue adhering to Rule 1 (PJ codes everything himself, never directly write project implementation files) and Rule 3 (extreme pedagogical depth with real-world analogies before showing code).
+### Current Execution Focus: The Enterprise Backend Sprints
 
-### Immediate Focus Areas for the Arch Linux Session:
-1. **Docker & Arch Linux Boot:**
-   - When PJ pulls the repository (`git pull`), guide him to run `docker compose up -d --build`.
-   - Verify all 7 containers are healthy:
-     - `saas-api` (Express backend on :4000)
-     - `saas-worker` (Dedicated BullMQ worker processing queues in background)
-     - `saas-redis` (Cache & queue store on :6379)
-     - `saas-prometheus` (Metrics scraper on :9090)
-     - `saas-tempo` (Distributed trace collector on :3200 & :4318)
-     - `saas-loki` (Log store on :3100)
-     - `saas-grafana` (Visualization on :3001)
-2. **Observability Visualization & Exploration (The LGTM Experience):**
-   - Guide PJ to open `http://localhost:3001` (User: `admin` / Pass: `admin`).
-   - Walk him through:
-     - **Tempo:** Searching for traces and viewing horizontal waterfall flame graphs.
-     - **Loki:** Querying JSON logs and using the "TraceID" derived field to jump directly into Tempo.
-     - **Prometheus:** Querying custom PromQL metrics (`http_requests_total`, `tasks_created_total`, `db_pool_active_connections`).
-3. **Load Testing at Bare-Metal Speed:**
-   - Install k6 on Arch: `sudo pacman -S k6`.
-   - Run `k6 run tests/load/k6-stress.js` against the containerized stack.
-   - Watch the Grafana dashboards and Tempo flame graphs update in real-time under live load.
-4. **Architecture Diagramming: Hands-On Evaluation (Mermaid.js vs Excalidraw):**
-   - Teach PJ **both** Mermaid.js and Excalidraw (via the VS Code extension) side-by-side using Project #1's architecture.
-   - PJ has never used either tool. Walk him through:
-     a) **Mermaid.js:** Write text-based diagrams in markdown (`docs/`), previewing with VS Code markdown preview.
-     b) **Excalidraw:** Create a visual diagram using the VS Code Excalidraw extension.
-   - After testing both hands-on, PJ will choose his preferred tool to standardize on for the rest of the 10-project series.
-5. **Transition to Project #2:**
-   - When PJ indicates readiness to advance, introduce **Project #2: Real-Time Collaborative Document Editor** (WebSockets, CRDTs / Operational Transformation, Redis Pub/Sub, document snapshots).
+Follow the 15 enterprise sprints across 5 phases detailed in [SAAS-ENTERPRISE-ROADMAP.md](file:///mnt/recovery/be/SAAS-ENTERPRISE-ROADMAP.md):
+
+- **Phase 1: Identity & Multi-Factor Authentication (2FA)**
+  - Sprint 1: Identity Lifecycle, Email Verification, Password Reset & Session/Device Tracking.
+  - Sprint 2: Multi-Factor Authentication (TOTP for Google/Microsoft Authenticator, SMS/WhatsApp OTP, Backup Codes, Tenant 2FA Enforcement).
+- **Phase 2: Workspaces, Teams & Two-Tier Authorization**
+  - Sprint 3: Workspace Provisioning, Cryptographic Invitations & Role Hierarchy Management.
+  - Sprint 4: Two-Tier Authorization & Project-Level Memberships (Compartmentalized RLS).
+- **Phase 3: The Jira / Linear Issue Tracking Engine**
+  - Sprint 5: Issue Hierarchy (Epics & Subtasks), Assignees, Workflows & Scheduling.
+  - Sprint 6: Issue Dependencies (DAG Blocker Cycle Detection) & Custom Fields Engine (JSONB + GIN).
+  - Sprint 7: Sprints, Milestones, Scrum Cycles & Burndown Data.
+  - Sprint 8: Time Tracking & Worklogs (Atomic hour rollups).
+- **Phase 4: Collaboration, Communication & Media**
+  - Sprint 9: Activity Stream, Task Changelog & User Mentions.
+  - Sprint 10: Direct-to-Storage Attachments (S3 / Cloudflare R2 Presigned URLs, zero memory buffering).
+  - Sprint 11: In-App Notification Center & Notification Preferences.
+  - Sprint 12: Real-Time Event Gateway (Server-Sent Events / WebSockets via Redis Pub/Sub).
+- **Phase 5: Enterprise Governance, Billing & Developer Platform**
+  - Sprint 13: Subscription Billing, Metering & Quotas (Stripe Integration, seat caps).
+  - Sprint 14: Workspace Bulk Data Export (Encrypted ZIP), Soft Deletion & GDPR Erasure.
+  - Sprint 15: Public Developer API (Fine-grained PAT scopes, Tiered Rate Limits, OpenAPI 3.1).
 
 ---
 
@@ -344,8 +353,8 @@ MILESTONE 6 EXECUTION ORDER:
      - Editable directly inside VS Code using the official free Excalidraw extension (`pomdtr.excalidraw-editor`).
      - Best for high-level module topology, whiteboard brainstorms, and system design interviews.
 - **Evaluation Plan:**
-  - In the next session, PJ will build the architecture diagrams for Project #1 using **both** tools.
-  - After comparing the developer experience (DX), PJ will settle on one tool to use for all future projects.
+  - In Sprint 1, Step 1.0 (the next session), PJ will construct the visual architecture diagrams for the Password Reset & Session Management subsystem using **both** tools (Mermaid.js sequence/ER diagrams in Markdown + Excalidraw topology in `docs/architecture/`).
+  - After comparing the developer experience (DX), PJ will settle on the optimal visual workflow to use across all 15 sprints and all 10 projects.
 - **Three Essential Perspectives to Diagram for Project #1:**
   1. **Data & Security Flow:** Inbound HTTP requests traversing middleware guards, database transactions, and RLS policies.
   2. **Asynchronous / Event-Driven Topology:** Background job queues, workers, external third-party integrations, and circuit breakers.

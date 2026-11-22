@@ -2,12 +2,14 @@ services:
   # 1. SaaS API Application
   app:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     container_name: saas-api
     restart: unless-stopped
     ports:
       - "4000:4000"
+    env_file:
+      - ./backend/.env
     environment:
       - NODE_ENV=production
       - PORT=4000
@@ -34,16 +36,20 @@ services:
   # Dedicated Background Worker (Processes BullMQ notifications & webhooks)
   worker:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     container_name: saas-worker
     restart: unless-stopped
     command: ["node", "dist/jobs/worker.js"]
+    env_file:
+      - ./backend/.env
     environment:
       - NODE_ENV=production
       - LOG_LEVEL=info
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=redis://redis:6379
+      - JWT_ACCESS_PRIVATE_KEY=${JWT_ACCESS_PRIVATE_KEY}
+      - JWT_ACCESS_PUBLIC_KEY=${JWT_ACCESS_PUBLIC_KEY}
       - OTEL_TRACING_ENABLED=true
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318/v1/traces
     depends_on:
@@ -78,7 +84,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./backend/docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
@@ -95,7 +101,7 @@ services:
       - "4318:4318" # OTLP HTTP receiver (used by OpenTelemetry Node SDK)
       - "4317:4317" # OTLP gRPC receiver
     volumes:
-      - ./docker/tempo/tempo.yml:/etc/tempo.yaml:ro
+      - ./backend/docker/tempo/tempo.yml:/etc/tempo.yaml:ro
     command: ["-config.file=/etc/tempo.yaml"]
     networks:
       - saas-network
@@ -108,7 +114,7 @@ services:
     ports:
       - "3100:3100"
     volumes:
-      - ./docker/loki/loki.yml:/etc/loki/local-config.yaml:ro
+      - ./backend/docker/loki/loki.yml:/etc/loki/local-config.yaml:ro
     command: ["-config.file=/etc/loki/local-config.yaml"]
     networks:
       - saas-network
@@ -125,7 +131,7 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
-      - ./docker/grafana/provisioning/datasources/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
+      - ./backend/docker/grafana/provisioning/datasources/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
     depends_on:
       - prometheus
       - tempo
