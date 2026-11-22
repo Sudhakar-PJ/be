@@ -5,6 +5,12 @@
 > **Status:** Project #1 (Multi-Tenant SaaS API) — Core Infrastructure Complete (57/57 Tests, Full LGTM Stack). Currently executing the **Enterprise Product Expansion** (Jira/Linear parity) detailed in [SAAS-ENTERPRISE-ROADMAP.md](file:///mnt/recovery/be/SAAS-ENTERPRISE-ROADMAP.md).  
 > **Last Updated:** 2026-11-22
 
+> [!IMPORTANT]
+> **DOCUMENT HIERARCHY & INGESTION DIRECTIVE FOR AI ASSISTANTS:**
+> 1. `PROJECT-CONTEXT.md` (THIS FILE) is the **Master Operational Anchor**: It defines the 10-Project Series roadmap, the immutable Operating Rules (PJ codes everything himself, zero ORMs, extreme pedagogical depth, visual system design modeling), and historical engineering progress.
+> 2. [SAAS-ENTERPRISE-ROADMAP.md](file:///mnt/recovery/be/SAAS-ENTERPRISE-ROADMAP.md) is the **Active Sprint Execution Engine**: It contains the granular, step-by-step checklist, database schemas, REST endpoints, and architectural requirements for the active 15 enterprise sprints (Sprint 1 through Sprint 15).
+> 3. **Mandatory AI Action:** Whenever a session starts or context is provided, the AI assistant **MUST treat `SAAS-ENTERPRISE-ROADMAP.md` as the direct active specification** and advance through its checkboxes sequentially. Do not invent new tasks outside this roadmap.
+
 ---
 
 ## 1. Critical Operating Rules for AI Assistants
