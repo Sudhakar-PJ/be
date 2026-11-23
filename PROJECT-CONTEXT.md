@@ -3,11 +3,11 @@
 > **Purpose:** Central living reference and handoff document. Any developer or AI assistant working in this workspace must read this document first before giving any guidance or suggestions.  
 > **Learner:** PJ Sudhakar  
 > **Status:** Project #1 (Multi-Tenant SaaS API) — Core Infrastructure Complete (57/57 Tests, Full LGTM Stack). Currently executing the **Enterprise Product Expansion** (Jira/Linear parity) detailed in [SAAS-ENTERPRISE-ROADMAP.md](file:///mnt/recovery/be/SAAS-ENTERPRISE-ROADMAP.md).  
-> **Last Updated:** 2026-11-22
+> **Last Updated:** 2026-11-23
 
 > [!IMPORTANT]
 > **DOCUMENT HIERARCHY & INGESTION DIRECTIVE FOR AI ASSISTANTS:**
-> 1. `PROJECT-CONTEXT.md` (THIS FILE) is the **Master Operational Anchor**: It defines the 10-Project Series roadmap, the immutable Operating Rules (PJ codes everything himself, zero ORMs, extreme pedagogical depth, visual system design modeling), and historical engineering progress.
+> 1. `PROJECT-CONTEXT.md` (THIS FILE) is the **Master Operational Anchor**: It defines the 10-Project Series roadmap, the immutable Operating Rules (PJ codes everything himself, zero ORMs, extreme pedagogical depth, deep systems architecture), and historical engineering progress.
 > 2. [SAAS-ENTERPRISE-ROADMAP.md](file:///mnt/recovery/be/SAAS-ENTERPRISE-ROADMAP.md) is the **Active Sprint Execution Engine**: It contains the granular, step-by-step checklist, database schemas, REST endpoints, and architectural requirements for the active 15 enterprise sprints (Sprint 1 through Sprint 15).
 > 3. **Mandatory AI Action:** Whenever a session starts or context is provided, the AI assistant **MUST treat `SAAS-ENTERPRISE-ROADMAP.md` as the direct active specification** and advance through its checkboxes sequentially. Do not invent new tasks outside this roadmap.
 
@@ -39,13 +39,10 @@
   2. Explain *why* something is designed the way it is, what security or performance hazards it avoids, and what catastrophic bugs would occur if done naively.
   3. Walk through the code thoroughly: explain what each TypeScript type, cryptographic primitive, SQL clause, or architectural boundary does so PJ builds deep intuition and confidence.
 
-### Rule 4: Mandatory Visual System Design Modeling (Mermaid.js & Excalidraw)
+### Rule 4: Deep Architectural Design & First-Principles Grounding
 
-- **Design Before Implementation:** Before writing any database migration SQL or application code for a feature or sprint, the AI mentor and PJ must model the system visually.
-- **Two-Pronged Visual Modeling Toolset:**
-  1. **Mermaid.js (Diagrams as Code):** Written directly in Markdown (`sequenceDiagram`, `erDiagram`, `stateDiagram-v2`, `flowchart TD/LR`). Zero-overhead, Git-versioned, and rendered natively in the IDE and GitHub.
-  2. **Excalidraw (Visual Architecture Extension):** Visual whiteboarding (`.excalidraw` via the IDE extension) for system topologies, distributed network meshes, and failure boundary maps stored in `docs/architecture/`.
-- **Pedagogical Mandate:** The AI must teach PJ how to construct, interpret, and iterate on these diagrams from scratch so PJ develops senior-level visual system design fluency.
+- **Architecture Before Implementation:** Before writing database migrations or application code, we thoroughly reason through the domain model, state transitions, edge cases, failure modes, and security implications in chat.
+- **Hands-On Code Mastery:** All focus is on building deep intuition for raw SQL, connection pooling, Redis caching, async queues, and strict TypeScript patterns. Diagramming is decoupled and deferred for separate study.
 
 ---
 
@@ -347,21 +344,10 @@ Follow the 15 enterprise sprints across 5 phases detailed in [SAAS-ENTERPRISE-RO
 
 ---
 
-## 7. System Architecture Diagramming Standards & Tool Evaluation
+## 7. Architectural Standards & Execution Principles
 
-- **Core Goal:** Master visual architecture communication through hands-on evaluation of the two leading tools:
-  1. **Mermaid.js (Diagrams as Code):**
-     - Zero installation; written in standard Markdown (````mermaid````) inside `docs/`.
-     - Git-native, renders automatically on GitHub and in VS Code Markdown preview.
-     - Best for sequence diagrams, state machines, and version-controlled architecture docs.
-  2. **Excalidraw (Visual Whiteboarding via VS Code Extension):**
-     - Hand-drawn, clean whiteboard aesthetic.
-     - Editable directly inside VS Code using the official free Excalidraw extension (`pomdtr.excalidraw-editor`).
-     - Best for high-level module topology, whiteboard brainstorms, and system design interviews.
-- **Evaluation Plan:**
-  - In Sprint 1, Step 1.0 (the next session), PJ will construct the visual architecture diagrams for the Password Reset & Session Management subsystem using **both** tools (Mermaid.js sequence/ER diagrams in Markdown + Excalidraw topology in `docs/architecture/`).
-  - After comparing the developer experience (DX), PJ will settle on the optimal visual workflow to use across all 15 sprints and all 10 projects.
-- **Three Essential Perspectives to Diagram for Project #1:**
-  1. **Data & Security Flow:** Inbound HTTP requests traversing middleware guards, database transactions, and RLS policies.
-  2. **Asynchronous / Event-Driven Topology:** Background job queues, workers, external third-party integrations, and circuit breakers.
-  3. **Infrastructure & Observability:** Container networks, Prometheus scrapers, OpenTelemetry collectors, and log pipelines.
+- **Three Essential Perspectives to Analyze for Project #1:**
+  1. **Data & Security Flow:** Inbound HTTP requests traversing middleware guards, database transactions, and PostgreSQL Row-Level Security (RLS) policies.
+  2. **Asynchronous / Event-Driven Topology:** Background BullMQ job queues, dedicated worker processes, external third-party integrations, and circuit breakers.
+  3. **Infrastructure & Observability:** Container networks, Prometheus metric scrapers, OpenTelemetry distributed tracing, and structured Pino logging.
+- **Pedagogical Alignment:** The mentor and PJ focus directly on code craftsmanship, deep systems theory, relational database design, and testing. Formal diagramming is separated for independent study.

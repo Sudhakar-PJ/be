@@ -2,23 +2,18 @@
 
 > **Document Status:** Active Master Specification & Comprehensive Sprint Checklist  
 > **Benchmark Standards:** **Jira Software**, **Linear**, **GitHub Projects**, and **GitLab**.  
-> **Operating Mandate:** Zero ORMs, raw PostgreSQL (`pg`), Redis (`ioredis`), strict TypeScript (`exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`), Zod schema validation, RFC 9457 Problem Details error responses, asynchronous BullMQ pipelines, and **Mandatory Visual System Design Modeling (Mermaid.js + Excalidraw)** before code implementation. PJ codes everything himself per Rule 1.
+> **Operating Mandate:** Zero ORMs, raw PostgreSQL (`pg`), Redis (`ioredis`), strict TypeScript (`exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`), Zod schema validation, RFC 9457 Problem Details error responses, and asynchronous BullMQ pipelines. PJ codes everything himself per Rule 1.
 
 ---
 
-## Visual System Design Mandate (Mermaid.js & Excalidraw)
+## Architectural Grounding & Domain Modeling
 
-> **Architectural Law:** Before writing any migration SQL or TypeScript implementation file for a sprint, the mentor and learner must design and reason through the system visually.
+> **Architectural Law:** Before writing any migration SQL or TypeScript implementation file for a sprint, the mentor and learner reason through the system design, relational algebra, and threat models from first principles:
 > 
-> 1. **Mermaid.js Diagrams (Markdown Native):**
->    - **Sequence Diagrams (`sequenceDiagram`):** Model end-to-end request-response flows, distributed transactions, asynchronous job dispatch, and token revocation cascades.
->    - **Entity-Relationship Diagrams (`erDiagram`):** Model relational tables, foreign key constraints, column types, and cascade rules before writing SQL.
->    - **State Machine Diagrams (`stateDiagram-v2`):** Model lifecycle transitions (e.g., Issue status workflows, user verification states, payment saga states).
->    - **Flowcharts (`flowchart TD/LR`):** Model service interactions, caching layers, and worker pipelines.
-> 2. **Excalidraw Visual Architecture (`.excalidraw` / IDE Extension):**
->    - Visual whiteboarding of high-level network topology, multi-tenant boundaries, distributed caching tiers, and failure isolation boundaries.
->    - Saved in `docs/architecture/` as living architectural assets.
-> 3. **Pedagogical Instruction:** The mentor must teach PJ how to read, construct, and reason through these diagrams from first principles.
+> 1. **Relational Constraints & Invariants:** Define primary keys, foreign keys, cascade behaviors, and uniqueness guarantees.
+> 2. **Threat Modeling & Edge Cases:** Identify timing attacks, replay attacks, concurrent race conditions, and privilege escalations.
+> 3. **Distributed Mechanics:** Model caching strategies, token invalidation cascades, and asynchronous queue workers.
+> 4. **Pedagogical Instruction:** Socratic analysis and deep real-world analogies (Stripe, GitHub, Linear) before typing code.
 
 ---
 
@@ -48,10 +43,6 @@
 ### Sprint 1: Identity Lifecycle, Password Reset & Session Tracking
 *Ensures secure user onboarding, self-service recovery, and visibility over active devices.*
 
-- [ ] **1.0 Visual System Design & Architecture Modeling (Mermaid.js + Excalidraw):**
-  - **Mermaid.js Sequence Diagram:** Model the complete Self-Service Password Reset flow (Timing-safe token generation $\rightarrow$ BullMQ dispatch $\rightarrow$ Argon2id rehash $\rightarrow$ atomic session revocation cascade).
-  - **Mermaid.js ER Diagram:** Model `users`, `sessions`, and `password_resets` schema relationships, indexes, and constraints.
-  - **Excalidraw Topology:** Model the active session architecture (HTTP Cookie / Bearer $\rightarrow$ PostgreSQL session store $\rightarrow$ Redis token denylist $\rightarrow$ remote device revocation).
 - [ ] **1.1 Database Migration (Identity & Sessions):**
   - Add to `users`: `verification_token_hash VARCHAR(64)`, `verification_token_expires_at TIMESTAMPTZ`, `timezone VARCHAR(50) DEFAULT 'UTC'`, `locale VARCHAR(10) DEFAULT 'en'`, `avatar_url VARCHAR(500)`.
   - Add to `sessions`: `user_agent TEXT`, `ip_address VARCHAR(45)`, `device_name VARCHAR(100)`, `last_active_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP`.
