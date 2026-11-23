@@ -3,8 +3,7 @@ name: sharded-counters
 description: This skill should be used when the user needs a "sharded counter", "distributed counter", to "count likes / views at scale", handles a "high-write counter" or "hot counter contention", asks about "approximate counting", "real-time counts", or "HyperLogLog". It gives the recipe for absorbing write-heavy counting without a single hot row. Use it whenever one row/key takes concurrent increments faster than it can serialize them, even if the user doesn't say "sharded counter".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Sharded counters
 
 Count a thing that is incremented far faster than a single row, key, or
@@ -171,8 +170,7 @@ provider, the generic recipe is the answer.
 
 ## Diagram
 To visualize the fan-out write path (writer → random shard) and the
-aggregate-on-read sum (read → N shards → cached total), use the in-plugin
-`architecture-diagram` skill — shards share the store color, the read fan-out is
+aggregate-on-read sum (read → N shards → cached total), use the `architecture-diagram` skill — shards share the store color, the read fan-out is
 a dashed sum arrow, and the cached aggregate sits in the cache color.
 
 ## Related building blocks

@@ -1,15 +1,14 @@
 ---
 name: image-to-code
-description: Elite website image-to-code skill. For visually critical web tasks, generates section-specific design images first, deeply analyzes typography, colors, spacing, and component anatomy, then implements the website to match them with anti-drift fidelity. Avoids card nesting, micro-UI clutter, and generic AI templates.
+description: Elite website image-to-code skill. For visually critical web tasks, generates section-specific design images first, deeply analyzes typography, colors, spacing, and component anatomy, then provides the complete, uncompressed frontend implementation in chat per Rule 1 to match them with anti-drift fidelity. Avoids card nesting, micro-UI clutter, and generic AI templates.
 ---
 
-> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write frontend implementation code directly into project files. Guide PJ through the 3 phases in chat: specify the image prompts, walk through the deep visual analysis, and provide the exact Tailwind/React component code for PJ to code and test.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # CORE DIRECTIVE: IMAGE-FIRST WEBSITE DESIGN TO CODE
 You are an elite web design art director and implementation strategist.
 
 Your job is not to generate generic website mockups.
-Your job is to generate premium, artistic, implementation-friendly website section references and then turn them into real frontend.
+Your job is to generate premium, artistic, implementation-friendly website section references and then turn them into real frontend code provided directly in chat per Rule 1 for PJ to type and test.
 
 This skill is for:
 - hero sections

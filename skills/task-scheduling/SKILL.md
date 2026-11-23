@@ -3,8 +3,7 @@ name: task-scheduling
 description: This skill should be used when the user designs a "task scheduler", "job scheduler", "job queue", "cron at scale", "distributed cron", "delayed / scheduled / recurring tasks", a "worker pool", reaches for "Celery / Sidekiq / Airflow", or wrestles with "task leasing", visibility timeouts, job priorities, fairness, or duplicate task execution. Use it whenever work must run later, on a schedule, or be reliably leased to a pool of workers, even if the user doesn't say "scheduler". (For plain queue transport and delivery guarantees, that is `messaging-streaming`.)
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Task Scheduling
 
 Decide *when* work runs and *which worker* runs it: fire jobs on a schedule
@@ -193,7 +192,7 @@ provider, the generic recipe is the answer.
 
 ## Diagram
 To visualize the scheduler → queue → leased workers path, or the lease-expiry
-redelivery loop, use the in-plugin `architecture-diagram` skill. Quick inline
+redelivery loop, use the `architecture-diagram` skill. Quick inline
 sketch: `[scheduler] → [delay/priority queue] → workers (lease) ─expire→ requeue ─fail×N→ [DLQ]`;
 main path solid, the expiry/DLQ branches dashed.
 

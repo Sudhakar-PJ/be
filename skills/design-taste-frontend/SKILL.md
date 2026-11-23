@@ -8,8 +8,7 @@ description: >-
   Use when designing, restyling, or reviewing landing pages, SaaS, dashboards, or when a page looks generic or "AI-made".
 ---
 
-> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). When used during interactive sessions, never auto-write code directly into project files. Guide the user in chat with art-direction rationale, component markup, and CSS/Tailwind tokens so they code and verify every screen.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # tasteskill 2.5
 
 Build the website a good company would ship: it says plainly what is sold, shows the real thing on

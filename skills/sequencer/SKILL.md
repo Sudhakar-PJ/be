@@ -3,8 +3,7 @@ name: sequencer
 description: This skill should be used when the user needs a "unique ID generator", "distributed IDs", a "Snowflake ID", asks "UUID vs auto-increment", wants a "time-sortable ID", a "monotonic sequence", a "ticket server", or "ID generation at scale". It gives a menu of ID schemes (UUID/ULID, Snowflake-style, DB ticket/range) with their causality, ordering, and clock-skew trade-offs. Use it whenever a design needs collision-free identifiers across many nodes, even if the user doesn't say "sequencer".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Sequencer
 
 Hand out identifiers that are unique across every node without a central
@@ -167,7 +166,7 @@ service — you run a library or a sequence yourself).
 
 ## Diagram
 To visualize the issuance path (generator nodes → 64-bit layout → record key) or
-the ticket-server block-allocation flow, use the in-plugin `architecture-diagram`
+the ticket-server block-allocation flow, use the `architecture-diagram`
 skill; an inline `[ts | node | seq]` sketch is enough for quick bit-budget
 reasoning. Do not embed Mermaid.
 

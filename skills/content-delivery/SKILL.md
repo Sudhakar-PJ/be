@@ -3,8 +3,7 @@ name: content-delivery
 description: This skill should be used when the user asks about a "CDN", "edge caching", "static asset delivery", "media / video delivery", "geo distribution of content" or "edge POP selection", "push vs pull CDN", "cache-control headers" / "TTL for static assets", "origin offload", or "origin shield". It gives the recipe for serving bytes from the edge close to users. Use it whenever a design serves images, video, JS/CSS, or downloads to a wide geography, or the origin is saturated by repeat reads of the same files, even if the user doesn't say "CDN".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Content Delivery
 
 Push bytes to the network edge so requests terminate close to the user and never
@@ -180,8 +179,7 @@ provider, the generic recipe is the answer.
 
 ## Diagram
 To visualize the edge → shield → origin pull path (and the dashed cold-miss arrow,
-plus geo-routing from clients to the nearest PoP), use the in-plugin
-`architecture-diagram` skill. Sketch the edge nodes in the cache color and the
+plus geo-routing from clients to the nearest PoP), use the `architecture-diagram` skill. Sketch the edge nodes in the cache color and the
 origin in its store color; do not embed Mermaid here.
 
 ## Related building blocks

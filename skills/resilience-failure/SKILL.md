@@ -3,8 +3,7 @@ name: resilience-failure
 description: This skill should be used when the user asks about "fault tolerance", "resilience", a "circuit breaker", "graceful degradation", "retry storm" or "thundering herd on recovery", "exponential backoff with jitter", "timeout", "bulkhead", a "single point of failure" (SPOF), "failover", or "rate limiting" (token bucket / leaky bucket / sliding window). Use it whenever a design must keep working through node crashes, slow dependencies, traffic spikes, or partial outages — i.e. any time the answer to "what happens when this breaks?" is missing, even if the user doesn't say "resilience".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Resilience & Failure
 
 Design the system so that when a part breaks — and it will — the failure is
@@ -159,8 +158,7 @@ recipe is the answer.
 
 ## Diagram
 To visualize a fallback path (gateway → timeout on primary → dashed arrow to
-cache/default) or a circuit-breaker state machine, use the in-plugin
-`architecture-diagram` skill; draw the degraded path as a dashed arrow and the
+cache/default) or a circuit-breaker state machine, use the `architecture-diagram` skill; draw the degraded path as a dashed arrow and the
 failed dependency in the error color.
 
 ## Related building blocks

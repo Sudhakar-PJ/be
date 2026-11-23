@@ -4,9 +4,7 @@ description: Pick the library for a frontend task from a curated list — primit
 disable-model-invocation: true
 ---
 
-> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write animation, component, or interaction code directly into project files. Explain the design engineering rationale, easing physics, and duration parameters in chat, and provide the exact React/CSS/Framer Motion code so PJ writes and tests every screen.
-
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Picking The Right Library
 
 ## Initial Response

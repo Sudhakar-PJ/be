@@ -1,6 +1,6 @@
 # Building-blocks index (the wiki)
 
-This plugin is a wiki of composable parts. This index says which block answers
+This skill set is a wiki of composable parts. This index says which block answers
 which question, and how the blocks combine into a whole design. Trigger a block
 directly when the user asks about that part — the orchestrator is not required
 for every question.
@@ -32,10 +32,8 @@ for every question.
 
 ## Entry points
 
-- **`/design <system>`** (slash command) — runs the whole workflow on a problem.
-- **`system-design-orchestrator`** (agent) — the autonomous driver of the loop; the
-  command dispatches to it. It loads this skill, then routes to the blocks below.
-- **Any block directly** — for a single-part question, trigger that skill alone.
+- **`system-design`** (skill) — the orchestrator that runs the full six-step reasoning loop on a problem, routing to the specialized building-block skills below.
+- **Any block directly** — for a single-part question (e.g. rate limiting, idempotency, sharding), trigger that building-block skill alone.
 
 ## Bottom-up layers (topological)
 

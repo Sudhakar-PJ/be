@@ -3,10 +3,10 @@
 Diagrams represent components as boxes and communication/data flow as arrows. Use
 them to *think*, not just to present.
 
-**The diagram engine for this plugin is the in-plugin `architecture-diagram`
+**The diagram engine for this skill set is the `architecture-diagram`
 skill** — it generates a self-contained dark-theme HTML+SVG diagram (with optional
 PNG/PDF export) from a component list and their connections. It ships inside this
-plugin, so there is no external dependency. Hand off to it once the design is
+skill set, so there is no external dependency. Hand off to it once the design is
 clear enough to draw.
 
 For *early* thinking in the conversation, a quick ASCII sketch is fine — it's

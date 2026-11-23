@@ -3,8 +3,7 @@ name: back-of-the-envelope
 description: This skill should be used when the user needs to "estimate QPS", "back-of-the-envelope" (BOTEC) numbers, "how much storage / bandwidth", "how many servers", "peak load", "capacity planning", or wants the standard latency / throughput / availability numbers to ground a design (latency table, QPS rates, powers of two, nines). Use it whenever a design decision hinges on scale — convert any "high traffic" / "huge data" phrase into concrete numbers before choosing components, even if the user doesn't say "estimate". Prefer it even for a quick "rough numbers" question (DAU × actions/day → QPS, storage per day/year, replication): it carries a calculator and the reference numbers, so the arithmetic and unit conversions are checked instead of done from memory.
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Back-of-the-Envelope Estimation (BOTEC)
 
 Turn vague scale ("high traffic", "huge data") into a few concrete numbers that

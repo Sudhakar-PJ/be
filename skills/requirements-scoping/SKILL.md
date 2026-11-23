@@ -3,8 +3,7 @@ name: requirements-scoping
 description: This skill should be used when the user needs to "clarify requirements", separate "functional vs non-functional requirements", "scope the problem", figure out "what questions should I ask", state the "requirements for <X>", or otherwise pin down a vague design prompt before building. It turns an ambiguous ask into functional requirements, non-functional constraints, and an explicit out-of-scope. Use it whenever a prompt is broad or under-specified ("design Twitter", "build a chat app") even if the user doesn't say "requirements".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Requirements Scoping
 
 Turn a vague prompt ("design a news feed") into three written lists: what the
@@ -146,7 +145,7 @@ units and assumptions written next to each number.
 ## Diagram
 Scoping output is three lists, not a picture — keep them as text so they stay the
 editable contract everything traces back to. When the scoped requirements justify
-a first high-level design, draw *that* with the in-plugin `architecture-diagram`
+a first high-level design, draw *that* with the `architecture-diagram`
 skill; the requirements themselves don't need a diagram.
 
 ## Related building blocks

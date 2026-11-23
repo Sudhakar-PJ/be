@@ -3,9 +3,7 @@ name: motionsites-web-builder
 description: Build award-level, cinematic websites, landing pages and hero sections, or detailed prompts for Lovable, Bolt and v0, using top MotionSites designs, real media and a screenshot-and-fix loop.
 ---
 
-> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write website code directly into project files. Guide PJ through the brief, the chosen examples, the media shelf selection, and the spec template in chat, providing the exact markup and CSS/WebGL code so PJ builds and inspects every screen.
-
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # MotionSites Web Builder
 
 Average AI websites happen for three reasons: a vague plan, no real media, and nobody looking at the result. This skill fixes all three. Follow the workflow every time; the steps are what make the output great.

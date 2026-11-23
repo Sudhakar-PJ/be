@@ -3,8 +3,7 @@ name: messaging-streaming
 description: This skill should be used when the user designs a "message queue", reaches for "Kafka", "RabbitMQ", "SQS", "Kinesis", "pub/sub", or "event-driven" architecture, asks about "async processing", "background jobs", "stream processing", or wrestles with "exactly-once vs at-least-once", "delivery guarantees", "message ordering", "duplicate handling / dedup", "dead letter queue", "backpressure", "saga orchestration", or "durable workflow". Use it whenever a slow or spiky operation should move off the request path, or two services must be decoupled, even if the user doesn't say "queue".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Messaging & Streaming
 
 Move work off the synchronous request path and decouple producers from
@@ -188,7 +187,7 @@ provider, the generic recipe is the answer.
 
 ## Diagram
 To visualize the producer → broker → consumer path, fan-out to multiple
-subscribers, or the retry → DLQ flow, use the in-plugin `architecture-diagram`
+subscribers, or the retry → DLQ flow, use the `architecture-diagram`
 skill. Quick inline sketch: `producer → [queue] → workers ─fail→ [DLQ]`; the main
 path solid, the DLQ branch dashed.
 

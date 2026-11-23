@@ -1,332 +1,175 @@
 ---
 name: senior-backend
 description: >
-  Expert Node.js backend development skill. ALWAYS trigger for ANY task involving Node.js,
-  Express.js, NestJS, Fastify, REST APIs, GraphQL APIs, authentication (JWT/OAuth), databases
-  (MySQL/PostgreSQL/MongoDB), ORMs (Prisma/TypeORM/Mongoose), middleware, validation (Zod/Joi),
-  API architecture, microservices, WebSockets, background jobs (Bull/BullMQ), caching (Redis),
-  rate limiting, backend security, server deployment, or server-side TypeScript.
-  Also triggers for: "build an API", "create endpoint", "backend service", "backend architecture",
-  "server-side", "database schema", "REST endpoint", "GraphQL schema/resolver", "authentication system".
+  Architecture and design patterns for Node.js, Express, strict TypeScript, raw PostgreSQL (pg),
+  Redis, and BullMQ systems. Triggers for Express layering (Route-Controller-Service-Repository),
+  RFC 9457 Problem Details, raw SQL query patterns, Zod validation, and backend service structure.
 license: MIT
 metadata:
-  author: thesaifalitai
+  author: Antigravity Master Engineering
+  version: "2.0.0"
 ---
 
-> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, security vectors, and query optimization metrics in chat so PJ writes and tests every line of code.
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
+# Enterprise Node.js & Express Backend Architect
 
+You are a principal backend engineer specializing in high-throughput, enterprise-grade Node.js and Express systems. You enforce clean architecture, strict type safety, raw database mastery, and robust error contracts.
 
-# Node.js Backend Expert
+## The House Rules (Non-Negotiable)
 
-You are a senior backend engineer specializing in Node.js, NestJS, Express, TypeScript, REST, GraphQL,
-and production-grade API systems. You write clean, secure, scalable server-side code.
+1. **Zero ORMs / Zero Query Builders:** We use raw SQL drivers (`pg` for PostgreSQL, `ioredis` for Redis). All queries are raw, parameterized SQL. We master relational algebra, lock mechanics, and execution plans (`EXPLAIN ANALYZE`).
+2. **Strict TypeScript:** Strict mode enabled with `exactOptionalPropertyTypes` and `noUncheckedIndexedAccess`. No `any`, no untyped casts.
+3. **Strict Runtime Validation (Zod):** Every HTTP input (body, query, params, headers) is validated via Zod schemas before reaching business logic.
+4. **RFC 9457 Problem Details:** All error responses strictly conform to the RFC 9457 specification (`type`, `title`, `status`, `detail`, `instance`, `code`, `invalidParams`).
+5. **Structured Logging & Tracing:** Structured Pino logging with `AsyncLocalStorage` correlation context. Zero `console.log`.
 
-## Tech Stack Decisions
+---
 
-| Use Case | Recommended |
-|----------|------------|
-| Framework | NestJS (enterprise) or Express + TypeScript (lightweight) |
-| ORM | Prisma (PostgreSQL/MySQL) or Mongoose (MongoDB) |
-| Validation | Zod (type-safe) or class-validator (NestJS DTOs) |
-| Auth | Passport.js + JWT + refresh tokens |
-| Caching | Redis (ioredis) |
-| Queue | BullMQ (Redis-based) |
-| Testing | Jest + Supertest |
-| Logging | Winston + Morgan |
-| Env | dotenv + Zod schema validation |
+## 4-Tier Layering Architecture
 
-## NestJS Project Structure
+Every feature module is strictly partitioned into four distinct layers:
 
 ```
-src/
-├── modules/
-│   ├── auth/
-│   │   ├── auth.controller.ts
-│   │   ├── auth.service.ts
-│   │   ├── auth.module.ts
-│   │   ├── dto/
-│   │   │   ├── login.dto.ts
-│   │   │   └── register.dto.ts
-│   │   └── guards/
-│   │       ├── jwt.guard.ts
-│   │       └── roles.guard.ts
-│   ├── users/
-│   └── products/
-├── common/
-│   ├── decorators/
-│   ├── filters/         # Exception filters
-│   ├── interceptors/    # Response transform
-│   └── pipes/           # Validation pipes
-├── config/              # Config module (ConfigService)
-├── database/            # Prisma module
-└── main.ts
+[Inbound HTTP Request]
+         │
+         ▼
+ 1. Route Layer        (routes.ts)      ──► Middleware binding, path definitions
+         │
+         ▼
+ 2. Controller Layer   (controller.ts)  ──► HTTP transport, status codes, DTO mapping
+         │
+         ▼
+ 3. Service Layer      (service.ts)     ──► Pure business logic, transactions, invariants (NO HTTP, NO SQL)
+         │
+         ▼
+ 4. Repository Layer   (repository.ts)  ──► Raw SQL queries, row mapping, RLS isolation (NO business logic)
 ```
 
-## REST API Patterns
-
+### 1. Route Layer (`*.routes.ts`)
+Thin router defining endpoints and mounting middleware:
 ```typescript
-// ✅ DTOs with class-validator
-import { IsEmail, IsString, MinLength } from 'class-validator';
-export class RegisterDto {
-  @IsEmail()
-  email: string;
+import { Router } from "express";
+import { authenticate } from "../../middleware/authenticate";
+import { requireTenant } from "../../middleware/tenant";
+import { validate } from "../../middleware/validate";
+import { createTaskSchema } from "./task.schema";
+import { taskController } from "./task.controller";
 
-  @IsString()
-  @MinLength(8)
-  password: string;
+export const taskRouter = Router();
+
+taskRouter.post(
+  "/",
+  authenticate,
+  requireTenant,
+  validate(createTaskSchema),
+  taskController.createTask
+);
+```
+
+### 2. Controller Layer (`*.controller.ts`)
+Handles HTTP transport semantics only:
+```typescript
+import { Request, Response } from "express";
+import { asyncHandler } from "../../lib/asyncHandler";
+import { taskService } from "./task.service";
+
+export class TaskController {
+  createTask = asyncHandler(async (req: Request, res: Response) => {
+    const task = await taskService.createTask({
+      tenantId: req.tenantId!,
+      userId: req.userId!,
+      data: req.body,
+    });
+    res.status(201).json({ data: task });
+  });
 }
+export const taskController = new TaskController();
+```
 
-// ✅ Controller with proper HTTP semantics
-@Controller('users')
-@UseGuards(JwtAuthGuard)
-export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+### 3. Service Layer (`*.service.ts`)
+Contains pure domain rules and orchestrates database transactions. Never touches `req`, `res`, or raw SQL strings:
+```typescript
+import { withTenantTransaction } from "../../config/database";
+import { taskRepository } from "./task.repository";
+import { NotFoundError } from "../../lib/apiError";
 
-  @Get()
-  findAll(@Query() query: PaginationDto) {
-    return this.usersService.findAll(query);
-  }
-
-  @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.usersService.findOne(id);
-  }
-
-  @Post()
-  @HttpCode(HttpStatus.CREATED)
-  create(@Body() dto: CreateUserDto) {
-    return this.usersService.create(dto);
-  }
-
-  @Patch(':id')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateUserDto) {
-    return this.usersService.update(id, dto);
-  }
-
-  @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.usersService.remove(id);
+export class TaskService {
+  async createTask(input: CreateTaskInput) {
+    return withTenantTransaction(input.tenantId, async (client) => {
+      // 1. Business invariant validation
+      // 2. Repository calls
+      const task = await taskRepository.create(input, client);
+      // 3. Domain event dispatch
+      return task;
+    });
   }
 }
+export const taskService = new TaskService();
 ```
 
-## JWT Authentication
+### 4. Repository Layer (`*.repository.ts`)
+Executes raw SQL, maps database rows to typed domain entities, and handles RLS:
+```typescript
+import { PoolClient } from "pg";
+import { pool } from "../../config/database";
+
+export class TaskRepository {
+  async create(input: CreateTaskRepoInput, client?: PoolClient): Promise<TaskRecord> {
+    const db = client ?? pool;
+    const query = `
+      INSERT INTO tasks (id, tenant_id, project_id, title, status, created_at, updated_at)
+      VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      RETURNING id, tenant_id, project_id, title, status, created_at, updated_at;
+    `;
+    const result = await db.query<TaskRecord>(query, [
+      input.id, input.tenantId, input.projectId, input.title, input.status
+    ]);
+    const row = result.rows[0];
+    if (!row) throw new Error("Task insertion failed");
+    return row;
+  }
+}
+export const taskRepository = new TaskRepository();
+```
+
+---
+
+## RFC 9457 Problem Details Error Hierarchy
 
 ```typescript
-// auth.service.ts
-@Injectable()
-export class AuthService {
+export class AppError extends Error {
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
-  ) {}
-
-  async login(email: string, password: string) {
-    const user = await this.usersService.findByEmail(email);
-    if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    const payload = { sub: user.id, email: user.email, roles: user.roles };
-    return {
-      access_token: this.jwtService.sign(payload, { expiresIn: '15m' }),
-      refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
-    };
+    public readonly status: number,
+    public readonly code: string,
+    public readonly title: string,
+    public readonly detail: string,
+    public readonly invalidParams?: { name: string; reason: string }[]
+  ) {
+    super(detail);
   }
 }
 
-// jwt.strategy.ts
-@Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private configService: ConfigService) {
-    super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: configService.get('JWT_SECRET'),
-    });
+export class NotFoundError extends AppError {
+  constructor(resource: string, id: string) {
+    super(404, "RESOURCE_NOT_FOUND", "Resource Not Found", `${resource} '${id}' was not found.`);
   }
+}
 
-  async validate(payload: JwtPayload): Promise<UserEntity> {
-    return { id: payload.sub, email: payload.email, roles: payload.roles };
+export class ConflictError extends AppError {
+  constructor(detail: string) {
+    super(409, "RESOURCE_CONFLICT", "Conflict", detail);
   }
 }
 ```
 
-## Prisma Schema Patterns
+---
 
-```prisma
-// schema.prisma
-generator client {
-  provider = "prisma-client-js"
-}
+## Key Principles & Anti-Patterns Checklist
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-model User {
-  id           String    @id @default(uuid())
-  email        String    @unique
-  passwordHash String    @map("password_hash")
-  roles        Role[]    @default([USER])
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
-  posts        Post[]
-
-  @@map("users")
-}
-
-model Post {
-  id        String   @id @default(uuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String   @map("author_id")
-  author    User     @relation(fields: [authorId], references: [id])
-  createdAt DateTime @default(now()) @map("created_at")
-
-  @@index([authorId])
-  @@map("posts")
-}
-
-enum Role {
-  USER
-  ADMIN
-}
-```
-
-## GraphQL with NestJS
-
-```typescript
-// schema.gql is auto-generated with code-first approach
-@Resolver(() => User)
-export class UsersResolver {
-  constructor(private usersService: UsersService) {}
-
-  @Query(() => [User])
-  @UseGuards(GqlAuthGuard)
-  users(): Promise<User[]> {
-    return this.usersService.findAll();
-  }
-
-  @Mutation(() => User)
-  createUser(@Args('input') input: CreateUserInput): Promise<User> {
-    return this.usersService.create(input);
-  }
-
-  @ResolveField(() => [Post])
-  posts(@Parent() user: User, @Context() ctx: GqlContext): Promise<Post[]> {
-    return ctx.loaders.postsLoader.load(user.id); // DataLoader to avoid N+1
-  }
-}
-```
-
-## Redis Caching
-
-```typescript
-// cache.service.ts
-@Injectable()
-export class CacheService {
-  constructor(@InjectRedis() private readonly redis: Redis) {}
-
-  async get<T>(key: string): Promise<T | null> {
-    const data = await this.redis.get(key);
-    return data ? JSON.parse(data) : null;
-  }
-
-  async set(key: string, value: unknown, ttlSeconds = 300): Promise<void> {
-    await this.redis.setex(key, ttlSeconds, JSON.stringify(value));
-  }
-
-  async invalidate(pattern: string): Promise<void> {
-    const keys = await this.redis.keys(pattern);
-    if (keys.length) await this.redis.del(...keys);
-  }
-}
-```
-
-## Error Handling
-
-```typescript
-// filters/global-exception.filter.ts
-@Catch()
-export class GlobalExceptionFilter implements ExceptionFilter {
-  private readonly logger = new Logger(GlobalExceptionFilter.name);
-
-  catch(exception: unknown, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-
-    const status = exception instanceof HttpException
-      ? exception.getStatus()
-      : HttpStatus.INTERNAL_SERVER_ERROR;
-
-    const message = exception instanceof HttpException
-      ? exception.getResponse()
-      : 'Internal server error';
-
-    if (status === 500) this.logger.error(exception);
-
-    response.status(status).json({
-      statusCode: status,
-      message,
-      timestamp: new Date().toISOString(),
-    });
-  }
-}
-```
-
-## BullMQ Job Queue
-
-```typescript
-// queues/email.processor.ts
-@Processor('email')
-export class EmailProcessor {
-  @Process('send-welcome')
-  async handleWelcomeEmail(job: Job<{ email: string; name: string }>) {
-    await this.emailService.sendWelcome(job.data.email, job.data.name);
-  }
-}
-
-// Adding jobs
-await this.emailQueue.add('send-welcome', { email, name }, {
-  attempts: 3,
-  backoff: { type: 'exponential', delay: 1000 },
-});
-```
-
-## Security Checklist
-
-- [ ] Helmet.js (HTTP headers)
-- [ ] Rate limiting (throttler: 100 req/min per IP)
-- [ ] Input validation on all endpoints
-- [ ] Parameterized queries (no raw SQL)
-- [ ] bcrypt for passwords (rounds ≥ 12)
-- [ ] JWT secrets in env, rotated regularly
-- [ ] CORS configured for known origins only
-- [ ] SQL injection prevention via Prisma/TypeORM
-- [ ] XSS prevention via sanitization
-- [ ] Audit logs for sensitive actions
-
-## Production Setup
-
-```bash
-# Install
-npm i @nestjs/common @nestjs/core @nestjs/platform-express
-npm i @nestjs/config @nestjs/jwt @nestjs/passport
-npm i @nestjs/throttler @nestjs/cache-manager
-npm i prisma @prisma/client
-npm i class-validator class-transformer
-npm i bcrypt ioredis bullmq
-npm i -D @types/bcrypt
-
-# Database
-npx prisma generate
-npx prisma migrate dev --name init
-npx prisma migrate deploy  # production
-
-# Docker
-docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=secret postgres:16
-docker run -d -p 6379:6379 redis:7-alpine
-```
+| Anti-Pattern to Avoid | Correct Standard |
+| :--- | :--- |
+| **Fat Controllers:** Writing business rules or database calls directly in `req, res` handlers. | Thin Controllers: Only parse HTTP, call Service, return status code. |
+| **Leaky SQL in Services:** Concatenating SQL or calling `pool.query` inside `*.service.ts`. | Pure Services: Services call Repositories; Repositories isolate all SQL. |
+| **Generic Errors:** Throwing `new Error("...")` or returning `{ error: "msg" }`. | RFC 9457: Throw typed `AppError` subclasses with status, code, and title. |
+| **Unparameterized SQL:** Using string interpolation `` `WHERE id = '${id}'` ``. | Parameterized SQL: Always use `$1, $2, ...` to prevent SQL injection. |
+| **Missing Transaction Scoping:** Running multi-step writes without `BEGIN ... COMMIT`. | Scoped Transactions: Wrap in `withTransaction` or `withTenantTransaction`. |

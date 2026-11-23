@@ -3,8 +3,7 @@ name: distributed-logging
 description: This skill should be used when the user designs "distributed logging", "log aggregation", "centralized logs", an "ELK" or "EFK" stack, "log shipping", "structured logging", a "correlation ID" or "trace ID" in logs, "log retention", or "high-volume log ingest". It gives the collect → buffer → ship → index → store → retain pipeline, sampling, ordering, and cold-storage tiering. Use it whenever many services emit logs that must be searched in one place under load, even if the user doesn't say "logging pipeline".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Distributed logging
 
 Move logs from thousands of processes into one searchable place, fast enough to
@@ -166,7 +165,7 @@ recipe is the answer.
 
 ## Diagram
 To visualize the pipeline (producers → agents → bus → indexer/search + archive sink)
-or the overflow/degradation path, use the in-plugin `architecture-diagram` skill —
+or the overflow/degradation path, use the `architecture-diagram` skill —
 draw the durable bus as the buffer between producers and sinks, the cold-archive sink
 with a `blob-store` color, and the drop-on-overflow path as a dashed arrow.
 

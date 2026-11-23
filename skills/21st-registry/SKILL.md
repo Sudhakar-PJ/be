@@ -16,6 +16,7 @@ description: >-
   For finding and installing existing items use `21st-cli-use`; for turning a
   project's design tokens into a theme use `21st-design-sync`.
 ---
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 
 # Publish & manage on the 21st registry
 

@@ -2,6 +2,7 @@
 name: web-design-guidelines
 description: Review and audit UI code against Vercel Web Interface Guidelines. Use when asked to "review my UI", "audit design", "check accessibility", "audit UI code", "lint my frontend", or "check site against interface guidelines".
 ---
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 
 # Web Interface Guidelines Auditor
 
@@ -12,7 +13,7 @@ Review frontend and UI code for strict compliance with Vercel Web Interface Guid
 - **When to Trigger:** Trigger when auditing, linting, or reviewing UI components, templates, styles, or frontend pages for accessibility, polish, edge cases, interaction patterns, and performance flaws.
 - **Distinction from Other Skills:**
   - `design-taste`: Art director deciding aesthetic style, typography hierarchies, and tactile depth.
-  - `ui-engineering`: Architect structuring component lifecycles, state triads, and clean separation.
+  - `frontend-orchestrator` (`ui-engineering.md`): Architect structuring component lifecycles, state triads, and clean separation.
   - `web-design-guidelines`: **QA Auditor & Linter** running strict verification passes on code to catch micro-flaws and output terse `file:line` findings.
 - **Hands-off Constraint:** When used alongside `tutor`, output findings and explain violations concisely in chat. Never directly alter user project source files.
 

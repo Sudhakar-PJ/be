@@ -16,17 +16,17 @@ Inspired by **NextLevelBuilder's `ui-ux-pro-max`**.
 
 ## 1. Color Harmony Matrices & Token Formulas
 
-### The 60-30-10 Rule in B2B SaaS
-* **60% Dominant Base:** Neutral background and structural canvas (e.g. `bg-zinc-950` dark, `bg-zinc-50` light).
-* **30% Secondary Structure:** Card surfaces, sidebars, borders, and input fields (`bg-zinc-900`, `border-zinc-800`).
-* **10% Accent Intent:** Primary action buttons, active tab indicators, and progress indicators. Never use accent colors on large backgrounds.
+### The 60-30-10 Rule in B2B SaaS (Semantic Tokens Only)
+* **60% Dominant Base:** Structural canvas (`bg-background`).
+* **30% Secondary Structure:** Card surfaces, sidebars, borders, inputs (`bg-card`, `bg-muted`, `border-border`).
+* **10% Accent Intent:** Primary actions, active tab indicators, focus rings (`bg-primary`, `text-primary-foreground`, `ring-ring`). Never flood backgrounds with raw accent colors.
 
-### Semantic Status Matrix (WCAG AA Compliant)
-Never guess status colors. Use this exact semantic matrix:
-* **Success / Completed:** Emerald (`text-emerald-400 bg-emerald-500/10 border-emerald-500/20`).
-* **Warning / In Progress:** Amber (`text-amber-400 bg-amber-500/10 border-amber-500/20`).
-* **Error / Blocker / Failed:** Rose (`text-rose-400 bg-rose-500/10 border-rose-500/20`).
-* **Informational / Neutral:** Sky (`text-sky-400 bg-sky-500/10 border-sky-500/20`) or Zinc (`text-zinc-400 bg-zinc-500/10 border-zinc-500/20`).
+### Semantic Status Matrix (WCAG AA Compliant Tokens)
+Never hardcode raw colors (e.g. `zinc`, `emerald`, `rose`). Map strictly to semantic design tokens:
+* **Success / Completed:** (`text-success bg-success/10 border-success/20`).
+* **Warning / In Progress:** (`text-warning bg-warning/10 border-warning/20`).
+* **Error / Blocker / Failed:** (`text-destructive bg-destructive/10 border-destructive/20`).
+* **Informational / Neutral:** (`text-muted-foreground bg-muted border-border`).
 
 ---
 

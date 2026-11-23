@@ -3,8 +3,7 @@ name: api-design
 description: This skill should be used when the user needs to "design the API", do "endpoint design", pin down a "request/response shape", choose a "pagination" strategy (cursor vs offset), add an "idempotency key" to a write, plan "API versioning", an "error contract", or pick between "REST vs gRPC vs GraphQL" or "WebSocket vs polling". Use it whenever a design has reached the interface — the concrete request, response, primary access path, and how clients page, retry, and version — even if the user only said "the boxes talk to each other".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # API Design
 
 Define the contract between clients and a service: the exact request and response
@@ -207,7 +206,7 @@ provider, the generic recipe is the answer.
 ## Diagram
 To visualize the request/response path, the cursor-paging loop, or an
 idempotent-retry sequence (client → gateway → service → store, with the replay
-branch), use the in-plugin `architecture-diagram` skill — do not embed Mermaid
+branch), use the `architecture-diagram` skill — do not embed Mermaid
 here. A one-line ASCII sketch inline is fine for quick reasoning.
 
 ## Related building blocks

@@ -3,8 +3,7 @@ name: observability
 description: This skill should be used when the user asks about "observability" or "monitoring", what "metrics, logs, and traces" to collect, "health checks" (liveness/readiness), "alerting" or "on-call", "SLO/SLI" or "error budgets", the "RED" or "USE" method, "dashboards", or names a tool like "Prometheus", "Grafana", or "Datadog". Use it whenever a design has no answer to "how would we know this is broken?" or "what do we alert on?" — i.e. any time failure would be invisible until users complain, even if the user doesn't say "observability".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Observability
 
 Decide *what to measure* so a system can be seen, alerted on, and debugged in
@@ -173,7 +172,7 @@ recipe is the answer.
 ## Diagram
 To visualize the telemetry flow (app → OpenTelemetry SDK → collector → metrics /
 logs / traces backends → dashboard + alertmanager) or the alert-to-page path, use
-the in-plugin `architecture-diagram` skill. Telemetry export uses dashed arrows to
+the `architecture-diagram` skill. Telemetry export uses dashed arrows to
 show it is off the request path.
 
 ## Related building blocks

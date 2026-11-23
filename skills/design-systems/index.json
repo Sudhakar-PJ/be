@@ -2,403 +2,403 @@
   "agentic": {
     "slug": "agentic",
     "name": "Agentic",
-    "skillPath": "skills/agentic/SKILL.md",
-    "designPath": "skills/agentic/DESIGN.md"
+    "skillPath": "skills/design-systems/agentic/SKILL.md",
+    "designPath": "skills/design-systems/agentic/DESIGN.md"
   },
   "artistic": {
     "slug": "artistic",
     "name": "Artistic",
-    "skillPath": "skills/artistic/SKILL.md",
-    "designPath": "skills/artistic/DESIGN.md"
+    "skillPath": "skills/design-systems/artistic/SKILL.md",
+    "designPath": "skills/design-systems/artistic/DESIGN.md"
   },
   "bold": {
     "slug": "bold",
     "name": "Bold",
-    "skillPath": "skills/bold/SKILL.md",
-    "designPath": "skills/bold/DESIGN.md"
+    "skillPath": "skills/design-systems/bold/SKILL.md",
+    "designPath": "skills/design-systems/bold/DESIGN.md"
   },
   "brutalism": {
     "slug": "brutalism",
     "name": "Brutalism",
-    "skillPath": "skills/brutalism/SKILL.md",
-    "designPath": "skills/brutalism/DESIGN.md"
+    "skillPath": "skills/design-systems/brutalism/SKILL.md",
+    "designPath": "skills/design-systems/brutalism/DESIGN.md"
   },
   "cafe": {
     "slug": "cafe",
     "name": "Cafe",
-    "skillPath": "skills/cafe/SKILL.md",
-    "designPath": "skills/cafe/DESIGN.md"
+    "skillPath": "skills/design-systems/cafe/SKILL.md",
+    "designPath": "skills/design-systems/cafe/DESIGN.md"
   },
   "claymorphism": {
     "slug": "claymorphism",
     "name": "Claymorphism",
-    "skillPath": "skills/claymorphism/SKILL.md",
-    "designPath": "skills/claymorphism/DESIGN.md"
+    "skillPath": "skills/design-systems/claymorphism/SKILL.md",
+    "designPath": "skills/design-systems/claymorphism/DESIGN.md"
   },
   "clean": {
     "slug": "clean",
     "name": "Clean",
-    "skillPath": "skills/clean/SKILL.md",
-    "designPath": "skills/clean/DESIGN.md"
+    "skillPath": "skills/design-systems/clean/SKILL.md",
+    "designPath": "skills/design-systems/clean/DESIGN.md"
   },
   "colorful": {
     "slug": "colorful",
     "name": "Colorful",
-    "skillPath": "skills/colorful/SKILL.md",
-    "designPath": "skills/colorful/DESIGN.md"
+    "skillPath": "skills/design-systems/colorful/SKILL.md",
+    "designPath": "skills/design-systems/colorful/DESIGN.md"
   },
   "contemporary": {
     "slug": "contemporary",
     "name": "Contemporary",
-    "skillPath": "skills/contemporary/SKILL.md",
-    "designPath": "skills/contemporary/DESIGN.md"
+    "skillPath": "skills/design-systems/contemporary/SKILL.md",
+    "designPath": "skills/design-systems/contemporary/DESIGN.md"
   },
   "corporate": {
     "slug": "corporate",
     "name": "Corporate",
-    "skillPath": "skills/corporate/SKILL.md",
-    "designPath": "skills/corporate/DESIGN.md"
+    "skillPath": "skills/design-systems/corporate/SKILL.md",
+    "designPath": "skills/design-systems/corporate/DESIGN.md"
   },
   "cosmic": {
     "slug": "cosmic",
     "name": "Cosmic",
-    "skillPath": "skills/cosmic/SKILL.md",
-    "designPath": "skills/cosmic/DESIGN.md"
+    "skillPath": "skills/design-systems/cosmic/SKILL.md",
+    "designPath": "skills/design-systems/cosmic/DESIGN.md"
   },
   "creative": {
     "slug": "creative",
     "name": "Creative",
-    "skillPath": "skills/creative/SKILL.md",
-    "designPath": "skills/creative/DESIGN.md"
+    "skillPath": "skills/design-systems/creative/SKILL.md",
+    "designPath": "skills/design-systems/creative/DESIGN.md"
   },
   "dithered": {
     "slug": "dithered",
     "name": "Dithered",
-    "skillPath": "skills/dithered/SKILL.md",
-    "designPath": "skills/dithered/DESIGN.md"
+    "skillPath": "skills/design-systems/dithered/SKILL.md",
+    "designPath": "skills/design-systems/dithered/DESIGN.md"
   },
   "doodle": {
     "slug": "doodle",
     "name": "Doodle",
-    "skillPath": "skills/doodle/SKILL.md",
-    "designPath": "skills/doodle/DESIGN.md"
+    "skillPath": "skills/design-systems/doodle/SKILL.md",
+    "designPath": "skills/design-systems/doodle/DESIGN.md"
   },
   "dramatic": {
     "slug": "dramatic",
     "name": "Dramatic",
-    "skillPath": "skills/dramatic/SKILL.md",
-    "designPath": "skills/dramatic/DESIGN.md"
+    "skillPath": "skills/design-systems/dramatic/SKILL.md",
+    "designPath": "skills/design-systems/dramatic/DESIGN.md"
   },
   "editorial": {
     "slug": "editorial",
     "name": "Editorial",
-    "skillPath": "skills/editorial/SKILL.md",
-    "designPath": "skills/editorial/DESIGN.md"
+    "skillPath": "skills/design-systems/editorial/SKILL.md",
+    "designPath": "skills/design-systems/editorial/DESIGN.md"
   },
   "square": {
     "slug": "square",
     "name": "Square",
-    "skillPath": "skills/square/SKILL.md",
-    "designPath": "skills/square/DESIGN.md"
+    "skillPath": "skills/design-systems/square/SKILL.md",
+    "designPath": "skills/design-systems/square/DESIGN.md"
   },
   "pulse": {
     "slug": "pulse",
     "name": "Pulse",
-    "skillPath": "skills/pulse/SKILL.md",
-    "designPath": "skills/pulse/DESIGN.md"
+    "skillPath": "skills/design-systems/pulse/SKILL.md",
+    "designPath": "skills/design-systems/pulse/DESIGN.md"
   },
   "stitch": {
     "slug": "stitch",
     "name": "Stitch",
-    "skillPath": "skills/stitch/SKILL.md",
-    "designPath": "skills/stitch/DESIGN.md"
+    "skillPath": "skills/design-systems/stitch/SKILL.md",
+    "designPath": "skills/design-systems/stitch/DESIGN.md"
   },
   "expressive": {
     "slug": "expressive",
     "name": "Expressive",
-    "skillPath": "skills/expressive/SKILL.md",
-    "designPath": "skills/expressive/DESIGN.md"
+    "skillPath": "skills/design-systems/expressive/SKILL.md",
+    "designPath": "skills/design-systems/expressive/DESIGN.md"
   },
   "fantasy": {
     "slug": "fantasy",
     "name": "Fantasy",
-    "skillPath": "skills/fantasy/SKILL.md",
-    "designPath": "skills/fantasy/DESIGN.md"
+    "skillPath": "skills/design-systems/fantasy/SKILL.md",
+    "designPath": "skills/design-systems/fantasy/DESIGN.md"
   },
   "flat": {
     "slug": "flat",
     "name": "Flat",
-    "skillPath": "skills/flat/SKILL.md",
-    "designPath": "skills/flat/DESIGN.md"
+    "skillPath": "skills/design-systems/flat/SKILL.md",
+    "designPath": "skills/design-systems/flat/DESIGN.md"
   },
   "friendly": {
     "slug": "friendly",
     "name": "Friendly",
-    "skillPath": "skills/friendly/SKILL.md",
-    "designPath": "skills/friendly/DESIGN.md"
+    "skillPath": "skills/design-systems/friendly/SKILL.md",
+    "designPath": "skills/design-systems/friendly/DESIGN.md"
   },
   "futuristic": {
     "slug": "futuristic",
     "name": "Futuristic",
-    "skillPath": "skills/futuristic/SKILL.md",
-    "designPath": "skills/futuristic/DESIGN.md"
+    "skillPath": "skills/design-systems/futuristic/SKILL.md",
+    "designPath": "skills/design-systems/futuristic/DESIGN.md"
   },
   "glassmorphism": {
     "slug": "glassmorphism",
     "name": "Glassmorphism",
-    "skillPath": "skills/glassmorphism/SKILL.md",
-    "designPath": "skills/glassmorphism/DESIGN.md"
+    "skillPath": "skills/design-systems/glassmorphism/SKILL.md",
+    "designPath": "skills/design-systems/glassmorphism/DESIGN.md"
   },
   "gradient": {
     "slug": "gradient",
     "name": "Gradient",
-    "skillPath": "skills/gradient/SKILL.md",
-    "designPath": "skills/gradient/DESIGN.md"
+    "skillPath": "skills/design-systems/gradient/SKILL.md",
+    "designPath": "skills/design-systems/gradient/DESIGN.md"
   },
   "power": {
     "slug": "power",
     "name": "Power",
-    "skillPath": "skills/power/SKILL.md",
-    "designPath": "skills/power/DESIGN.md"
+    "skillPath": "skills/design-systems/power/SKILL.md",
+    "designPath": "skills/design-systems/power/DESIGN.md"
   },
   "material": {
     "slug": "material",
     "name": "Material",
-    "skillPath": "skills/material/SKILL.md",
-    "designPath": "skills/material/DESIGN.md"
+    "skillPath": "skills/design-systems/material/SKILL.md",
+    "designPath": "skills/design-systems/material/DESIGN.md"
   },
   "minimal": {
     "slug": "minimal",
     "name": "Minimal",
-    "skillPath": "skills/minimal/SKILL.md",
-    "designPath": "skills/minimal/DESIGN.md"
+    "skillPath": "skills/design-systems/minimal/SKILL.md",
+    "designPath": "skills/design-systems/minimal/DESIGN.md"
   },
   "modern": {
     "slug": "modern",
     "name": "Modern",
-    "skillPath": "skills/modern/SKILL.md",
-    "designPath": "skills/modern/DESIGN.md"
+    "skillPath": "skills/design-systems/modern/SKILL.md",
+    "designPath": "skills/design-systems/modern/DESIGN.md"
   },
   "mono": {
     "slug": "mono",
     "name": "Mono",
-    "skillPath": "skills/mono/SKILL.md",
-    "designPath": "skills/mono/DESIGN.md"
+    "skillPath": "skills/design-systems/mono/SKILL.md",
+    "designPath": "skills/design-systems/mono/DESIGN.md"
   },
   "neobrutalism": {
     "slug": "neobrutalism",
     "name": "Neobrutalism",
-    "skillPath": "skills/neobrutalism/SKILL.md",
-    "designPath": "skills/neobrutalism/DESIGN.md"
+    "skillPath": "skills/design-systems/neobrutalism/SKILL.md",
+    "designPath": "skills/design-systems/neobrutalism/DESIGN.md"
   },
   "neon": {
     "slug": "neon",
     "name": "Neon",
-    "skillPath": "skills/neon/SKILL.md",
-    "designPath": "skills/neon/DESIGN.md"
+    "skillPath": "skills/design-systems/neon/SKILL.md",
+    "designPath": "skills/design-systems/neon/DESIGN.md"
   },
   "neumorphism": {
     "slug": "neumorphism",
     "name": "Neumorphism",
-    "skillPath": "skills/neumorphism/SKILL.md",
-    "designPath": "skills/neumorphism/DESIGN.md"
+    "skillPath": "skills/design-systems/neumorphism/SKILL.md",
+    "designPath": "skills/design-systems/neumorphism/DESIGN.md"
   },
   "pacman": {
     "slug": "pacman",
     "name": "Pacman",
-    "skillPath": "skills/pacman/SKILL.md",
-    "designPath": "skills/pacman/DESIGN.md"
+    "skillPath": "skills/design-systems/pacman/SKILL.md",
+    "designPath": "skills/design-systems/pacman/DESIGN.md"
   },
   "paper": {
     "slug": "paper",
     "name": "Paper",
-    "skillPath": "skills/paper/SKILL.md",
-    "designPath": "skills/paper/DESIGN.md"
+    "skillPath": "skills/design-systems/paper/SKILL.md",
+    "designPath": "skills/design-systems/paper/DESIGN.md"
   },
   "perspective": {
     "slug": "perspective",
     "name": "Perspective",
-    "skillPath": "skills/perspective/SKILL.md",
-    "designPath": "skills/perspective/DESIGN.md"
+    "skillPath": "skills/design-systems/perspective/SKILL.md",
+    "designPath": "skills/design-systems/perspective/DESIGN.md"
   },
   "premium": {
     "slug": "premium",
     "name": "Premium",
-    "skillPath": "skills/premium/SKILL.md",
-    "designPath": "skills/premium/DESIGN.md"
+    "skillPath": "skills/design-systems/premium/SKILL.md",
+    "designPath": "skills/design-systems/premium/DESIGN.md"
   },
   "professional": {
     "slug": "professional",
     "name": "Professional",
-    "skillPath": "skills/professional/SKILL.md",
-    "designPath": "skills/professional/DESIGN.md"
+    "skillPath": "skills/design-systems/professional/SKILL.md",
+    "designPath": "skills/design-systems/professional/DESIGN.md"
   },
   "basic": {
     "slug": "basic",
     "name": "Basic",
-    "skillPath": "skills/basic/SKILL.md",
-    "designPath": "skills/basic/DESIGN.md"
+    "skillPath": "skills/design-systems/basic/SKILL.md",
+    "designPath": "skills/design-systems/basic/DESIGN.md"
   },
   "refined": {
     "slug": "refined",
     "name": "Refined",
-    "skillPath": "skills/refined/SKILL.md",
-    "designPath": "skills/refined/DESIGN.md"
+    "skillPath": "skills/design-systems/refined/SKILL.md",
+    "designPath": "skills/design-systems/refined/DESIGN.md"
   },
   "retro": {
     "slug": "retro",
     "name": "Retro",
-    "skillPath": "skills/retro/SKILL.md",
-    "designPath": "skills/retro/DESIGN.md"
+    "skillPath": "skills/design-systems/retro/SKILL.md",
+    "designPath": "skills/design-systems/retro/DESIGN.md"
   },
   "shadcn": {
     "slug": "shadcn",
     "name": "Shadcn",
-    "skillPath": "skills/shadcn/SKILL.md",
-    "designPath": "skills/shadcn/DESIGN.md"
+    "skillPath": "skills/design-systems/shadcn/SKILL.md",
+    "designPath": "skills/design-systems/shadcn/DESIGN.md"
   },
   "geometric": {
     "slug": "geometric",
     "name": "Geometric",
-    "skillPath": "skills/geometric/SKILL.md",
-    "designPath": "skills/geometric/DESIGN.md"
+    "skillPath": "skills/design-systems/geometric/SKILL.md",
+    "designPath": "skills/design-systems/geometric/DESIGN.md"
   },
   "skeumorphism": {
     "slug": "skeumorphism",
     "name": "Skeumorphism",
-    "skillPath": "skills/skeumorphism/SKILL.md",
-    "designPath": "skills/skeumorphism/DESIGN.md"
+    "skillPath": "skills/design-systems/skeumorphism/SKILL.md",
+    "designPath": "skills/design-systems/skeumorphism/DESIGN.md"
   },
   "sleek": {
     "slug": "sleek",
     "name": "Sleek",
-    "skillPath": "skills/sleek/SKILL.md",
-    "designPath": "skills/sleek/DESIGN.md"
+    "skillPath": "skills/design-systems/sleek/SKILL.md",
+    "designPath": "skills/design-systems/sleek/DESIGN.md"
   },
   "spacious": {
     "slug": "spacious",
     "name": "Spacious",
-    "skillPath": "skills/spacious/SKILL.md",
-    "designPath": "skills/spacious/DESIGN.md"
+    "skillPath": "skills/design-systems/spacious/SKILL.md",
+    "designPath": "skills/design-systems/spacious/DESIGN.md"
   },
   "storytelling": {
     "slug": "storytelling",
     "name": "Storytelling",
-    "skillPath": "skills/storytelling/SKILL.md",
-    "designPath": "skills/storytelling/DESIGN.md"
+    "skillPath": "skills/design-systems/storytelling/SKILL.md",
+    "designPath": "skills/design-systems/storytelling/DESIGN.md"
   },
   "tetris": {
     "slug": "tetris",
     "name": "Tetris",
-    "skillPath": "skills/tetris/SKILL.md",
-    "designPath": "skills/tetris/DESIGN.md"
+    "skillPath": "skills/design-systems/tetris/SKILL.md",
+    "designPath": "skills/design-systems/tetris/DESIGN.md"
   },
   "vibrant": {
     "slug": "vibrant",
     "name": "Vibrant",
-    "skillPath": "skills/vibrant/SKILL.md",
-    "designPath": "skills/vibrant/DESIGN.md"
+    "skillPath": "skills/design-systems/vibrant/SKILL.md",
+    "designPath": "skills/design-systems/vibrant/DESIGN.md"
   },
   "vintage": {
     "slug": "vintage",
     "name": "Vintage",
-    "skillPath": "skills/vintage/SKILL.md",
-    "designPath": "skills/vintage/DESIGN.md"
+    "skillPath": "skills/design-systems/vintage/SKILL.md",
+    "designPath": "skills/design-systems/vintage/DESIGN.md"
   },
   "levels": {
     "slug": "levels",
     "name": "Levels",
-    "skillPath": "skills/levels/SKILL.md",
-    "designPath": "skills/levels/DESIGN.md"
+    "skillPath": "skills/design-systems/levels/SKILL.md",
+    "designPath": "skills/design-systems/levels/DESIGN.md"
   },
   "bento": {
     "slug": "bento",
     "name": "Bento",
-    "skillPath": "skills/bento/SKILL.md",
-    "designPath": "skills/bento/DESIGN.md"
+    "skillPath": "skills/design-systems/bento/SKILL.md",
+    "designPath": "skills/design-systems/bento/DESIGN.md"
   },
   "lingo": {
     "slug": "lingo",
     "name": "Lingo",
-    "skillPath": "skills/lingo/SKILL.md",
-    "designPath": "skills/lingo/DESIGN.md"
+    "skillPath": "skills/design-systems/lingo/SKILL.md",
+    "designPath": "skills/design-systems/lingo/DESIGN.md"
   },
   "enterprise": {
     "slug": "enterprise",
     "name": "Enterprise",
-    "skillPath": "skills/enterprise/SKILL.md",
-    "designPath": "skills/enterprise/DESIGN.md"
+    "skillPath": "skills/design-systems/enterprise/SKILL.md",
+    "designPath": "skills/design-systems/enterprise/DESIGN.md"
   },
   "roku": {
     "slug": "roku",
     "name": "Roku",
-    "skillPath": "skills/roku/SKILL.md",
-    "designPath": "skills/roku/DESIGN.md"
+    "skillPath": "skills/design-systems/roku/SKILL.md",
+    "designPath": "skills/design-systems/roku/DESIGN.md"
   },
   "ant": {
     "slug": "ant",
     "name": "Ant",
-    "skillPath": "skills/ant/SKILL.md",
-    "designPath": "skills/ant/DESIGN.md"
+    "skillPath": "skills/design-systems/ant/SKILL.md",
+    "designPath": "skills/design-systems/ant/DESIGN.md"
   },
   "claude": {
     "slug": "claude",
     "name": "Claude",
-    "skillPath": "skills/claude/SKILL.md",
-    "designPath": "skills/claude/DESIGN.md"
+    "skillPath": "skills/design-systems/claude/SKILL.md",
+    "designPath": "skills/design-systems/claude/DESIGN.md"
   },
   "codex": {
     "slug": "codex",
     "name": "Codex",
-    "skillPath": "skills/codex/SKILL.md",
-    "designPath": "skills/codex/DESIGN.md"
+    "skillPath": "skills/design-systems/codex/SKILL.md",
+    "designPath": "skills/design-systems/codex/DESIGN.md"
   },
   "fiction": {
     "slug": "fiction",
     "name": "Fiction",
-    "skillPath": "skills/fiction/SKILL.md",
-    "designPath": "skills/fiction/DESIGN.md"
+    "skillPath": "skills/design-systems/fiction/SKILL.md",
+    "designPath": "skills/design-systems/fiction/DESIGN.md"
   },
   "immersive": {
     "slug": "immersive",
     "name": "Immersive",
-    "skillPath": "skills/immersive/SKILL.md",
-    "designPath": "skills/immersive/DESIGN.md"
+    "skillPath": "skills/design-systems/immersive/SKILL.md",
+    "designPath": "skills/design-systems/immersive/DESIGN.md"
   },
   "impeccable": {
     "slug": "impeccable",
     "name": "Impeccable",
-    "skillPath": "skills/impeccable/SKILL.md",
-    "designPath": "skills/impeccable/DESIGN.md"
+    "skillPath": "skills/design-systems/impeccable/SKILL.md",
+    "designPath": "skills/design-systems/impeccable/DESIGN.md"
   },
   "matrix": {
     "slug": "matrix",
     "name": "Matrix",
-    "skillPath": "skills/matrix/SKILL.md",
-    "designPath": "skills/matrix/DESIGN.md"
+    "skillPath": "skills/design-systems/matrix/SKILL.md",
+    "designPath": "skills/design-systems/matrix/DESIGN.md"
   },
   "riso": {
     "slug": "riso",
     "name": "Riso",
-    "skillPath": "skills/riso/SKILL.md",
-    "designPath": "skills/riso/DESIGN.md"
+    "skillPath": "skills/design-systems/riso/SKILL.md",
+    "designPath": "skills/design-systems/riso/DESIGN.md"
   },
   "sega": {
     "slug": "sega",
     "name": "Sega",
-    "skillPath": "skills/sega/SKILL.md",
-    "designPath": "skills/sega/DESIGN.md"
+    "skillPath": "skills/design-systems/sega/SKILL.md",
+    "designPath": "skills/design-systems/sega/DESIGN.md"
   },
   "sketch": {
     "slug": "sketch",
     "name": "Sketch",
-    "skillPath": "skills/sketch/SKILL.md",
-    "designPath": "skills/sketch/DESIGN.md"
+    "skillPath": "skills/design-systems/sketch/SKILL.md",
+    "designPath": "skills/design-systems/sketch/DESIGN.md"
   },
   "terracotta": {
     "slug": "terracotta",
     "name": "Terracotta",
-    "skillPath": "skills/terracotta/SKILL.md",
-    "designPath": "skills/terracotta/DESIGN.md"
+    "skillPath": "skills/design-systems/terracotta/SKILL.md",
+    "designPath": "skills/design-systems/terracotta/DESIGN.md"
   }
 }

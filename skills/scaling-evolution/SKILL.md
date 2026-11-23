@@ -3,8 +3,7 @@ name: scaling-evolution
 description: This skill should be used when the user asks "how does this scale", "scale to millions", "scaling roadmap", "where is the bottleneck", "what breaks first", "10x growth", "vertical vs horizontal scaling", "scale from zero", or "what's the next scale curve". It gives the order-of-magnitude evolution path (single server → tiers → replicas → cache → CDN → stateless tier → multi-region → sharding) and a way to diagnose the *next* bottleneck instead of memorizing one big diagram. Use it whenever a design must grow by orders of magnitude or a load increase is on the table, even if the user doesn't say "scaling".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Scaling Evolution
 
 Grow a design one bottleneck at a time. A system that serves 1k users and one
@@ -149,8 +148,7 @@ multi-AZ → multi-region) — tie the target to the requirement, not ambition
 
 ## Diagram
 To visualize the current architecture and the one-rung-ahead version side by
-side (so the breaking point and the next move are explicit), use the in-plugin
-`architecture-diagram` skill. Sketch only the rung you're on plus the next one —
+side (so the breaking point and the next move are explicit), use the `architecture-diagram` skill. Sketch only the rung you're on plus the next one —
 not the whole ladder.
 
 ## Related building blocks

@@ -3,8 +3,7 @@ name: playwright-cli
 description: Automate browser interactions, generate E2E test suites, inspect DOM snapshots, record video traces, and test web applications with Playwright CLI.
 ---
 
-> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). When used during test-driven development, provide the Playwright test scripts, selector strategies, and CLI test runner commands in chat so PJ writes and runs the test suites directly.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Browser Automation with playwright-cli
 
 ## Quick start

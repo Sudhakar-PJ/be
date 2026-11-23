@@ -3,8 +3,7 @@ name: distributed-search
 description: This skill should be used when the user designs a "search system", needs "full-text search", asks about an "inverted index", "Elasticsearch / OpenSearch", "relevance ranking" (TF-IDF/BM25), "search autocomplete / typeahead", an "indexing pipeline", or "faceted search". It gives the crawl/index/search architecture, index sharding and replication, ranking, and near-real-time indexing. Use it whenever users must query text by relevance rather than fetch rows by key, even if they don't say "search engine".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Distributed search
 
 Find the documents that best match a free-text query, ranked by relevance, fast,
@@ -180,7 +179,7 @@ provider, the generic recipe is the answer.
 ## Diagram
 To visualize the source → indexing pipeline → inverted index (sharded +
 replicated) → query/rank path, or the crawl→parse→dedupe front end, use the
-in-plugin `architecture-diagram` skill — show the indexing path and the query
+`architecture-diagram` skill — show the indexing path and the query
 fan-out as distinct flows, with replicas behind each shard.
 
 ## Related building blocks

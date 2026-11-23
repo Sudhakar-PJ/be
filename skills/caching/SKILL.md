@@ -3,8 +3,7 @@ name: caching
 description: This skill should be used when the user asks about a "caching strategy", "cache invalidation", "what to cache", "read-through vs write-through vs write-back", "cache eviction" (LRU/LFU/TTL), "Redis vs Memcached", "stale reads", or hits "thundering herd", "cache stampede", "cache penetration", or "hot key" problems, or is choosing a Redis `maxmemory` eviction policy (allkeys-lru, volatile-lru, noeviction) vs TTL expiry for sessions or other cached state. Use it whenever a design is read-heavy or a datastore is overloaded by reads, even if the user doesn't say "cache".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Caching
 
 Put a copy of hot data closer to the reader so most requests skip the slow path.
@@ -145,7 +144,7 @@ exists for that provider, the generic recipe is the answer.
 
 ## Diagram
 To visualize the cache-aside read path (app → cache → miss → origin → populate)
-or the stampede/fallback flow, use the in-plugin `architecture-diagram` skill —
+or the stampede/fallback flow, use the `architecture-diagram` skill —
 cache nodes use the cache color, the origin its store color, and the miss path a
 dashed arrow.
 

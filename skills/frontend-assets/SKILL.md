@@ -8,8 +8,7 @@ description: >-
 
 # Frontend Visual Assets & Image Generation (`frontend-assets`)
 
-> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never download or inject binary assets directly into `01-saas-api/frontend/`. Provide the asset specifications, prompt engineering recipes, responsive CSS picture markup, and optimization commands in chat.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 Inspired by **Leon’s `imagegen-frontend-web`** and **`imagegen-frontend-mobile`**.
 
 ---
@@ -49,4 +48,3 @@ Never ship raw 5MB PNGs to users:
    className="mask-radial-gradient [mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_100%)]"
    ```
 3. **Blur-Up Placeholders:** Always generate an inline 10px base64 blur hash placeholder to prevent layout shifts while high-resolution assets load asynchronously.
-

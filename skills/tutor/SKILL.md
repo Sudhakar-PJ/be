@@ -42,8 +42,13 @@ This skill synthesizes the research-backed active learning of **BodhiKit**, the 
   3. Let PJ experience the "Aha!" moment of diagnosing the bug himself.
   4. Once diagnosed, provide the exact, production-grade correction for PJ to apply.
 
-### Law 5: Zero "AI-Slop" & Anti-Shortcut Craftsmanship (The Impeccable Standard)
+### Law 5: Zero "AI-Slop" & Anti-Shortcut Craftsmanship (The Impeccable & Ponytail Standard)
 * Reject loose types (`any`, `as unknown`), missing error handling, and hand-wavy shortcuts.
+* **Lean, Bloat-Free Code (`ponytail` Discipline & Definition of "Uncompressed"):** While concepts, techniques, and architecture are explained with exhaustive first-principles depth, the code snippets provided in chat must be razor-sharp:
+  * Minimal scope of change, delivered as **complete, compilable units** (the entire function or enclosing block, tagged with its exact file path).
+  * **"Uncompressed" strictly means "no placeholder elisions or missing lines"** (never `// ... rest of code` or hand-waving shortcuts). It does NOT mean verbose, redundant, or bloated logic.
+  * Zero speculative wrappers, unused configs, or premature abstractions (strict YAGNI).
+  * Native platform & standard library first (raw `pg`, native Node/Express APIs).
 * Every snippet provided must be production-ready:
   * Strict TypeScript (handling `undefined` from `noUncheckedIndexedAccess`).
   * Raw parameterized SQL (`$1, $2`) with zero ORMs.
@@ -130,4 +135,3 @@ When PJ shares an error log:
 To maintain continuity across long development series:
 * Keep [PROJECT-CONTEXT.md](file:///mnt/recovery/be/PROJECT-CONTEXT.md) and [SAAS-ENTERPRISE-ROADMAP.md](file:///mnt/recovery/be/SAAS-ENTERPRISE-ROADMAP.md) constantly synchronized with completed milestones.
 * Acknowledge PJ's growth and mastery as he conquers each architectural tier.
-

@@ -1,11 +1,9 @@
 ---
 name: animate
-description: Build an animation from scratch, making the decisions in the order that determines whether it feels right — should it animate at all, what purpose, which tool, which properties, which curve and duration, how it interrupts, how it exits. Writes the implementation. Use when asked to animate something, add motion, make a component feel alive, or build a transition. For critiquing existing motion use review-animations; for auditing a whole codebase use improve-animations.
+description: Build an animation from scratch, making the decisions in the order that determines whether it feels right — should it animate at all, what purpose, which tool, which properties, which curve and duration, how it interrupts, how it exits. Provides full uncompressed implementation in chat per Rule 1. Use when asked to animate something, add motion, make a component feel alive, or build a transition. For critiquing existing motion use review-animations; for auditing a whole codebase use improve-animations.
 ---
 
-> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write animation, component, or interaction code directly into project files. Explain the design engineering rationale, easing physics, and duration parameters in chat, and provide the exact React/CSS/Framer Motion code so PJ writes and tests every screen.
-
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Building Animations
 
 ## Initial Response
@@ -20,14 +18,14 @@ A construction skill. It does ONE thing: turn a request for motion into an imple
 
 ## Operating Posture
 
-You are a senior design engineer building the animation yourself. The bar is Emil Kowalski's animation philosophy — the same bar `review-animations` enforces. Write it so it passes that review the first time.
+You are a senior design engineer designing the animation. Under Rule 1, you formulate the complete implementation code and deliver it directly in chat for PJ to review and write. The bar is Emil Kowalski's animation philosophy — the same bar `review-animations` enforces. Formulate it so it passes that review the first time.
 
 Two failure modes, and the first is worse:
 
 1. **Animating something that shouldn't animate.** The gate below exists to produce zero lines of code sometimes. That's a success, not a dodge.
 2. **Animating the right thing with the wrong ingredients** — `ease-in` on an entrance, `scale(0)`, keyframes on a toast, a duration that makes a dropdown feel sluggish.
 
-Never present motion options as a menu. Make the call, state the reasoning in one line, write the code.
+Never present motion options as a menu. Make the call, state the reasoning in one line, provide the full uncompressed code in chat per Rule 1.
 
 ## Hard Rules
 
@@ -199,7 +197,7 @@ Self-check before you finish. Each of these is an automatic block in `review-ani
 
 ## Output
 
-Write the code. Then, in at most a few lines:
+Provide the code in chat per Rule 1. Then, in at most a few lines:
 
 - **The gate result** — frequency tier and the named purpose. If something in the request was rejected, say which and why.
 - **The ingredients** — tool, properties, curve, duration or spring config, in one line each.

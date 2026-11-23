@@ -2,6 +2,7 @@
 name: 21st-ui-build
 description: Build or substantially change production UI using the current project's design context, existing components, and grounded 21st inspiration. Use when implementing a page, section, component, responsive redesign, or visual polish in an existing web project. Trigger for requests such as "build this UI", "implement this screen", "make this page production-ready", or "use 21st to create the interface". Use 21st-ui-explore first when the visual direction is intentionally undecided, and 21st-ui-review for critique-only work.
 ---
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 
 # Build project-aware UI
 

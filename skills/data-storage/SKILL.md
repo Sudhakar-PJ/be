@@ -3,8 +3,7 @@ name: data-storage
 description: This skill should be used when the user asks "SQL or NoSQL", "which database", how to design a "data model" or "schema design", picks an "indexing" strategy, needs "sharding" or "partitioning", sets up "replication" (leader-follower / multi-leader), defines a "primary key"/"sort key", asks whether to "denormalize", or weighs "polyglot persistence". Use it whenever a design must decide where records live, how they are keyed and accessed, and how the store scales past one node — even if the user just says "store the data".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Data Storage
 
 Choose where records live, how they are keyed and queried, and how the store
@@ -193,7 +192,7 @@ provider, the generic recipe is the answer.
 
 ## Diagram
 To visualize the data tier — leader with read replicas, a sharded cluster with a
-router, or a polyglot split — use the in-plugin `architecture-diagram` skill.
+router, or a polyglot split — use the `architecture-diagram` skill.
 Draw the shard key on the routing arrow and the replication direction explicitly;
 do not embed Mermaid here.
 

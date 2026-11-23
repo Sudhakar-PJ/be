@@ -4,8 +4,9 @@ description: >-
   Finds, searches, and evaluates AI agent skills across the open web, GitHub,
   independent developer repositories, community awesome-lists, and skills.sh
   when the user describes a skill or asks how to automate a capability.
-  Automatically hands off found skills to skill-creator for Antigravity adaptation.
+  Automatically hands off found skills to workspace-skill-adapter for Antigravity adaptation.
 ---
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 
 # Skill Finder (Wide-Net Open-Source Discovery Engine)
 
@@ -32,7 +33,7 @@ When triggered, execute the following 5-step pipeline:
        └─► IF CUSTOM / DOMAIN SKILL: Cast a Wide Net Across the Open-Source Ecosystem
               │
               ▼
-[ Step 2: Query Analysis ] ──► [ Step 3: Wide-Net Search ] ──► [ Step 4: Quality Vetting ] ──► [ Step 5: skill-creator Handoff ]
+[ Step 2: Query Analysis ] ──► [ Step 3: Wide-Net Search ] ──► [ Step 4: Quality Vetting ] ──► [ Step 5: workspace-skill-adapter Handoff ]
 ```
 
 ---
@@ -117,13 +118,13 @@ Present the top 1–2 discovered skills to the user:
 
 ---
 
-## Step 5: Autonomous Handoff to `skill-creator`
+## Step 5: Autonomous Handoff to `workspace-skill-adapter`
 
 Most independent skills found on GitHub are written for Claude Code, Cursor, or raw LLM prompts.
 
 Once the user approves or selects a candidate:
 1. Retrieve the raw Markdown content or URL from the repository.
-2. Hand off directly to **`skill-creator`** to:
+2. Hand off directly to **`workspace-skill-adapter`** to:
    - Translate all tool calls (`Bash` &rarr; `run_command`, `View` &rarr; `read_file`, `Edit` &rarr; `edit_file`).
    - Format standard Antigravity YAML frontmatter (`name`, `description`).
    - Save the finalized skill to `/mnt/recovery/be/skills/<skill-name>/SKILL.md`.

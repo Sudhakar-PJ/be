@@ -3,8 +3,7 @@ name: blob-store
 description: This skill should be used when the user wants a "blob store" or "object storage", names "S3" or an S3-compatible store, needs to "store images / video / files", asks about "multipart upload" or "resumable upload", "signed / presigned URLs", "media storage", "unstructured data at scale", object "versioning", storage "tiering" (hot/cold/archive), or "erasure coding" vs replication for durability. Use it whenever a design must hold large unstructured objects (photos, video, backups, logs, ML datasets) and serve them cheaply and durably, even if the user just says "where do we put the files".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Blob store
 
 Store large, immutable, unstructured objects — images, video, backups, model
@@ -176,7 +175,7 @@ the answer.
 
 ## Diagram
 To visualize the upload/download path (client → signed URL → store; CDN fronting GET; index
-mapping key → shards) or the EC write fan-out, use the in-plugin `architecture-diagram`
+mapping key → shards) or the EC write fan-out, use the `architecture-diagram`
 skill — show the metadata index as a distinct node and the CDN as the edge layer. Do not
 embed Mermaid here.
 

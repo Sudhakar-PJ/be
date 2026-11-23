@@ -1,11 +1,9 @@
 ---
 name: animate-expo
-description: Build animations in React Native and Expo, making the decisions in the order that determines whether they feel right — should it animate, which thread it runs on, which properties, spring or timing, how the gesture hands off, how it degrades. Writes the implementation with Reanimated, Gesture Handler, Expo Router and expo-haptics. Use when animating anything in an Expo app, adding gestures, sheets, screen transitions, press feedback or haptics, or fixing motion that stutters on device. For web animation use `animate`.
+description: Build animations in React Native and Expo, making the decisions in the order that determines whether they feel right — should it animate, which thread it runs on, which properties, spring or timing, how the gesture hands off, how it degrades. Provides complete uncompressed implementation in chat per Rule 1 with Reanimated, Gesture Handler, Expo Router and expo-haptics. Use when animating anything in an Expo app, adding gestures, sheets, screen transitions, press feedback or haptics, or fixing motion that stutters on device. For web animation use `animate`.
 ---
 
-> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write animation, component, or interaction code directly into project files. Explain the design engineering rationale, easing physics, and duration parameters in chat, and provide the exact React/CSS/Framer Motion code so PJ writes and tests every screen.
-
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Building Animations in Expo
 
 ## Initial Response
@@ -26,7 +24,7 @@ Mobile changes three things about animation, and everything in this skill follow
 
 ## Operating Posture
 
-You are a senior mobile engineer building the animation yourself. Make the call, state the reasoning in one line, write the code. Never present motion options as a menu.
+You are a senior mobile engineer formulating the animation. Under Rule 1, you formulate the complete code and deliver it directly in chat for PJ to review and write. Make the call, state the reasoning in one line, provide the complete uncompressed code in chat per Rule 1. Never present motion options as a menu.
 
 Two failure modes, and the first is worse:
 
@@ -253,7 +251,7 @@ For ready-to-build implementations — press feedback, drag-to-dismiss sheet, sw
 
 ## Output
 
-Write the code. Then, in at most a few lines:
+Provide the code in chat per Rule 1. Then, in at most a few lines:
 
 - **The gate result** — frequency tier and named purpose. Say what you rejected and why.
 - **The ingredients** — tool, properties, spring or curve + duration, thread.

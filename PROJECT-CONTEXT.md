@@ -2,24 +2,25 @@
 
 > **Purpose:** Central living reference and handoff document. Any developer or AI assistant working in this workspace must read this document first before giving any guidance or suggestions.  
 > **Learner:** PJ Sudhakar  
-> **Status:** Project #1 (Multi-Tenant SaaS API) — Core Infrastructure Complete (57/57 Tests, Full LGTM Stack). Currently executing the **Enterprise Product Expansion** (Jira/Linear parity) detailed in [SAAS-ENTERPRISE-ROADMAP.md](file:///mnt/recovery/be/SAAS-ENTERPRISE-ROADMAP.md).  
+> **Status:** Project #1 (Multi-Tenant SaaS API) — Core Infrastructure Complete (57/57 Tests, Full LGTM Stack).  
+> **CURRENT ACTIVE PREREQUISITE:** **Milestone 5.6 (Pre-Sprint Security, Concurrency & RLS Audit Remediation)** detailed below and in Phase 0 of [SAAS-ENTERPRISE-ROADMAP.md](file:///mnt/recovery/be/SAAS-ENTERPRISE-ROADMAP.md). Must be 100% completed before Sprint 1 begins.  
 > **Last Updated:** 2026-11-23
 
 > [!IMPORTANT]
 > **DOCUMENT HIERARCHY & INGESTION DIRECTIVE FOR AI ASSISTANTS:**
 > 1. `PROJECT-CONTEXT.md` (THIS FILE) is the **Master Operational Anchor**: It defines the 10-Project Series roadmap, the immutable Operating Rules (PJ codes everything himself, zero ORMs, extreme pedagogical depth, deep systems architecture), and historical engineering progress.
-> 2. [SAAS-ENTERPRISE-ROADMAP.md](file:///mnt/recovery/be/SAAS-ENTERPRISE-ROADMAP.md) is the **Active Sprint Execution Engine**: It contains the granular, step-by-step checklist, database schemas, REST endpoints, and architectural requirements for the active 15 enterprise sprints (Sprint 1 through Sprint 15).
-> 3. **Mandatory AI Action:** Whenever a session starts or context is provided, the AI assistant **MUST treat `SAAS-ENTERPRISE-ROADMAP.md` as the direct active specification** and advance through its checkboxes sequentially. Do not invent new tasks outside this roadmap.
+> 2. [SAAS-ENTERPRISE-ROADMAP.md](file:///mnt/recovery/be/SAAS-ENTERPRISE-ROADMAP.md) is the **Active Sprint Execution Engine**: It contains the granular, step-by-step checklist, database schemas, REST endpoints, and architectural requirements.
+> 3. **Mandatory AI Action:** Whenever a session starts or context is provided, the AI assistant **MUST start with Phase 0 / Milestone 5.6 (Audit Remediation & Hardening)** in `SAAS-ENTERPRISE-ROADMAP.md` before advancing to Sprint 1. Do not skip to Sprint 1 while these 7 vulnerabilities remain open.
 
 ---
 
 ## 1. Critical Operating Rules for AI Assistants
 
-### Rule 1: PJ Codes Everything Himself
+### Rule 1: PJ Codes Everything Himself (Applies to Backend & Frontend)
 
-- **The AI must NEVER directly write, modify, or generate project implementation files** (such as files in `01-saas-api/backend/src/`, `01-saas-api/backend/migrations/`, `01-saas-api/backend/tests/`, etc.).
+- **The AI must NEVER directly write, modify, or generate project implementation files** (across both `01-saas-api/backend/` and `01-saas-api/frontend/`). Rule 1 is strictly binding across the entire full stack per Option A.
 - **The AI's role is strictly as a senior mentor, tutor, and staff architect (strictly adhering to [skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)):**
-  1. Teach the underlying theory, data structures, and PostgreSQL/Redis mechanics deeply.
+  1. Teach the underlying theory, CSS/Tailwind mechanics, database structures, and architectural patterns deeply.
   2. Explain the architectural _why_ and evaluate trade-offs before showing any code.
   3. Provide exact terminal commands (e.g. `npm install ...`, `mkdir ...`) and complete, production-grade code snippets directly inside the chat interface.
   4. Wait for PJ to create, type, review, and test each file before advancing.
@@ -307,19 +308,45 @@ MILESTONE 6 EXECUTION ORDER:
 
 ## 6. Next Immediate Action for AI Assistants
 
-> [!IMPORTANT]
-> **CRITICAL DIRECTIVE — REFER TO `SAAS-ENTERPRISE-ROADMAP.md` FIRST:**  
-> Although the core infrastructure engine (Milestones 1–6) is 100% complete and passing in Docker on Arch Linux, PJ is expanding the SaaS backend to achieve full enterprise parity with commercial giants like **Jira**, **Linear**, and **GitHub Projects** before building the frontend or moving to Project #2.  
-> **ANY AI ASSISTANT STARTING A SESSION MUST REFER TO [SAAS-ENTERPRISE-ROADMAP.md](file:///mnt/recovery/be/SAAS-ENTERPRISE-ROADMAP.md) AS THE ACTIVE MASTER SPECIFICATION.**
->
-> **Pedagogical Mandate (Strict):**
-> 1. Continue adhering to **Rule 1** (PJ codes everything himself; never write or modify implementation files directly in `src/`, `migrations/`, or `tests/`).
-> 2. Continue adhering to **Rule 2** (Zero ORMs, raw PostgreSQL, strict TypeScript, RFC 9457 errors).
-> 3. Continue adhering to **Rule 3** (Extreme pedagogical depth, real-world analogies, explain the architectural *why* before giving terminal commands and code snippets).
+> [!CAUTION]
+> **MANDATORY PREREQUISITE BEFORE STARTING SPRINT 1:**  
+> A senior code review audit uncovered 7 critical security, concurrency, and RLS flaws in the existing codebase. 
+> **ANY AI ASSISTANT STARTING A SESSION MUST BEGIN WITH MILESTONE 5.6 (PHASE 0 IN `SAAS-ENTERPRISE-ROADMAP.md`).**  
+> Sprint 1 cannot begin until these 7 issues are resolved and verified with adversarial integration tests.
 
-### Current Execution Focus: The Enterprise Backend Sprints
+### Milestone 5.6: The Security, Concurrency & RLS Hardening Checklist
 
-Follow the 15 enterprise sprints across 5 phases detailed in [SAAS-ENTERPRISE-ROADMAP.md](file:///mnt/recovery/be/SAAS-ENTERPRISE-ROADMAP.md):
+1. **0.1 RLS Enforcement via Dedicated Runtime Role:**
+   - Audit found `rolbypassrls = true` on the Neon/Postgres superuser connection, meaning RLS was never enforced at the DB level; isolation relied solely on application `WHERE tenant_id = $1`.
+   - Fix: Provision `app_runtime` non-superuser role (`NOBYPASSRLS`), connect through it, and verify that missing `SET LOCAL app.current_tenant` queries fail at the DB level.
+2. **0.2 Eliminate Webhook Cross-Tenant IDOR/BOLA:**
+   - Audit found `webhook.repository.ts` (`findById`, `update`, `rotateSecret`, `delete`) only filters `WHERE id = $1` without `tenant_id`.
+   - Fix: Enforce `WHERE id = $1 AND tenant_id = $2` on all webhook repository queries.
+3. **0.3 Mount PAT Scopes on Tasks & Projects:**
+   - Audit found `requireScope` is only mounted on webhook routes; PATs with any scope can mutate tasks and projects.
+   - Fix: Add `requireScope('tasks:read')` and `requireScope('tasks:write')` to `task.routes.ts` and `project.routes.ts`. Align scope names with enterprise roadmap.
+4. **0.4 Global Rate Limiter & X-Forwarded-For Spoofing Defense:**
+   - Audit found `apiRateLimiter` is unmounted in `app.ts` (only `/auth` is limited), and it trusts raw `X-Forwarded-For` headers.
+   - Fix: Configure Express `trust proxy` safely, mount `apiRateLimiter` across `/api/v1`, and use safe `req.ip`.
+5. **0.5 Concurrency Race Fixes (Tokens, Task Numbers, Unique Keys):**
+   - Refresh token race: Use atomic conditional `UPDATE sessions SET is_revoked = TRUE WHERE id = $1 AND is_revoked = FALSE RETURNING id;`. If `rowCount === 0`, trigger `revokeFamily` reuse detection.
+   - Task number race: Fix `MAX(number)+1` race condition using an atomic counter or `INSERT ... ON CONFLICT` retry loop.
+   - Catch Postgres unique constraint violation (`23505`) and return clean RFC 9457 `409 Conflict` instead of `500`.
+6. **0.6 Fix Audit Log Immutability Trigger (Unblock GDPR Erasure) & Wire Service:**
+   - Audit found `trg_audit_logs_immutable` catches `ON DELETE CASCADE` and `ON DELETE SET NULL`, making deleting tenants or users impossible (breaking Sprint 14 GDPR).
+   - Fix: Update trigger to allow system/cascade deletions. Wire `auditService` into domain events so it is actively used in production.
+7. **0.7 Operational Hygiene & Security Best Practices:**
+   - Login timing equalization: Run dummy Argon2id hash when email is not found to prevent user enumeration.
+   - Remove refresh token from response JSON body (keep strictly in `HttpOnly` cookie).
+   - Validate `assigneeId` belongs to `tenant_members` before assigning tasks.
+   - Close webhook queue in worker graceful shutdown (`closeAllQueues`).
+   - Remove leftover debug route `/api/v1/test-error`.
+
+---
+
+### Subsequent Focus: The 15 Enterprise Sprints (After Milestone 5.6)
+
+Once Milestone 5.6 is complete and verified, follow the 15 enterprise sprints detailed in [SAAS-ENTERPRISE-ROADMAP.md](file:///mnt/recovery/be/SAAS-ENTERPRISE-ROADMAP.md):
 
 - **Phase 1: Identity & Multi-Factor Authentication (2FA)**
   - Sprint 1: Identity Lifecycle, Email Verification, Password Reset & Session/Device Tracking.

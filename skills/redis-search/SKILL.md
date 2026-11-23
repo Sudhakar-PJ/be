@@ -7,8 +7,7 @@ metadata:
   version: "1.0.0"
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Redis Search
 
 Single source of guidance for Redis Search — the retrieval surface that spans lexical, numeric, geo, JSON-path, and vector queries. Vector fields are part of the same `FT.CREATE` machinery as TEXT/TAG/NUMERIC fields, and `FT.HYBRID` blends lexical and vector ranking in one command, so this skill covers them together.

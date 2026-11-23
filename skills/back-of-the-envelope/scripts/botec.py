@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Back-of-the-envelope calculator — deterministic sizing for system design.
 
-The one objectively-scriptable surface in this plugin: turn assumptions (DAU,
+The one objectively-scriptable surface in this skill set: turn assumptions (DAU,
 actions, object size, retention, peak factor) into the numbers that decide an
 architecture (QPS, peak QPS, storage/day & total, bandwidth, server count).
 

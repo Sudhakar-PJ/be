@@ -3,8 +3,7 @@ name: consistency-coordination
 description: This skill should be used when the user asks about the "CAP theorem", "PACELC", a "consistency model", "eventual vs strong consistency", "read-your-writes", "causal consistency", "quorum" or "R+W>N", "consensus", "Raft / Paxos", "leader election", "consistent hashing", a "distributed transaction", "2PC", or "saga". Use it whenever a design has multiple copies of data or coordinating nodes and a decision hinges on what a reader is guaranteed to see during replication lag, a network partition, or a node failure — even if the user doesn't say "consistency".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Consistency & Coordination
 
 Decide what a reader is guaranteed to see when data lives on more than one node,
@@ -188,7 +187,7 @@ provider, the generic recipe is the answer.
 
 ## Diagram
 To visualize a leader-follower-under-partition scenario, a quorum read/write, or a
-consistent-hashing ring, use the in-plugin `architecture-diagram` skill. An inline
+consistent-hashing ring, use the `architecture-diagram` skill. An inline
 sketch (`client → leader → [replication stream] → followers`, with the partition as
 a dashed/broken arrow) is fine for quick reasoning; do not embed Mermaid.
 

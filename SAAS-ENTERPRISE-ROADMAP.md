@@ -38,6 +38,44 @@
 
 ---
 
+## Phase 0: Mandatory Pre-Sprint Code Audit Remediation & Hardening (Milestone 5.6)
+
+> [!CAUTION]
+> **MANDATORY PREREQUISITE BEFORE STARTING SPRINT 1:**  
+> A senior code review audit of the core infrastructure revealed 7 critical security, concurrency, and RLS flaws. Sprint 1 MUST NOT begin until this milestone is 100% complete and verified with adversarial integration tests. Any AI assistant starting a session must begin with this checklist.
+
+### Milestone 5.6 Checklist: Security, Concurrency & RLS Hardening
+
+- [ ] **0.1 RLS Enforcement & Dedicated Runtime Role:**
+  - Audit revealed `rolbypassrls = true` on the database connection role (Neon/Postgres owner), meaning RLS was never enforced at the database level.
+  - Create a dedicated non-superuser role (e.g. `app_runtime`) with `NOBYPASSRLS`.
+  - Connect via `app_runtime` and add adversarial tests proving unauthorized cross-tenant queries/inserts without `SET LOCAL app.current_tenant` fail at the DB level.
+- [ ] **0.2 Eliminate Webhook Cross-Tenant IDOR / BOLA:**
+  - Audit revealed `webhook.repository.ts` queries (`findById`, `update`, `rotateSecret`, `delete`) only check `WHERE id = $1` without tenant isolation.
+  - Fix all webhook queries to strictly enforce `WHERE id = $1 AND tenant_id = $2`.
+- [ ] **0.3 Mount PAT Scopes on Tasks & Projects:**
+  - Audit revealed `requireScope` is only mounted on webhooks; PATs with any scope can mutate tasks and projects.
+  - Add `requireScope('tasks:read')`, `requireScope('tasks:write')`, and project scopes to `task.routes.ts` and `project.routes.ts`. Align scope naming in `pat.ts` with enterprise issue terminology.
+- [ ] **0.4 Global API Rate Limiter & X-Forwarded-For Spoofing Defense:**
+  - Audit revealed `apiRateLimiter` is unmounted in `app.ts` (only `/auth` is limited), and it blindly trusts `req.headers["x-forwarded-for"]`.
+  - Configure Express `app.set('trust proxy', 1)` and safely extract client IP. Mount `apiRateLimiter` across all `/api/v1` routes.
+- [ ] **0.5 Concurrency Race Fixes (Tokens, Task Numbers, Unique Keys):**
+  - Fix refresh token family rotation race: `UPDATE sessions SET is_revoked = TRUE WHERE id = $1 AND is_revoked = FALSE RETURNING id;`. If `rowCount === 0`, trigger `revokeFamily` reuse detection.
+  - Fix task number generation collision (`MAX(number)+1` race): atomic project counter or `INSERT ... ON CONFLICT` handling.
+  - Catch Postgres unique constraint violation (`23505`) and return RFC 9457 `409 Conflict` instead of unhandled `500`.
+- [ ] **0.6 Fix Audit Log Immutability Trigger (Unblock GDPR Erasure) & Wire Service:**
+  - Audit revealed `trg_audit_logs_immutable` catches `ON DELETE CASCADE` and `ON DELETE SET NULL`, making deleting tenants or users impossible (breaking Sprint 14 GDPR).
+  - Update trigger to allow system/cascade deletions.
+  - Wire `auditService` into domain lifecycle events (tasks, projects, webhooks) so it is no longer dead code.
+- [ ] **0.7 Operational Hygiene & Security Best Practices:**
+  - Login timing equalization: Run dummy Argon2id hash when user email is not found to prevent user enumeration.
+  - Remove refresh token from response JSON body (keep strictly in `HttpOnly` cookie).
+  - Validate `assigneeId` belongs to `tenant_members` before assigning tasks.
+  - Close webhook queue in worker graceful shutdown (`closeAllQueues`).
+  - Remove leftover debug route `/api/v1/test-error`.
+
+---
+
 ## Phase 1: Identity, Multi-Factor Authentication (MFA/2FA) & Security
 
 ### Sprint 1: Identity Lifecycle, Password Reset & Session Tracking

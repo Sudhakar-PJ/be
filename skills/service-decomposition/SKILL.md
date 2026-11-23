@@ -3,8 +3,7 @@ name: service-decomposition
 description: This skill should be used when the user asks "monolith vs microservices", how to "split into services", set "service boundaries", find the right "service granularity", design an "API gateway / BFF", do "service discovery" or add a "service mesh", or worries that services are "too chatty" / "too fine-grained" — including when a team is pushed to adopt microservices or Kafka between services "to be ready to scale" and the right answer may be a modular monolith. It gives the recipe for carving a system into services (or deciding not to) and wiring how they find and call each other. Use it whenever a design has more than one service — or someone is tempted to add more — even if the user doesn't say "microservices".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Service Decomposition
 
 Decide how to carve a system into deployable services — or whether to — and how
@@ -142,7 +141,7 @@ recipe is the answer.
 
 ## Diagram
 To visualize the service tier (gateway → services → their data, with sync vs async
-edges and trust boundaries), use the in-plugin `architecture-diagram` skill.
+edges and trust boundaries), use the `architecture-diagram` skill.
 
 ## Related building blocks
 - `api-design` — *pairs with* this: decomposition sets the boundaries, `api-design` defines each service's contract.

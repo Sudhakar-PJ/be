@@ -2,6 +2,7 @@
 name: design-systems
 description: Theme registry & aesthetic style selector containing 67 design systems (enterprise, shadcn, bento, minimal, neobrutalism, glassmorphism, claymorphism, etc.). Use when asked to "apply a UI theme", "switch aesthetic", "use enterprise/shadcn/bento style", or choose a visual design preset.
 ---
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 
 # Design Systems Theme Registry (67 Curated Aesthetics)
 
@@ -18,7 +19,7 @@ When the user asks to style a component, page, or dashboard with a specific visu
 3. **Apply Tokens Strictly:** Use the exact font families, border radii, hex color tokens, and shadow treatments defined in that theme's files.
 4. **Pedagogical & Structural Compliance:**
    - **With `tutor`:** Provide theme tokens, Tailwind classes, or CSS variables directly in chat; guide the user interactively without auto-writing code into project files.
-   - **With `ui-engineering`:** Maintain strict component bounds (<200 lines, 4-state lifecycle, state triad).
+   - **With `frontend-orchestrator` (`ui-engineering` reference):** Maintain strict component bounds (<200 lines, 4-state lifecycle, state triad per [skills/frontend-orchestrator/references/ui-engineering.md](file:///mnt/recovery/be/skills/frontend-orchestrator/references/ui-engineering.md)).
    - **With `web-design-guidelines`:** Ensure colors pass WCAG 2.1/2.2 AA contrast ratios and preserve accessibility standards.
 
 ---
@@ -125,6 +126,6 @@ User: "Let's build the workspace activity dashboard using the bento theme."
 Agent:
 1. Opens `skills/design-systems/bento/SKILL.md` and `DESIGN.md`.
 2. Adopts bento modular grid ratios, rounded borders, and subtle contrast surfaces.
-3. Implements the components using `ui-engineering` architecture and `tutor` active-coding rules.
+3. Implements the components using `frontend-orchestrator` component rules (`ui-engineering.md`) and `tutor` active-coding rules.
 ```
 

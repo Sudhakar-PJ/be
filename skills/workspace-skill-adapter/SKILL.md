@@ -1,13 +1,14 @@
 ---
-name: skill-creator
+name: workspace-skill-adapter
 description: >-
   Creates, adapts, and optimizes AI agent skills for Google Antigravity IDE.
   Converts external skills from Claude Code, Cursor, Codex, and skills.sh into
   native Antigravity skills, adjusting tool signatures and frontmatter. Use when
   authoring new skills or when given a direct skill URL or content.
 ---
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 
-# Skill Creator (Antigravity Adaptation Engine)
+# Workspace Skill Adapter (Antigravity Adaptation Engine)
 
 Use this skill when:
 1. The user provides a direct link or URL to an external skill (e.g., from `skills.sh`, GitHub, Claude Code, or Cursor).

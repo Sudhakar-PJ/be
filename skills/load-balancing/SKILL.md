@@ -3,8 +3,7 @@ name: load-balancing
 description: This skill should be used when the user adds a "load balancer", asks about "L4 vs L7" (transport vs application layer), picks a balancing algorithm ("round robin", "least connections", "weighted", "IP hash"), configures "health checks", needs "sticky sessions" / "session affinity", adds a "reverse proxy", does "SSL/TLS termination", spreads "traffic distribution" across an "autoscaling group", or wants a stateless web tier behind a single entry point. Use it whenever a design has more than one server behind one address, or a single box is the entry-point bottleneck or SPOF, even if the user doesn't say "load balancer".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Load Balancing
 
 Spread incoming requests across a pool of identical backends so no single server
@@ -189,7 +188,7 @@ provider, the generic recipe is the answer.
 
 ## Diagram
 To visualize the request path (client → balancer → backend pool) or the
-health-check/failover flow, use the in-plugin `architecture-diagram` skill. A
+health-check/failover flow, use the `architecture-diagram` skill. A
 quick inline sketch — `client → [LB] → {web1, web2, web3} → shared state` — is
 fine for reasoning; do not embed Mermaid.
 

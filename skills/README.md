@@ -15,27 +15,38 @@ This directory stores project-scoped skills for AI assistants working in this re
 | Skill | Name | Description |
 | :--- | :--- | :--- |
 | 🔍 **Skill Finder** | [`skills/skill-finder/SKILL.md`](./skill-finder/SKILL.md) | Discovers open-source agent skills across GitHub, independent developer repositories, and registries. Checks native Antigravity commands first. |
-| ⚙️ **Skill Creator** | [`skills/skill-creator/SKILL.md`](./skill-creator/SKILL.md) | Adapts external skills (Claude Code, Cursor, Codex) into native Antigravity skills, adjusting tool signatures, sandbox rules, and frontmatter. Enforces the 5 Antigravity Porting Guardrails. |
+| ⚙️ **Workspace Skill Adapter** | [`skills/workspace-skill-adapter/SKILL.md`](./workspace-skill-adapter/SKILL.md) | Adapts external skills (Claude Code, Cursor, Codex) into native Antigravity skills, adjusting tool signatures, sandbox rules, and frontmatter. Enforces the 5 Antigravity Porting Guardrails. |
 
 ### 🎨 Frontend Architecture, Design & Media
+
+#### 🧭 Master Orchestration & Assembly Line
 | Skill | Name | Description |
 | :--- | :--- | :--- |
-| 🏗️ **UI Engineering** | [`skills/ui-engineering/SKILL.md`](./ui-engineering/SKILL.md) | Full Addy Osmani standards: component composition, <200-line limit, mandatory 4-state lifecycle (loading/empty/error/success), WCAG 2.1 AA accessibility, performance budgets, and design tokens. |
-| ✨ **Design Taste (tasteskill v2.5)** | [`skills/design-taste-frontend/SKILL.md`](./design-taste-frontend/SKILL.md) | Leon's authentic, uncompressed anti-slop art direction suite: 9 non-negotiable house rules, figma.com/x.ai bar, 22 reference playbooks (cards, backgrounds, diagrams, creative effects, layouts, motion, copy, photo licensing), and curated palette/typography libraries. |
-| 📊 **UI/UX Pro Max** | [`skills/ui-ux-pro-max/SKILL.md`](./ui-ux-pro-max/SKILL.md) | NextLevelBuilder design intelligence database: 60-30-10 color harmony math, font pairing matrix, enterprise table UX, debounced search filters, and dashboard metrics layouts. |
-| 🎬 **Motion Graphics** | [`skills/motion-graphics/SKILL.md`](./motion-graphics/SKILL.md) | Programmatic timeline choreography with Remotion and Framer Motion: spring physics, micro-staggers, GPU transform animations, and deterministic frame-accuracy. |
+| 🧭 **Frontend Orchestrator** | [`skills/frontend-orchestrator/SKILL.md`](./frontend-orchestrator/SKILL.md) | Master frontend routing engine: enforces Step 0 (Framework ADR & Design Token Genesis), bifurcates tasks between Marketing UI (taste-led) and B2B Product UI (Jira/Linear dense tables, boards), defines Precedence hierarchy, provides Rule 1 CLI protocol for scaffolding tools (`shadcn add`), and embeds full uncompressed playbooks for UI/UX Pro Max, UI Engineering, Frontend Design, and Motion Graphics in `references/`. |
+
+#### 🏢 B2B Product UI & Design Systems (Jira / Linear App Screens)
+| Skill | Name | Description |
+| :--- | :--- | :--- |
+| 💎 **Impeccable** | [`skills/impeccable/SKILL.md`](./impeccable/SKILL.md) | Paul Bakaus's complete Design Director system (v4.10): 48 uncompressed playbooks (`craft-floor`, `critique-rubric`, `shape`, `polish`, `typeset`, `bolder`, `quieter`, `harden`, `animate`) spanning Persuade, Operate, and Read modes. |
+| 🧱 **shadcn/ui** | [`skills/shadcn/SKILL.md`](./shadcn/SKILL.md) | Official shadcn/ui framework engineering: CLI registry management (`add`, `search`), composition rules, forms architecture (`FieldGroup`, `InputGroup`), Base UI vs Radix UI conventions, chat UI patterns, design system specs, and Lucide icons rules with 6 rule books and 6 reference guides. |
+| 🎨 **Design Systems Registry** | [`skills/design-systems/SKILL.md`](./design-systems/SKILL.md) | 67 uncompressed design system themes (enterprise, shadcn, bento, minimal, neobrutalism, glassmorphism, claymorphism, etc.) with exact tokens, font pairings, and aesthetic presets. |
+
+#### 🚀 Marketing, Creative & Cinematic Landing Pages
+| Skill | Name | Description |
+| :--- | :--- | :--- |
+| ✨ **Design Taste (tasteskill v2.5)** | [`skills/design-taste-frontend/SKILL.md`](./design-taste-frontend/SKILL.md) | Authentic, uncompressed anti-slop art direction suite: 9 non-negotiable house rules, figma.com/x.ai bar, 22 reference playbooks (cards, backgrounds, diagrams, creative effects, layouts, motion, copy, photo licensing), and curated palette/typography libraries. |
+| 🌐 **MotionSites Web Builder** | [`skills/motionsites-web-builder/SKILL.md`](./motionsites-web-builder/SKILL.md) | MotionSites cinematic website & hero builder: 5-step workflow (brief, reference examples, real media shelf, spec-first drafting, build), 40+ production design examples, 7 deep technique guides (WebGL 3D, depth, scroll, type motion), and real media assets. |
+| 📸 **Image-to-Code** | [`skills/image-to-code/SKILL.md`](./image-to-code/SKILL.md) | Elite 3-phase visual engineering engine: generate section-specific design images first, deeply analyze typography/color/spacing/density, and implement code with anti-drift precision. 38 uncompressed rules breaking AI slop and card-nesting clichés. |
+| 🖼️ **Frontend Assets** | [`skills/frontend-assets/SKILL.md`](./frontend-assets/SKILL.md) | ImageGen suite: generating, prompting, and placing 3D matte clay/frosted glass illustrations, responsive viewport aspect ratios, and WebP optimization pipelines. |
 | 🎞️ **HyperFrames (HeyGen)** | [`skills/hyperframes/SKILL.md`](./hyperframes/SKILL.md) | HeyGen's programmatic HTML-to-video GSAP timeline renderer: deterministic seekable animations, clip lifecycles, and render quality gates. |
 | ✂️ **Cut the Curve** | [`skills/cut-the-curve/SKILL.md`](./cut-the-curve/SKILL.md) | HeyGen's cinematic GSAP seam templates: zoom-through, inverse zoom-through, waterfall cuts, rack-focus blur-cuts, and nudge curves with canonical code implementations. |
 | 📐 **Motion Doctrine** | [`skills/motion-doctrine/SKILL.md`](./motion-doctrine/SKILL.md) | Universal physics laws for motion design: vector law, velocity matching across camera cuts, and directional continuity. |
-| 🖼️ **Frontend Assets** | [`skills/frontend-assets/SKILL.md`](./frontend-assets/SKILL.md) | Leon's ImageGen suite: generating, prompting, and placing 3D matte clay/frosted glass illustrations, responsive viewport aspect ratios, and WebP optimization pipelines. |
-| 📸 **Image-to-Code** | [`skills/image-to-code/SKILL.md`](./image-to-code/SKILL.md) | Leon's elite 3-phase visual engineering engine: generate section-specific design images first, deeply analyze typography/color/spacing/density, and implement code with anti-drift precision. 38 uncompressed rules breaking AI slop and card-nesting clichés. |
-| 🌐 **MotionSites Web Builder** | [`skills/motionsites-web-builder/SKILL.md`](./motionsites-web-builder/SKILL.md) | MotionSites cinematic website & hero builder: 5-step workflow (brief, reference examples, real media shelf, spec-first drafting, build), 40+ production design examples, 7 deep technique guides (WebGL 3D, depth, scroll, type motion), and real media assets. |
-| 🛡️ **Web Design Guidelines** | [`skills/web-design-guidelines/SKILL.md`](./web-design-guidelines/SKILL.md) | Vercel's Web Interface Guidelines auditor: 50+ strict rules for accessibility, focus states, paste-preservation, `tabular-nums`, `min-w-0` flex truncation, and `file:line` issue reporting. |
+
+#### ⚡ Performance & Accessibility Quality Gates
+| Skill | Name | Description |
+| :--- | :--- | :--- |
 | ⚡ **React Best Practices (Vercel)** | [`skills/vercel-react-best-practices/SKILL.md`](./vercel-react-best-practices/SKILL.md) | Vercel's 70+ performance engineering rules across 8 categories: eliminating async waterfalls, bundle size & dynamic imports, RSC/server action optimization, client data fetching, re-render avoidance, and JS engine speed with 75 rule books. |
-| 🎨 **Design Systems Registry** | [`skills/design-systems/SKILL.md`](./design-systems/SKILL.md) | 67 uncompressed design system themes (enterprise, shadcn, bento, minimal, neobrutalism, glassmorphism, claymorphism, etc.) with exact tokens, font pairings, and aesthetic presets. |
-| 🧱 **shadcn/ui** | [`skills/shadcn/SKILL.md`](./shadcn/SKILL.md) | Official shadcn/ui framework engineering: CLI registry management (`add`, `search`), composition rules, forms architecture (`FieldGroup`, `InputGroup`), Base UI vs Radix UI conventions, chat UI patterns, design system specs, and Lucide icons rules with 6 rule books and 6 reference guides. |
-| 💎 **Impeccable** | [`skills/impeccable/SKILL.md`](./impeccable/SKILL.md) | Paul Bakaus's complete Design Director system (v4.10): 48 uncompressed playbooks (`craft-floor`, `critique-rubric`, `shape`, `polish`, `typeset`, `bolder`, `quieter`, `harden`, `animate`) spanning Persuade, Operate, and Read modes. |
-| 🎯 **Frontend Design** | [`skills/frontend-design/SKILL.md`](./frontend-design/SKILL.md) | Anthropic Studio Design standard: eliminating the 5 AI design tells (terracotta cream, neon cyberpunk, broadsheet, SaaS cards, template chrome), two-pass design planning, and intentional UX copywriting. |
+| 🛡️ **Web Design Guidelines** | [`skills/web-design-guidelines/SKILL.md`](./web-design-guidelines/SKILL.md) | Vercel's Web Interface Guidelines auditor: 50+ strict rules for accessibility, focus states, paste-preservation, `tabular-nums`, `min-w-0` flex truncation, and `file:line` issue reporting. |
 
 ### 🪄 Interaction Design & Motion Engineering (Emil Kowalski Suite — 20 Uncompressed Skills)
 | Skill | Name | Description |
@@ -168,6 +179,16 @@ This directory stores project-scoped skills for AI assistants working in this re
 | 🏛️ **Senior Backend** | [`skills/senior-backend/SKILL.md`](./senior-backend/SKILL.md) | Senior Node.js & Express API Architect: RFC 9457 Problem Details error contracts, idempotency keys with Redis, dual-token JWT lifecycles, BullMQ distributed background queues, and Prometheus telemetry. |
 | 🐰 **CodeRabbit Code Review** | [`skills/coderabbit-code-review/SKILL.md`](./coderabbit-code-review/SKILL.md) | CodeRabbit's official automated code reviewer for AI agents: multi-pass git diff review, edge cases, architectural regressions, and PR summaries with Antigravity sandbox compatibility. |
 
+### ✂️ Pragmatic Engineering & Anti-Bloat (Ponytail Suite)
+| Skill | Name | Description |
+| :--- | :--- | :--- |
+| ✂️ **Ponytail** | [`skills/ponytail/SKILL.md`](./ponytail/SKILL.md) | Lazy senior dev mode: enforces the 7-rung ladder of laziness (YAGNI, reuse, standard library, native platform, minimal complete code). Prevents over-engineering while strictly protecting security and error handling. Includes 12 comparison playbooks in `examples/`. |
+| 🔍 **Ponytail Review** | [`skills/ponytail-review/SKILL.md`](./ponytail-review/SKILL.md) | Multi-pass diff review checking if logic is sound, fast, safe under load, and identifying what code can be safely deleted or simplified. |
+| 🧹 **Ponytail Audit** | [`skills/ponytail-audit/SKILL.md`](./ponytail-audit/SKILL.md) | Repository-wide code quality and bloat audit: ranks bugs, over-engineered abstractions, slow paths, and dead code. |
+| 📝 **Ponytail Debt** | [`skills/ponytail-debt/SKILL.md`](./ponytail-debt/SKILL.md) | Extracts and tracks `shortcut:` and debt comments across the codebase into an organized technical debt ledger. |
+| 📊 **Ponytail Gain** | [`skills/ponytail-gain/SKILL.md`](./ponytail-gain/SKILL.md) | Displays measured savings in complexity, lines of code eliminated, and runtime performance improvements. |
+| ❓ **Ponytail Help** | [`skills/ponytail-help/SKILL.md`](./ponytail-help/SKILL.md) | Quick reference for Ponytail intensity modes (`lite`, `full`, `ultra`) and command options. |
+
 ---
 
 ## The Workflow Pipeline
@@ -185,7 +206,7 @@ This directory stores project-scoped skills for AI assistants working in this re
                         ▼                                ▼                                ▼
      ┌────────────────────────────────────┐  ┌────────────────────────────────────┐  ┌────────────────────────────────────┐
      │       SKILL DISCOVERY & CREATION   │  │       FRONTEND DOMAIN ARSENAL      │  │        BACKEND & SYSTEM DESIGN     │
-     │   (skill-finder ➔ skill-creator)   │  │   • UI Engineering & Design Taste  │  │   • Master System Design (22 skills│
+     │   (skill-finder ➔ skill-adapter)   │  │   • UI Engineering & Design Taste  │  │   • Master System Design (22 skills│
      │  • Hunts open web & GitHub repos   │  │   • Vercel React Best Practices    │  │   • Official Redis Suite (6 skills)│
      │  • Enforces 5 Porting Guardrails   │  │   • Emil Kowalski & GSAP Suites    │  │   • 5 Specialized Architecture Co. │
      └────────────────────────────────────┘  │   • Three.js 3D & Playwright CLI   │  │   • Postgres (Neon) & OWASP Sec.   │

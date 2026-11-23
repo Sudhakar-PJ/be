@@ -3,8 +3,7 @@ name: system-design
 description: This skill should be used when the user asks to "design a system", "design <a product>" (e.g. "design WhatsApp", "design a URL shortener", "design a news feed"), "high-level architecture for…", "how would you architect…", "system design interview", or wants to scope, diagram, and justify a backend/distributed-system design. It runs a reasoning loop — clarify, estimate, design, weigh trade-offs, stress-test, iterate — and routes to focused building-block skills. Use it whenever a request is an open-ended design problem, even if the user doesn't say "system design".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # System Design (orchestrator)
 
 Drive an open-ended design problem from a vague prompt to a justified,
@@ -52,7 +51,7 @@ trade-offs** — with estimation and failure-testing made explicit. See
 
 ## Routing to building blocks
 
-This plugin is a wiki of composable parts. As each concern comes up in the loop,
+This skill set is a wiki of composable parts. As each concern comes up in the loop,
 **invoke the focused skill** (via the Skill tool) rather than reconstructing its
 recipe from memory — load it so the options, trade-off table, behavior under
 stress, and cloud-provider variants come from the skill itself. That invocation
@@ -124,8 +123,8 @@ ask the user a clarifying question rather than guessing silently.
 - **Write up the design** with `assets/design-doc-template.md` — it threads the
   reasoning loop, so the trade-offs and failure story are first-class, not
   footnotes.
-- **Diagram** with the in-plugin `architecture-diagram` skill — a self-contained
-  dark-theme HTML+SVG generator that ships in this plugin (no external
+- **Diagram** with the `architecture-diagram` skill — a self-contained
+  dark-theme HTML+SVG generator that ships in this skill set (no external
   dependency). A quick ASCII sketch is fine for early thinking; render properly
   once the design is clear. See `references/diagramming.md` for what to draw at
   each step and how to specify a diagram to that skill.
@@ -152,15 +151,11 @@ answer (first pass or revision) includes, in the reply itself:
 
 A pros/cons list, or trade-offs for only one choice, does not meet the bar.
 
-## Running it as a workflow
+## Running the System Design Loop
 
-Two entry points drive this skill as a repeatable process:
-- **`/design <system>`** — the slash command that runs the full loop on a problem.
-- **`system-design-orchestrator`** — the agent the command dispatches to; it loads
-  this skill, then invokes the building-block skills as each concern arises.
+This skill directly runs the full reasoning loop when asked to design a system, architecture, or distributed component. It orchestrates the process and routes to specialized building-block skills as each concern arises (e.g. `caching`, `resilience-failure`, `data-storage`, `architecture-diagram`).
 
-Both compose the same blocks listed above — invoke a block skill when its concern
-is active rather than reconstructing its recipe from memory.
+Invoke a building-block skill when its concern is active rather than reconstructing its recipe from memory.
 
 ## References
 

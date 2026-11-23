@@ -3,8 +3,7 @@ name: dns
 description: This skill should be used when the user asks about "DNS", "domain resolution", "GeoDNS / geo routing", "latency-based routing", "weighted / failover routing", "Route 53 / Cloud DNS", an "A/CNAME/ALIAS record", "anycast", or "DNS TTL / propagation". It gives the global front door that maps a name to the right IP and steers users to the right region or endpoint. Use it whenever a design must direct traffic across regions/data centers, do health-checked failover at the name layer, or expose a stable hostname even if the user doesn't say "DNS".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # DNS
 
 DNS is the global front door: it turns a name (`api.example.com`) into an address
@@ -159,7 +158,7 @@ provider, the generic recipe is the answer.
 ## Diagram
 To visualize the resolution path (client → recursive resolver → root/TLD/
 authoritative → answer) or a geo/latency-steered multi-region front door, use the
-in-plugin `architecture-diagram` skill. A quick inline sketch:
+`architecture-diagram` skill. A quick inline sketch:
 `client → resolver → authoritative (policy: latency) → region A | region B`.
 
 ## Related building blocks

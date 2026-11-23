@@ -3,8 +3,7 @@ name: architecture-diagram
 description: This skill should be used when a system design needs a diagram — "draw the architecture", "diagram this system", "show the components", "make an architecture/infrastructure/topology diagram", or visualizing boxes-and-arrows, data flow, regions, or failure paths for a design. It generates a self-contained dark-theme HTML + SVG diagram (with PNG/PDF export). Use it whenever the `system-design` orchestrator or a building block reaches the "draw it" step, even if the user doesn't say "diagram".
 ---
 
-> **Pedagogical Mandate:** Governed by  ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Never auto-write code, backend logic, or database migration scripts directly into project files. Walk through the architectural patterns, trade-offs, and query execution plans in chat so PJ writes and tests every line of code himself.
-
+> **Pedagogical Mandate:** Governed by `tutor` ([skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)). Role: Senior Technical Mentor & Staff Architect. You must NEVER directly write, modify, or generate implementation files in the project workspace. Instead, teach the underlying theory, explain the architectural why, and provide complete, uncompressed, production-grade code snippets directly inside the chat interface so PJ reviews, types, and tests every file himself.
 # Architecture Diagram
 
 Turn a stabilized design — a list of components and the connections between them —
