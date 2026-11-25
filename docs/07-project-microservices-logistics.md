@@ -151,3 +151,15 @@ Milestone 6: Distributed Tracing & End-to-End Load Testing
 1. **The Partial Failure & Saga Compensation Test:** Make the Payment Service reject payments due to insufficient funds after stock has already been reserved. Verify that the Saga Orchestrator executes the compensating transaction, stock is returned to Inventory, and the order is marked `CANCELED`.
 2. **The Cascading Failure Circuit Breaker Test:** Intentionally shut down the Shipping Service. Fire 500 requests at the Order Service. Verify that after 10 failures, the circuit breaker opens, returning an immediate fallback response without blocking threads or exhausting connection pools.
 3. **The Kafka Consumer Partition Rebalance Test:** Kill one of 3 consumer instances in a consumer group while actively processing 10,000 events. Verify that Kafka automatically rebalances partitions to the remaining 2 consumers with zero lost messages or duplicate commits.
+
+---
+
+## 8. Review Addendum (2026-11-25)
+
+- **Schema evolution:** Protobuf field-numbering rules, backward/forward compatibility, and a schema registry (Confluent/Apicurio) or Buf breaking-change checks in CI. Lab: deploy a producer with a new field while old consumers keep running.
+- **Event versioning:** a standard envelope (`event_id`, `type`, `version`, `occurred_at`, trace context), upcasting old events, never reusing event type names.
+- **Contract testing** with Pact (consumer-driven contracts) in CI, so services deploy independently without breaking each other.
+- **Service discovery & internal load balancing:** DNS-based vs client-side discovery; gRPC client-side load balancing (long-lived HTTP/2 connections defeat L4 load balancers).
+- **Kafka semantics:** idempotent producer vs transactions vs exactly-once read-process-write, and why end-to-end exactly-once still needs idempotent consumers (your dedup table).
+- **Stretch:** replace the polling outbox relay with Debezium CDC (Postgres logical replication → Kafka) and compare.
+- **Testing:** Testcontainers for Kafka + Postgres integration tests.

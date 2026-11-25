@@ -195,3 +195,24 @@ Milestone 6: Partitioning & High-Scale Optimization
 2. **The Double-Debit Network Glitch:** Fire 20 identical checkout requests with the same `Idempotency-Key` concurrently. Verify that the bank/ledger is debited exactly once and all 20 requests return identical success responses.
 3. **The Ledger Inbalance Attack:** Attempt to insert an unbalanced ledger entry (Debit $50, Credit $40). Verify the transaction is rejected by the domain layer and database constraints before committing.
 4. **The Outbox Crash Test:** Kill the Node.js server immediately after a database commit but before webhook/email dispatch. Restart the server and verify that the Outbox worker automatically picks up the pending event and completes delivery.
+
+---
+
+## 8. Review Addendum (2026-11-25)
+
+### New Milestone 0: Postgres Internals & Isolation Levels (before Milestone 1)
+- MVCC: tuple versions, `xmin/xmax`, why `UPDATE` = insert + dead tuple, vacuum, bloat, HOT updates, WAL.
+- Isolation levels: READ COMMITTED vs REPEATABLE READ vs SERIALIZABLE. Reproduce **lost update**, **write skew** (e.g. two concurrent withdrawals that each check the combined balance), and phantom reads in two `psql` sessions; fix each one; handle `40001` with retries.
+- Lock modes: row locks (`FOR UPDATE`, `FOR NO KEY UPDATE`, `FOR SHARE`), `lock_timeout`, deadlock detection.
+
+### Corrections & Additions
+- **Redlock caveat:** teach Kleppmann's critique ("How to do distributed locking") and **fencing tokens**. A lock that can expire during a GC pause is not mutual exclusion; the downstream resource must reject stale tokens. Lab: pause the lock holder past its TTL and show the double-write; fix it with a fencing token.
+- **Compare three inventory strategies under k6:** `SELECT ... FOR UPDATE`, a single atomic `UPDATE inventory SET reserved_stock = reserved_stock + 1 WHERE reserved_stock < total_stock RETURNING *` (often the best), and the Redis pre-claim. Measure throughput and p99.
+- **Enforce the ledger invariant in the DB,** not only in the domain layer: a `DEFERRABLE INITIALLY DEFERRED` constraint trigger that asserts `SUM(debits) = SUM(credits)` per transaction at commit. Make `ledger_entries` append-only (revoke UPDATE/DELETE; corrections are reversing entries).
+- **Reconciliation:** a nightly job compares your ledger with the payment provider's settlement report and flags mismatches. This is the hard part of real payments work.
+- **Money:** multi-currency accounts (never sum across currencies), rounding rules, and storing FX rates with each transaction.
+- **Replication (Milestone 6 addendum):** add a streaming read replica (docker-compose). Show replication lag and a read-your-writes bug (write to primary → read from replica → stale). Fix it with primary-pinning after writes or LSN-based routing.
+
+### New Milestone 7: Event Sourcing & CQRS
+- Model the account as an event stream (`FundsDeposited`, `FundsReserved`, ...) with optimistic concurrency on the stream version.
+- Build projections (read models) and snapshots, and rebuild a projection from zero. Compare with the double-entry table design.

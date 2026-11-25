@@ -159,3 +159,17 @@ Milestone 6: Resilience, Edge Caching & Load Testing
 1. **The Header Spoofing Vulnerability Test:** Send an external request with `X-User-ID: admin-uuid` and `X-Tenant-ID: victim-tenant`. Verify that the gateway completely strips these incoming headers and only passes downstream values decoded from the verified JWT.
 2. **The Rate Limiter Boundary Burst Test:** Launch a concurrency script firing 500 requests within 100 milliseconds against a rate limit of 100 requests/sec. Prove that the Token Bucket allows the initial burst up to capacity and returns `429 Too Many Requests` with a valid `Retry-After` header for the remainder.
 3. **The Microservice Outage Graceful Degradation Test:** Kill the downstream Recommendation Service. Request the mobile dashboard. Verify that the Gateway returns the user profile and recent orders (HTTP 200) with recommendations gracefully set to an empty array rather than failing the entire page with a 500 error.
+
+---
+
+## 8. Review Addendum (2026-11-25)
+
+- **Clock bug in the token bucket Lua (§5):** `now` comes from `ARGV`, i.e. each gateway instance's own clock. With 3 instances and clock skew, refills become inconsistent. Use `redis.call('TIME')` inside the script. Also prefer `HSET` over the deprecated `HMSET`, and set `EXPIRE` on the reject path too.
+- **Internal trust boundary:** forwarding `X-User-ID` is only safe if services accept traffic *only* from the gateway. Add mTLS between the gateway and services (or signed internal JWTs). Otherwise anything inside the network can impersonate any user.
+- **GraphQL safety:** query depth limits, complexity/cost analysis, persisted queries, and disabling introspection in production.
+- **Resilience at the edge:** retry budgets (cap retries at ~10% of traffic), hedged requests for tail latency, deadline propagation (gRPC deadlines), and load-balancing algorithms (round-robin vs least-connections vs power-of-two-choices).
+
+### New Milestone 0: Networking Fundamentals (before Milestone 1)
+- TCP handshake, keep-alive, head-of-line blocking; the TLS 1.3 handshake and termination; HTTP/1.1 vs HTTP/2 vs HTTP/3 (QUIC).
+- DNS resolution, TTLs, and DNS-based failover; L4 vs L7 load balancers.
+- Lab: capture a request with Wireshark/`tcpdump` and identify the TCP and TLS handshakes and the HTTP/2 frames.

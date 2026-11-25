@@ -148,3 +148,15 @@ Milestone 6: Chaos Engineering & Incident Postmortems
 1. **The SIGTERM In-Flight Request Drain Test:** Fire a slow 5-second request to a pod. Issue a `kubectl delete pod` command. Verify that the pod does not instantly kill the connection, finishes processing the in-flight request successfully, and exits cleanly.
 2. **The Automated Canary Rollback Test:** Deploy a canary version containing an intentional 500 error triggered on 5% of requests. Verify that the monitoring loop detects the error budget burn, halts deployment, purges the canary pod, and leaves the stable version running with zero manual intervention.
 3. **The Database Migration Lock Contention Test:** Execute a continuous 500 QPS read/write load test with k6 while running a schema migration. Verify that the migration uses `CREATE INDEX CONCURRENTLY` and non-locking column additions, resulting in zero query timeouts (`504 Gateway Timeout`) during the rollout.
+
+---
+
+## 8. Review Addendum (2026-11-25)
+
+- **CI basics now start in Project #1** (roadmap item 0.18). This project builds on them: Trivy, ephemeral environments, image promotion, canaries.
+- **Infrastructure as Code:** Terraform for a cloud environment (VPC, subnets, security groups, managed Postgres, least-privilege IAM). Remote state + locking, `plan` output in PRs.
+- **Secrets management:** Vault or cloud KMS / Secrets Manager, External Secrets Operator in K8s, secret rotation without restarts.
+- **GitOps & progressive delivery:** Argo CD for declarative deploys; Argo Rollouts or Flagger to automate the canary analysis described in §5 instead of a hand-written loop.
+- **Disaster recovery:** not just PITR "drills" but a timed **restore test** with RPO/RTO measured; backups that are never restored don't count. Discuss multi-region (active-passive vs active-active) and what breaks (sequences, uniqueness, conflict resolution).
+- **Runbooks & on-call:** one runbook per alert, linked from the alert annotation.
+- **Supply chain:** pin base images by digest, generate an SBOM, sign images (cosign), automate dependency updates (Renovate/Dependabot).

@@ -179,3 +179,15 @@ Milestone 6: High-Scale GPS Simulation & Load Testing
 1. **The Spatial Cross-Border Geofence Test:** Ingest a GPS coordinate located 1 meter outside a delivery boundary polygon. Verify that PostGIS `ST_Contains` returns false and rejects the order with an RFC 9457 out-of-zone error.
 2. **The Simultaneous Order Dispatch Collision:** Trigger 2 orders simultaneously for the exact same location with only 1 available driver in range. Prove using Redis distributed locks that only 1 order locks the driver, while the second order cleanly falls back to expanding its search radius.
 3. **The GPS Noise Spike:** Feed a sequence of GPS points where a driver suddenly teleports 5 kilometers in 1 second (impossible speed anomaly). Verify that the ingestion validation pipeline rejects the anomalous coordinate and maintains route integrity.
+
+---
+
+## 8. Review Addendum (2026-11-25)
+
+- **Driver locking needs fencing.** Same lesson as Project #3: a Redis lock TTL can expire while the dispatcher is paused. Use an atomic Lua compare-and-set on driver state (`AVAILABLE → OFFERED:<order_id>:<token>`) and have the acceptance step verify the token.
+- **A single `drivers:available` GEO key is one hot key** on one Redis node. Shard it by H3 cell (res 5–6) or city and query the k-ring of cells. That leads straight into the sharding milestone.
+
+### New Milestone 7: Sharding & Partitioning
+- Partition trips/history by city/region; compare **range vs hash vs geo** partitioning. Use Postgres declarative partitioning first, then route across 2–3 Postgres instances (hand-rolled router or Citus).
+- **Consistent hashing** with virtual nodes: implement it, add/remove a node, and measure how many keys move vs naive `hash % N`.
+- Hot partitions (a stadium event in one cell), cross-shard queries (scatter-gather), and re-sharding/online migration strategy.

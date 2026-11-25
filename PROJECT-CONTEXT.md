@@ -3,13 +3,13 @@
 > **Purpose:** Central living reference and handoff document. Any developer or AI assistant working in this workspace must read this document first before giving any guidance or suggestions.  
 > **Learner:** PJ Sudhakar  
 > **Status:** Project #1 (Multi-Tenant SaaS API) — Core Infrastructure Complete (57/57 Tests, Full LGTM Stack).  
-> **CURRENT ACTIVE PREREQUISITE:** **Milestone 5.6 (Pre-Sprint Security, Concurrency & RLS Audit Remediation)** detailed below and in Phase 0 of [SAAS-ENTERPRISE-ROADMAP.md](file:///mnt/recovery/be/SAAS-ENTERPRISE-ROADMAP.md). Must be 100% completed before Sprint 1 begins.  
+> **CURRENT ACTIVE PREREQUISITE:** **Milestone 5.6 (Pre-Sprint Security, Concurrency & RLS Audit Remediation)** detailed below and in Phase 0 of [SAAS-ENTERPRISE-ROADMAP.md](SAAS-ENTERPRISE-ROADMAP.md). Must be 100% completed before Sprint 1 begins.  
 > **Last Updated:** 2026-11-23
 
 > [!IMPORTANT]
 > **DOCUMENT HIERARCHY & INGESTION DIRECTIVE FOR AI ASSISTANTS:**
 > 1. `PROJECT-CONTEXT.md` (THIS FILE) is the **Master Operational Anchor**: It defines the 10-Project Series roadmap, the immutable Operating Rules (PJ codes everything himself, zero ORMs, extreme pedagogical depth, deep systems architecture), and historical engineering progress.
-> 2. [SAAS-ENTERPRISE-ROADMAP.md](file:///mnt/recovery/be/SAAS-ENTERPRISE-ROADMAP.md) is the **Active Sprint Execution Engine**: It contains the granular, step-by-step checklist, database schemas, REST endpoints, and architectural requirements.
+> 2. [SAAS-ENTERPRISE-ROADMAP.md](SAAS-ENTERPRISE-ROADMAP.md) is the **Active Sprint Execution Engine**: It contains the granular, step-by-step checklist, database schemas, REST endpoints, and architectural requirements.
 > 3. **Mandatory AI Action:** Whenever a session starts or context is provided, the AI assistant **MUST start with Phase 0 / Milestone 5.6 (Audit Remediation & Hardening)** in `SAAS-ENTERPRISE-ROADMAP.md` before advancing to Sprint 1. Do not skip to Sprint 1 while these 7 vulnerabilities remain open.
 
 ---
@@ -19,7 +19,7 @@
 ### Rule 1: PJ Codes Everything Himself (Applies to Backend & Frontend)
 
 - **The AI must NEVER directly write, modify, or generate project implementation files** (across both `01-saas-api/backend/` and `01-saas-api/frontend/`). Rule 1 is strictly binding across the entire full stack per Option A.
-- **The AI's role is strictly as a senior mentor, tutor, and staff architect (strictly adhering to [skills/tutor/SKILL.md](file:///mnt/recovery/be/skills/tutor/SKILL.md)):**
+- **The AI's role is strictly as a senior mentor, tutor, and staff architect (strictly adhering to [skills/tutor/SKILL.md](skills/tutor/SKILL.md)):**
   1. Teach the underlying theory, CSS/Tailwind mechanics, database structures, and architectural patterns deeply.
   2. Explain the architectural _why_ and evaluate trade-offs before showing any code.
   3. Provide exact terminal commands (e.g. `npm install ...`, `mkdir ...`) and complete, production-grade code snippets directly inside the chat interface.
@@ -342,11 +342,19 @@ MILESTONE 6 EXECUTION ORDER:
    - Close webhook queue in worker graceful shutdown (`closeAllQueues`).
    - Remove leftover debug route `/api/v1/test-error`.
 
+### Milestones 5.7 & 5.8: Second Audit (2026-11-25), also before Sprint 1
+
+A second audit added items **0.8–0.24** to Phase 0 in [SAAS-ENTERPRISE-ROADMAP.md](SAAS-ENTERPRISE-ROADMAP.md). Key points:
+- **Do 0.1 together with the PAT lookup fix:** `authenticate.ts` queries `personal_access_tokens` (FORCE RLS) without tenant context, so PAT auth breaks the moment RLS is enforced.
+- 0.8 Redis outage hangs requests (`maxRetriesPerRequest: null` on the app client) · 0.9 transactional outbox (dual-write loss) · 0.10 atomic signup · 0.11 keyset cursor precision · 0.12 idempotency scoping · 0.13 bounded queries · 0.14 pool timeouts/rollback/param logging · 0.15 tenant-safe composite FKs + FK indexes · 0.16 task event correctness · 0.17 PG error mapping · 0.18 CI + isolated test DB + unit tests · 0.19 server timeouts, `/metrics` exposure, SSRF · 0.20 finish observability (alerts, dashboards, SLOs, worker metrics).
+- 0.21–0.24 (foundational skills): cache-aside, JWT `kid`/JWKS rotation, envelope encryption for secrets, ETag/If-Match.
+- The roadmap now also has a **Scope Recommendation** table (defer sprints 7, 8, 10, 11, 12, 13) and a proposed **OAuth2/OIDC sprint**. The series-level curriculum review is in [docs/00-master-roadmap.md](docs/00-master-roadmap.md); each project doc has a "Review Addendum" section.
+
 ---
 
 ### Subsequent Focus: The 15 Enterprise Sprints (After Milestone 5.6)
 
-Once Milestone 5.6 is complete and verified, follow the 15 enterprise sprints detailed in [SAAS-ENTERPRISE-ROADMAP.md](file:///mnt/recovery/be/SAAS-ENTERPRISE-ROADMAP.md):
+Once Milestone 5.6 is complete and verified, follow the 15 enterprise sprints detailed in [SAAS-ENTERPRISE-ROADMAP.md](SAAS-ENTERPRISE-ROADMAP.md):
 
 - **Phase 1: Identity & Multi-Factor Authentication (2FA)**
   - Sprint 1: Identity Lifecycle, Email Verification, Password Reset & Session/Device Tracking.

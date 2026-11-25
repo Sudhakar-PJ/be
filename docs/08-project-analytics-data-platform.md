@@ -169,3 +169,13 @@ Milestone 6: Analytics API & High-Scale Load Testing
 1. **The Row-Store vs Column-Store Benchmark:** Run an aggregation query calculating average duration grouped by category over 10,000,000 rows in PostgreSQL vs ClickHouse. Prove that ClickHouse executes the query > 50x faster while using 80% less memory.
 2. **The Buffer Saturation & Backpressure Test:** Artificially throttle the ClickHouse database connection while blasting the Node.js ingestion gateway with 30,000 requests/sec. Verify that Node.js streams apply backpressure, slow down the HTTP clients cleanly, and avoid `FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory`.
 3. **The Duplicate Event Replay Test:** Ingest 100,000 events where 10% are duplicate `event_id`s with identical timestamps. Verify that the `ReplacingMergeTree` engine background deduplication eliminates the duplicates and reports the exact unique event count.
+
+---
+
+## 8. Review Addendum (2026-11-25)
+
+- **The funnel SQL in §5 is incorrect.** It ranks events per user and then applies `LAG` over an aggregate ordered by `MIN(occurred_at)`, which doesn't compute ordered step-to-step conversion. Rewrite it with ClickHouse's `windowFunnel(window)(timestamp, cond1, cond2, ...)`, and also write a portable version by hand to understand what the function does.
+- **`ReplacingMergeTree` deduplicates only eventually** (at merge time). Lab 3 must query with `FINAL` (or `argMax` / `GROUP BY`), or run `OPTIMIZE TABLE ... FINAL` before asserting counts. Learn why exact dedup at read time is expensive.
+- **Late & out-of-order events** are named in §1 but have no milestone. Add one: event time vs processing time, watermarks, allowed lateness, and how late events update already-materialized rollups.
+- **Ingestion durability:** an in-memory micro-batch buffer loses up to 500ms of events on crash. Options: accept the loss (analytics), a local disk spool/WAL, or Kafka in front (ClickHouse Kafka engine). Make the trade-off explicit in an ADR.
+- **Multi-tenant OLAP:** per-tenant query limits (`max_execution_time`, `max_memory_usage`, quotas) so one tenant's huge query can't starve the others.

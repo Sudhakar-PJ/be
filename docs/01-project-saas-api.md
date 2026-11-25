@@ -300,3 +300,13 @@ To ensure you have mastered this material, every milestone ends with an adversar
 2. **The Refresh Token Replay Attack:** Simulate an attacker intercepting an already-used refresh token. Verify that the server detects reuse, revokes all tokens in the family, and writes a security alert to the audit log.
 3. **The Concurrent Double-Submit Attack:** Use `k6` to fire 50 identical `POST /api/v1/tasks` requests with the same `Idempotency-Key` within 10 milliseconds. Prove that exactly 1 task is created in PostgreSQL and all 50 requests receive identical responses.
 4. **Database Connection Starvation:** Simulate 2,000 concurrent requests with a Postgres pool size capped at 10. Verify that requests queue cleanly without leaking connections or crashing the Node.js event loop.
+
+---
+
+## 9. Review Addendum (2026-11-25)
+
+- The second code audit's findings are tracked as **Milestones 5.7 and 5.8 (items 0.8–0.24)** in [SAAS-ENTERPRISE-ROADMAP.md](../SAAS-ENTERPRISE-ROADMAP.md). Highest priority: the PAT lookup breaks once RLS is enforced (coupled with 0.1), Redis outages hang requests (0.8), dual-write event loss → transactional outbox (0.9), non-atomic signup (0.10).
+- **Milestone 6 is not fully done against this spec:** "Grafana dashboard & alert configuration" is missing (no alert rules, Alertmanager, dashboards, or SLOs; the worker is not scraped). Tracked as 0.20.
+- **CI** (GitHub Actions + isolated test DB + migrations) moves into Project #1 (0.18) instead of waiting for Project #10.
+- **Caching** gets introduced here (0.21: cache-aside on tenant membership and PAT lookups).
+- **Sprint scope:** see "Scope Recommendation" in the roadmap. Defer sprints duplicated by later projects; add the OAuth2/OIDC sprint.

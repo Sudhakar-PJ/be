@@ -42,7 +42,7 @@
 
 > [!CAUTION]
 > **MANDATORY PREREQUISITE BEFORE STARTING SPRINT 1:**  
-> A senior code review audit of the core infrastructure revealed 7 critical security, concurrency, and RLS flaws. Sprint 1 MUST NOT begin until this milestone is 100% complete and verified with adversarial integration tests. Any AI assistant starting a session must begin with this checklist.
+> A senior code review audit of the core infrastructure revealed 7 critical security, concurrency, and RLS flaws (0.1–0.7). A second audit (2026-11-25) added Milestones 5.7 (0.8–0.20) and 5.8 (0.21–0.24). Sprint 1 MUST NOT begin until 0.1–0.20 are complete and verified with adversarial integration tests. Any AI assistant starting a session must begin with this checklist.
 
 ### Milestone 5.6 Checklist: Security, Concurrency & RLS Hardening
 
@@ -73,6 +73,95 @@
   - Validate `assigneeId` belongs to `tenant_members` before assigning tasks.
   - Close webhook queue in worker graceful shutdown (`closeAllQueues`).
   - Remove leftover debug route `/api/v1/test-error`.
+
+> [!WARNING]
+> **Coupled with 0.1:** `src/middleware/authenticate.ts` looks up `personal_access_tokens` (FORCE RLS) with **no tenant context**. It only works today because the role bypasses RLS. The moment 0.1 lands, every PAT login fails. Fix the PAT lookup in the same change (e.g. a `SECURITY DEFINER` function that resolves `token_hash → (pat_id, tenant_id, user_id, scopes)`, or a non-RLS lookup table), and add a test for it.
+
+### Milestone 5.7 Checklist: Second Audit Findings (Review 2026-11-25)
+
+> Found in a second code audit. Also prerequisites for Sprint 1; 0.8–0.10 are the highest priority.
+
+- [ ] **0.8 Redis Failure Must Not Hang Requests:**
+  - `src/config/redis.ts` sets `maxRetriesPerRequest: null` on the **app** client (copied from BullMQ). During a Redis outage, the JWT denylist `EXISTS` check waits forever → every authenticated request hangs.
+  - Keep `null` only on BullMQ connections; give the app client a finite retry count + command timeout. Decide fail-open vs fail-closed for the denylist and rate limiter, and test it (stop Redis mid-test).
+  - Set Redis `maxmemory-policy noeviction` (BullMQ requirement) and enable AOF persistence in `docker-compose.yml` (currently `--save "" --appendonly no` → restart loses queued jobs and the denylist).
+- [ ] **0.9 Transactional Outbox (Dual-Write Fix):**
+  - Today: DB commit in one step, then webhook dispatch / BullMQ enqueue in another; failures are only logged (`webhook-dispatcher.service.ts`). Crash or Redis outage in between = event lost forever.
+  - Add an `outbox_events` table; insert the event **inside the same transaction** as the business write; a relay worker polls with `SELECT ... FOR UPDATE SKIP LOCKED` and enqueues into BullMQ, marking rows processed. Adversarial test: kill the process after commit and before enqueue → the event is still delivered after restart.
+- [ ] **0.10 Atomic Signup:**
+  - `auth.service.ts` inserts the user and the session in separate transactions → a failure leaves an orphan user whose email can never sign up again. Wrap both in one `withTransaction`.
+- [ ] **0.11 Keyset Cursor Precision Bug:**
+  - The cursor encodes `created_at` via `toISOString()` (millisecond precision) but Postgres stores microseconds → rows created in the same millisecond are skipped. Either cursor on the UUIDv7 `id` alone, or encode the full-precision timestamp (`created_at::text`). Test: insert 50 rows in one statement, paginate with limit 7, assert all 50 are seen exactly once.
+- [ ] **0.12 Idempotency Key Scoping:**
+  - `src/middleware/idempotency.ts` scopes keys by tenant only. Scope by `tenant + user + method + route`, store a SHA-256 of the request body, and return `422` if the same key arrives with a different body (Stripe semantics).
+- [ ] **0.13 Bounded Queries Everywhere:**
+  - `webhook.controller.ts` uses `parseInt(limit)` with no upper bound or NaN check (`?limit=abc` → 500, `?limit=1000000` → everything). The project, PAT, and webhook list repositories have no `LIMIT` at all. The audit log uses OFFSET.
+  - Validate every `limit` with Zod (`.int().min(1).max(100).default(20)`) and add keyset pagination to every list endpoint.
+- [ ] **0.14 Database Driver Hardening (`src/config/database.ts`):**
+  - Set `statement_timeout`, `idle_in_transaction_session_timeout`, and `query_timeout` on the pool.
+  - If `ROLLBACK` throws, the original error is hidden and a broken client goes back to the pool. Preserve the original error and call `client.release(err)` so the pool discards the connection.
+  - Failed queries log raw `params` (password hashes, token hashes, webhook secrets). Stop logging params, or redact them.
+- [ ] **0.15 Tenant-Safe Foreign Keys & FK Indexes:**
+  - FKs reference `(id)`, not `(tenant_id, id)` → the DB can't stop a task, comment, or task_label from pointing at another tenant's row. Add `UNIQUE (tenant_id, id)` on parent tables and composite FKs `(tenant_id, project_id) REFERENCES projects(tenant_id, id)`.
+  - Index the unindexed FK columns (`tasks.assignee_id`, `tasks.created_by`, `projects.created_by`, `comments.author_id`, `audit_logs.actor_id`, `webhook_subscriptions.created_by`). Otherwise user deletes and `ON DELETE SET NULL` cascades seq-scan.
+- [ ] **0.16 Task Update Event Correctness:**
+  - The assignment notification fires on every PATCH containing `assigneeId`, even when unchanged, and uses `record.created_by` as the actor instead of the requesting user. The `task.updated` webhook has no `actorId`. Fire only on actual change, with the real actor.
+- [ ] **0.17 Unhandled Postgres Error Codes:**
+  - Map `22P02` (invalid text representation), `23503` (FK violation), `23514` (check violation), and `40001`/`40P01` (serialization/deadlock) to proper RFC 9457 responses instead of 500.
+- [ ] **0.18 CI Pipeline & Isolated Test Database:**
+  - Add `.github/workflows/ci.yml`: install → typecheck → lint → spin up Postgres + Redis service containers → run migrations → run tests → build Docker image.
+  - Tests currently share the dev `DATABASE_URL` and use hard-coded slugs (`'task-corp'`) against unique indexes; signup users are never cleaned up. Use a dedicated test DB (or a per-run schema) with deterministic setup/teardown.
+  - Add a `vitest.config.ts`, install `@vitest/coverage-v8`, and start writing **unit tests** for pure logic (`pagination.ts`, `pat.ts` scope algebra, `webhook-signature.ts`, the audit hash chain).
+  - Add a migration step to deploy (a separate `migrate` job/container, not the app CMD).
+- [ ] **0.19 Server Timeouts & Edge Hygiene:**
+  - Set `server.headersTimeout`, `server.requestTimeout`, `server.keepAliveTimeout` in `src/index.ts` (slowloris defense; keep `keepAliveTimeout` above the load balancer's idle timeout).
+  - Move `/metrics` off the public API (separate port or auth).
+  - The webhook SSRF guard is skipped outside production, and the DNS check is separate from `fetch` (a DNS-rebinding window). Run the guard in every environment and pin the resolved IP via a custom `undici` dispatcher `lookup`.
+- [ ] **0.20 Finish Milestone 6 Observability (spec'd but not built):**
+  - The worker has no telemetry import and no metrics endpoint, and `prometheus.yml` scrapes only `app` → queue/email metrics are never collected. Instrument and scrape the worker.
+  - Add Prometheus `rule_files` + Alertmanager, provisioned Grafana dashboards (RED + pool + queue depth), and ship logs to Loki (pino transport or promtail/alloy).
+  - Define 2–3 SLOs (availability, p99 latency) with multi-window burn-rate alerts.
+
+### Milestone 5.8: Foundational Skills Not Yet Practiced (do before or alongside Sprint 1)
+
+- [ ] **0.21 Read-Through Caching (cache-aside):** Cache tenant membership (`requireTenant`) and the PAT lookup in Redis with TTL + jitter. Invalidate on membership change, role change, and PAT revoke. Learn: stampede protection (single-flight / lock), negative caching, and the stale-read window. Measure DB QPS before/after with k6.
+- [ ] **0.22 JWT Key Rotation:** Add `kid`, `iss`, and `aud` claims; support 2 active public keys; expose `/.well-known/jwks.json`. Rotate a key in a test without logging users out.
+- [ ] **0.23 Secrets at Rest:** Webhook signing secrets are stored in plaintext (migration 004). Encrypt with AES-256-GCM using envelope encryption (data key per record, wrapped by a master key from env/KMS). This same utility is reused in Sprint 2 for TOTP secrets.
+- [ ] **0.24 Conditional Requests (nice-to-have):** Map the task `version` column to `ETag` / `If-Match` (`412 Precondition Failed`) so OCC is expressed in standard HTTP.
+
+---
+
+## Scope Recommendation for the 15 Sprints (Review 2026-11-25)
+
+> The 15 sprints add up to a full Jira clone. Several sprints are mostly CRUD with little new to learn, or duplicate later projects. Focus Project #1 on sprints that teach new concepts, and defer the rest so Project #1 doesn't consume the time budget of Projects #2–#5.
+
+| Sprint | Recommendation | Reason |
+|---|---|---|
+| 1 Identity lifecycle | **Keep** | Token lifecycles, timing-safe flows, session revocation |
+| 2 MFA | **Keep (TOTP + backup codes)**, defer SMS/WhatsApp | TOTP/HOTP crypto is the lesson; SMS is provider glue |
+| 3 Workspaces & invites | **Keep** | Invariants (last-owner), atomic acceptance, token design |
+| 4 Two-tier authz | **Keep** | RLS policies driven by membership, policy performance |
+| 5 Epics/subtasks | Keep, slim | Recursive CTEs for hierarchy rollups |
+| 6 DAG + custom fields | **Keep** | Cycle detection via recursive CTE, JSONB + GIN, dynamic validation |
+| 7 Sprints & burndown | Defer | Mostly CRUD + GROUP BY |
+| 8 Worklogs | Defer | One atomic increment |
+| 9 Activity & mentions | **Keep** | Field-diff capture, fan-out of notifications |
+| 10 S3 attachments | Defer → covered in Project #4 | Presigned URLs taught there in depth |
+| 11 Notification center | Defer | CRUD; the fan-out lesson lives in Sprint 9 |
+| 12 SSE realtime | Defer → covered in Project #2 | Redis pub/sub + persistent connections taught there |
+| 13 Stripe billing | Defer → covered in Project #3 | Inbound webhooks, payment state machines taught there |
+| 14 Export & GDPR | **Keep** | Erasure vs immutable hash-chained audit log, a real conflict between requirements |
+| 15 Public API & OpenAPI | **Keep** | Contract-first APIs, tiered limits |
+
+### Proposed New Sprint: OAuth 2.0 / OpenID Connect & SSO (slot after Sprint 2)
+
+*Enterprise SaaS customers expect "Sign in with Google/Microsoft" and SSO more than SMS OTP.*
+
+- [ ] **N.1** OIDC Authorization Code flow with PKCE as a **client** (Google / Microsoft): `state` + `nonce` validation, ID token verification via provider JWKS, account linking by verified email.
+- [ ] **N.2** Table `user_identities (user_id, provider, provider_subject, UNIQUE(provider, provider_subject))`.
+- [ ] **N.3** Tenant-level SSO enforcement (`tenants.sso_required`, allowed email domains).
+- [ ] **N.4** Study only (no build): SAML 2.0 vs OIDC, SCIM user provisioning.
+- [ ] **N.5** Adversarial tests: CSRF via missing `state`, ID token replay via `nonce`, account takeover via unverified email linking.
 
 ---
 

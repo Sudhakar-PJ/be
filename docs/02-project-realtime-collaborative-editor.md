@@ -180,3 +180,14 @@ Milestone 6: Resiliency, Backpressure & Load Testing
 1. **The Disconnect Dead Client Test:** Force-kill a client process without sending a WebSocket `close` frame. Verify that the server's heartbeat detector flags the socket as dead within 35 seconds, purges it from the in-memory room registry, and expires its presence from Redis.
 2. **The Multi-Node Relay Test:** Spawn two separate Node.js server instances on different ports connected to the same Redis instance. Connect Client 1 to Server A and Client 2 to Server B. Send an edit from Client 1 and verify Client 2 receives it in < 15ms.
 3. **The Saturated Client Backpressure Test:** Send a high-velocity stream of 50,000 messages to a slow client. Monitor `ws.bufferedAmount`. Verify the server stops buffering and pauses or drops non-critical cursor events before memory overflows.
+
+---
+
+## 8. Review Addendum (2026-11-25)
+
+- **The conflict-resolution core is underspecified.** "JSONB + OCC reject-and-rebase" is not how collaborative editors work; under concurrent typing it rejects most edits. Make a real algorithm the core milestone: implement a sequence CRDT (RGA or YATA-style) yourself for plain text, then study Yjs's internals and compare. Lab: two clients edit the same position offline, reconnect, and converge to identical documents.
+- **Redis Pub/Sub is at-most-once.** Messages published while a gateway is reconnecting are lost. Add per-document **sequence numbers** and a **resume protocol**: the client sends its last seen seq on reconnect, and the server replays the gap from the Redis Stream or Postgres.
+- **Load balancing for WebSockets:** L4 vs L7, sticky sessions, connection draining on deploy, and why a reconnect storm needs jittered backoff on both sides.
+- **ID generation:** design Snowflake-style 64-bit IDs (timestamp | worker | sequence) for chat messages; compare with UUIDv7. Discuss clock skew.
+- **Wide-column storage (stretch):** store chat history in ScyllaDB/Cassandra with partition key `(document_id, day_bucket)` and clustering on message ID. Learn query-first modeling, unbounded partition risk, and tunable consistency (`QUORUM` vs `ONE`).
+- **Clarify the event path:** the spec lists Pub/Sub, Streams, *and* LISTEN/NOTIFY. Write down which one carries which event and why, or drop LISTEN/NOTIFY.

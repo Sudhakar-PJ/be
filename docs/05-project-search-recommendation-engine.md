@@ -180,3 +180,18 @@ Milestone 6: Search Analytics & Load Testing
 1. **The Typo & Stemming Stress Test:** Execute queries with heavy typos (e.g. "sammsung gallaxy phon"). Verify that OpenSearch fuzzy analyzers return the correct Samsung Galaxy products with relevance scores above 0.75.
 2. **The Vector Hallucination & Precision Test:** Search for an exact part serial number (e.g. "SN-98234-A"). Verify that lexical BM25 search correctly prioritizes the exact match, whereas vector search alone would return unrelated semantically similar products.
 3. **The Index Desync Reconciliation Test:** Kill the OpenSearch cluster for 5 minutes while creating 200 new products in PostgreSQL. Bring OpenSearch back online and verify that the CDC outbox worker flushes all queued items with zero dropped records.
+
+---
+
+## 8. Review Addendum (2026-11-25)
+
+- **The "recommendation" half is missing.** All milestones are search. Add a recommendation milestone: item-to-item collaborative filtering ("customers also bought") from co-occurrence counts, plus embedding-based "similar items" via pgvector. Discuss cold start and precomputing recommendations offline vs computing them online.
+- **Relevance must be measurable.** Build a small judged query set (50 queries with graded relevance) and compute **NDCG@10, precision@k, and MRR** for BM25 only, vector only, and RRF. Every tuning change (analyzers, `ef_search`, RRF k) must move these numbers. Without this, "relevance" is guesswork.
+- **CDC ordering note:** Kafka/Debezium only arrives in Project #7. Here, sync via a polling **transactional outbox → OpenSearch** relay. Handle out-of-order updates with external versioning (`version_type=external`, using a sequence or `updated_at`).
+
+### New Milestone 7: Caching Deep-Dive
+- Search result cache (normalized query + filters → result IDs) and an embedding cache (query text → vector).
+- Implement and compare cache-aside, read-through, and write-through; measure hit ratio and p99 with k6.
+- **Cache stampede:** reproduce it (a popular key expires under 1,000 QPS), then fix with single-flight/request coalescing, probabilistic early expiration (XFetch), and TTL jitter.
+- **Invalidation:** event-driven invalidation from the outbox stream vs TTL-only; the stale-read window; negative caching for zero-result queries.
+- **Hot keys:** detect them and mitigate with a local in-process LRU (L1) in front of Redis (L2).

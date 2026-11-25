@@ -193,3 +193,14 @@ Milestone 6: Performance, Cleanup & High-Volume Analytics
 1. **The Worker Death Simulation:** Force-kill (`kill -9`) the FFmpeg worker process halfway through transcoding a 1 GB video. Verify that the job queue detects the heartbeat timeout, reassigns the job to another worker, and cleans up orphaned partial `.ts` files.
 2. **The Event Loop Latency Test:** Ingest 50 concurrent video upload intents while actively transcoding 5 videos. Monitor Node.js event loop lag. Prove that the API gateway response time remains under 20ms because transcoding runs out-of-process.
 3. **The Corrupted Media Poison Pill:** Upload an invalid MP4 file (random bytes disguised with an `.mp4` extension). Verify that FFmpeg fails gracefully, records the error in the DLQ, updates the video status to `FAILED`, and does not crash the worker.
+
+---
+
+## 8. Review Addendum (2026-11-25)
+
+- **ADR-0006 rationale is a strawman.** Postgres JSONB handles polymorphic metadata without "8 join tables". Keep MongoDB if the goal is to learn a document DB, but then actually learn it: write concern (`w: majority`), read concern, replica sets, schema validation, and when *not* to embed.
+- **Access control for playback:** signed CDN URLs / signed cookies with short expiry, so private videos can't be hot-linked. Also tokenized HLS key delivery (AES-128 HLS) as a DRM-lite exercise.
+- **Long-running jobs in BullMQ:** lock duration vs job duration, stalled-job detection, progress heartbeats, and making the transcode idempotent (deterministic output keys, so a retried job overwrites instead of duplicating).
+- **Upload alternatives:** compare tus with S3 native **multipart upload** (presigned part URLs + `CompleteMultipartUpload`), which is what most production systems use. Add lifecycle rules to abort incomplete multipart uploads.
+- **Distributed scheduler:** the cleanup/retention jobs are a chance to build a cron that runs exactly once across N worker replicas (leader lease or `SKIP LOCKED` on a jobs table), and to discuss missed runs and catch-up.
+- **Backpressure on the worker pool:** admission control when queue depth exceeds what workers can clear (reject or defer uploads, autoscale signal).
